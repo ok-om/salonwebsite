@@ -1,0 +1,36 @@
+[     111ms] [LOG] %c Console Ninja extension is connected to Vite, background: rgb(30,30,30); color: rgb(255,213,92) see https://tinyurl.com/2vt8jxzw for more info. @ :0
+[     208ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=a621b25f:21550
+[     720ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:5173/api/cms/config:0
+[     725ms] [WARNING] Could not fetch remote CMS config, using defaults: Request failed with status code 500 @ http://localhost:5173/src/context/SiteConfigContext.jsx:51
+[     730ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:5173/api/cms/config:0
+[     731ms] [WARNING] Could not fetch remote CMS config, using defaults: Request failed with status code 500 @ http://localhost:5173/src/context/SiteConfigContext.jsx:51
+[  933460ms] [LOG] [vite] server connection lost. Polling for restart... @ http://localhost:5173/@vite/client:559
+[  933864ms] [LOG] %c Console Ninja extension is connected to Vite, background: rgb(30,30,30); color: rgb(255,213,92) see https://tinyurl.com/2vt8jxzw for more info. @ :0
+[  934643ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=a621b25f:21550
+[  935363ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:5173/api/cms/config:0
+[  935368ms] [WARNING] Could not fetch remote CMS config, using defaults: Request failed with status code 500 @ http://localhost:5173/src/context/SiteConfigContext.jsx:51
+[  935368ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:5173/api/cms/config:0
+[  935370ms] [WARNING] Could not fetch remote CMS config, using defaults: Request failed with status code 500 @ http://localhost:5173/src/context/SiteConfigContext.jsx:51
+[ 1163320ms] [LOG] [vite] server connection lost. Polling for restart... @ http://localhost:5173/@vite/client:559
+[ 1163328ms] [ERROR] Failed to load resource: net::ERR_NETWORK_IO_SUSPENDED @ http://localhost:5173/:0
+[ 2194039ms] [LOG] %c Console Ninja extension is connected to Vite, background: rgb(30,30,30); color: rgb(255,213,92) see https://tinyurl.com/2vt8jxzw for more info. @ :0
+[ 2194472ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=a621b25f:21550
+[ 2195684ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:5173/api/cms/config:0
+[ 2195693ms] [WARNING] Could not fetch remote CMS config, using defaults: Request failed with status code 500 @ http://localhost:5173/src/context/SiteConfigContext.jsx:51
+[ 2195693ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:5173/api/cms/config:0
+[ 2195696ms] [WARNING] Could not fetch remote CMS config, using defaults: Request failed with status code 500 @ http://localhost:5173/src/context/SiteConfigContext.jsx:51
+[ 2198238ms] [LOG] [vite] server connection lost. Polling for restart... @ http://localhost:5173/@vite/client:559
+[ 3154792ms] [ERROR] Failed to load resource: net::ERR_NETWORK_IO_SUSPENDED @ http://localhost:5173/:0
+[ 3157176ms] [LOG] %c Console Ninja extension is connected to Vite, background: rgb(30,30,30); color: rgb(255,213,92) see https://tinyurl.com/2vt8jxzw for more info. @ :0
+[ 3157838ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=a621b25f:21550
+[ 3159898ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:5173/api/cms/config:0
+[ 3159904ms] [WARNING] Could not fetch remote CMS config, using defaults: Request failed with status code 500 @ http://localhost:5173/src/context/SiteConfigContext.jsx:51
+[ 3159905ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:5173/api/cms/config:0
+[ 3159908ms] [WARNING] Could not fetch remote CMS config, using defaults: Request failed with status code 500 @ http://localhost:5173/src/context/SiteConfigContext.jsx:51
+[ 3166178ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_RESET @ http://localhost:5173/src/components/StampCard.jsx?t=1788882465760:0
+[ 3166180ms] [ERROR] [hmr] Failed to reload /src/components/StampCard.jsx. This could be due to syntax errors or importing non-existent modules. (see errors above) @ :0
+[ 3166181ms] [LOG] [vite] server connection lost. Polling for restart... @ http://localhost:5173/@vite/client:559
+[ 3166183ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_RESET @ http://localhost:5173/src/context/AuthContext.jsx?t=1788882465668:0
+[ 3166183ms] [ERROR] [hmr] Failed to reload /src/context/AuthContext.jsx. This could be due to syntax errors or importing non-existent modules. (see errors above) @ :0
+[ 3166183ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_RESET @ http://localhost:5173/src/components/Admin/AdminDashboard.jsx?t=1788882465698:0
+[ 3166184ms] [ERROR] [hmr] Failed to reload /src/components/Admin/AdminDashboard.jsx. This could be due to syntax errors or importing non-existent modules. (see errors above) @ :0

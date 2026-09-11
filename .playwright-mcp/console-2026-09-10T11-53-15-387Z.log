@@ -1,0 +1,178 @@
+[      87ms] [LOG] %c Console Ninja extension is connected to Vite, background: rgb(30,30,30); color: rgb(255,213,92) see https://tinyurl.com/2vt8jxzw for more info. @ :0
+[     227ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=17e164b4:21550
+[     908ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:5173/api/cms/config:0
+[     912ms] [WARNING] Could not fetch remote CMS config, using defaults: Request failed with status code 500 @ http://localhost:5173/src/context/SiteConfigContext.jsx:51
+[     912ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:5173/api/cms/config:0
+[     913ms] [WARNING] Could not fetch remote CMS config, using defaults: Request failed with status code 500 @ http://localhost:5173/src/context/SiteConfigContext.jsx:51
+[  326745ms] ReferenceError: loadedModel is not defined
+    at animate (http://localhost:5173/src/components/Three/Hero3DCanvas.jsx?t=1789041521908:173:7)
+    at http://localhost:5173/src/components/Three/Hero3DCanvas.jsx?t=1789041521908:183:5
+    at commitHookEffectListMount (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=17e164b4:16915:34)
+    at commitPassiveMountOnFiber (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=17e164b4:18156:19)
+    at commitPassiveMountEffects_complete (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=17e164b4:18129:17)
+    at commitPassiveMountEffects_begin (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=17e164b4:18119:15)
+    at commitPassiveMountEffects (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=17e164b4:18109:11)
+    at flushPassiveEffectsImpl (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=17e164b4:19490:11)
+    at flushPassiveEffects (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=17e164b4:19447:22)
+    at commitRootImpl (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=17e164b4:19416:13)
+    at commitRoot (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=17e164b4:19277:13)
+    at performSyncWorkOnRoot (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=17e164b4:18895:11)
+    at flushSyncCallbacks (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=17e164b4:9119:30)
+    at flushSync (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=17e164b4:18959:15)
+    at Object.scheduleRefresh (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=17e164b4:20004:13)
+    at http://localhost:5173/@react-refresh:228:17
+    at Set.forEach (<anonymous>)
+    at performReactRefresh (http://localhost:5173/@react-refresh:217:26)
+    at http://localhost:5173/@react-refresh:608:3
+[  326755ms] [ERROR] The above error occurred in the <Hero3DCanvas> component:
+
+    at Hero3DCanvas (http://localhost:5173/src/components/Three/Hero3DCanvas.jsx?t=1789041521908:26:20)
+    at div
+    at div
+    at div
+    at section
+    at HeroVideo (http://localhost:5173/src/components/HeroVideo.jsx?t=1789040590062:25:29)
+    at div
+    at MainContent (http://localhost:5173/src/App.jsx?t=1789040590062:34:46)
+    at SmoothScrollProvider (http://localhost:5173/src/context/SmoothScrollContext.jsx:37:40)
+    at SiteConfigProvider (http://localhost:5173/src/context/SiteConfigContext.jsx:21:38)
+    at AuthProvider (http://localhost:5173/src/context/AuthContext.jsx:21:32)
+    at App
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries. @ :0
+[  326767ms] ReferenceError: loadedModel is not defined
+    at animate (http://localhost:5173/src/components/Three/Hero3DCanvas.jsx?t=1789041521908:173:7)
+[  326792ms] ReferenceError: loadedModel is not defined
+    at animate (http://localhost:5173/src/components/Three/Hero3DCanvas.jsx?t=1789041521908:173:7)
+    at http://localhost:5173/src/components/Three/Hero3DCanvas.jsx?t=1789041521908:183:5
+    at commitHookEffectListMount (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=17e164b4:16915:34)
+    at commitPassiveMountOnFiber (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=17e164b4:18156:19)
+    at commitPassiveMountEffects_complete (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=17e164b4:18129:17)
+    at commitPassiveMountEffects_begin (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=17e164b4:18119:15)
+    at commitPassiveMountEffects (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=17e164b4:18109:11)
+    at flushPassiveEffectsImpl (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=17e164b4:19490:11)
+    at flushPassiveEffects (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=17e164b4:19447:22)
+    at commitRootImpl (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=17e164b4:19416:13)
+    at commitRoot (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=17e164b4:19277:13)
+    at performSyncWorkOnRoot (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=17e164b4:18895:11)
+    at flushSyncCallbacks (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=17e164b4:9119:30)
+    at flushSync (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=17e164b4:18959:15)
+    at Object.scheduleRefresh (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=17e164b4:20004:13)
+    at http://localhost:5173/@react-refresh:228:17
+    at Set.forEach (<anonymous>)
+    at performReactRefresh (http://localhost:5173/@react-refresh:217:26)
+    at http://localhost:5173/@react-refresh:608:3
+[  403165ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:5173/api/cms/config:0
+[  403169ms] [WARNING] Could not fetch remote CMS config, using defaults: Request failed with status code 500 @ http://localhost:5173/src/context/SiteConfigContext.jsx:51
+[  403173ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:5173/api/cms/config:0
+[  403174ms] [WARNING] Could not fetch remote CMS config, using defaults: Request failed with status code 500 @ http://localhost:5173/src/context/SiteConfigContext.jsx:51
+[  404980ms] [LOG] [vite] server connection lost. Polling for restart... @ http://localhost:5173/@vite/client:559
+[  405649ms] [LOG] %c Console Ninja extension is connected to Vite, background: rgb(30,30,30); color: rgb(255,213,92) see https://tinyurl.com/2vt8jxzw for more info. @ :0
+[  405802ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=17e164b4:21550
+[  406331ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:5173/api/cms/config:0
+[  406338ms] [WARNING] Could not fetch remote CMS config, using defaults: Request failed with status code 500 @ http://localhost:5173/src/context/SiteConfigContext.jsx:51
+[  406353ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:5173/api/cms/config:0
+[  406356ms] [WARNING] Could not fetch remote CMS config, using defaults: Request failed with status code 500 @ http://localhost:5173/src/context/SiteConfigContext.jsx:51
+[  588725ms] [WARNING] GSAP target .section-header-reveal not found. https://gsap.com @ http://localhost:5173/node_modules/.vite/deps/gsap.js?v=17e164b4:88
+[  588726ms] [WARNING] GSAP target  not found. https://gsap.com @ http://localhost:5173/node_modules/.vite/deps/gsap.js?v=17e164b4:88
+[  588727ms] [WARNING] GSAP target  not found. https://gsap.com @ http://localhost:5173/node_modules/.vite/deps/gsap.js?v=17e164b4:88
+[  588729ms] [WARNING] GSAP target  not found. https://gsap.com @ http://localhost:5173/node_modules/.vite/deps/gsap.js?v=17e164b4:88
+[  588745ms] [WARNING] GSAP target  not found. https://gsap.com @ http://localhost:5173/node_modules/.vite/deps/gsap.js?v=17e164b4:88
+[  695676ms] NotFoundError: Failed to execute 'removeChild' on 'Node': The node to be removed is not a child of this node.
+    at removeChild (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=17e164b4:8456:26)
+    at commitDeletionEffectsOnFiber (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=17e164b4:17510:21)
+    at commitDeletionEffects (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=17e164b4:17477:13)
+    at recursivelyTraverseMutationEffects (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=17e164b4:17674:17)
+    at commitMutationEffectsOnFiber (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=17e164b4:17737:15)
+    at recursivelyTraverseMutationEffects (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=17e164b4:17685:15)
+    at commitMutationEffectsOnFiber (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=17e164b4:17737:15)
+    at recursivelyTraverseMutationEffects (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=17e164b4:17685:15)
+    at commitMutationEffectsOnFiber (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=17e164b4:17699:15)
+    at recursivelyTraverseMutationEffects (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=17e164b4:17685:15)
+    at commitMutationEffectsOnFiber (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=17e164b4:17737:15)
+    at recursivelyTraverseMutationEffects (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=17e164b4:17685:15)
+    at commitMutationEffectsOnFiber (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=17e164b4:17699:15)
+    at recursivelyTraverseMutationEffects (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=17e164b4:17685:15)
+    at commitMutationEffectsOnFiber (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=17e164b4:17896:15)
+    at recursivelyTraverseMutationEffects (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=17e164b4:17685:15)
+    at commitMutationEffectsOnFiber (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=17e164b4:17699:15)
+    at recursivelyTraverseMutationEffects (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=17e164b4:17685:15)
+    at commitMutationEffectsOnFiber (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=17e164b4:17896:15)
+    at recursivelyTraverseMutationEffects (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=17e164b4:17685:15)
+[  695707ms] [WARNING] GSAP target  not found. https://gsap.com @ http://localhost:5173/node_modules/.vite/deps/gsap.js?v=17e164b4:88
+[  695708ms] [WARNING] GSAP target  not found. https://gsap.com @ http://localhost:5173/node_modules/.vite/deps/gsap.js?v=17e164b4:88
+[  695720ms] [WARNING] GSAP target  not found. https://gsap.com @ http://localhost:5173/node_modules/.vite/deps/gsap.js?v=17e164b4:88
+[  695725ms] [WARNING] GSAP target .salon-bg-slide not found. https://gsap.com @ http://localhost:5173/node_modules/.vite/deps/gsap.js?v=17e164b4:88
+[  695725ms] [WARNING] GSAP target  not found. https://gsap.com @ http://localhost:5173/node_modules/.vite/deps/gsap.js?v=17e164b4:88
+[  695725ms] [WARNING] GSAP target  not found. https://gsap.com @ http://localhost:5173/node_modules/.vite/deps/gsap.js?v=17e164b4:88
+[  695727ms] [WARNING] GSAP target  not found. https://gsap.com @ http://localhost:5173/node_modules/.vite/deps/gsap.js?v=17e164b4:88
+[  695736ms] [WARNING] GSAP target .section-header-reveal not found. https://gsap.com @ http://localhost:5173/node_modules/.vite/deps/gsap.js?v=17e164b4:88
+[  695737ms] [WARNING] GSAP target  not found. https://gsap.com @ http://localhost:5173/node_modules/.vite/deps/gsap.js?v=17e164b4:88
+[  695737ms] [WARNING] GSAP target  not found. https://gsap.com @ http://localhost:5173/node_modules/.vite/deps/gsap.js?v=17e164b4:88
+[  695737ms] [WARNING] GSAP target  not found. https://gsap.com @ http://localhost:5173/node_modules/.vite/deps/gsap.js?v=17e164b4:88
+[  695765ms] [ERROR] The above error occurred in the <div> component:
+
+    at div
+    at div
+    at section
+    at HairCutScrollShowcase (http://localhost:5173/src/components/HairCutScrollShowcase.jsx?t=1789041890533:235:41)
+    at div
+    at MainContent (http://localhost:5173/src/App.jsx:34:46)
+    at SmoothScrollProvider (http://localhost:5173/src/context/SmoothScrollContext.jsx:37:40)
+    at SiteConfigProvider (http://localhost:5173/src/context/SiteConfigContext.jsx:21:38)
+    at AuthProvider (http://localhost:5173/src/context/AuthContext.jsx:21:32)
+    at App
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries. @ :0
+[  695768ms] [WARNING] Invalid scope @ http://localhost:5173/node_modules/.vite/deps/gsap.js?v=17e164b4:88
+[  695768ms] [WARNING] Invalid scope @ http://localhost:5173/node_modules/.vite/deps/gsap.js?v=17e164b4:88
+[  695769ms] [WARNING] GSAP target  not found. https://gsap.com @ http://localhost:5173/node_modules/.vite/deps/gsap.js?v=17e164b4:88
+[  695769ms] [WARNING] Invalid scope @ http://localhost:5173/node_modules/.vite/deps/gsap.js?v=17e164b4:88
+[  695769ms] [WARNING] Invalid scope @ http://localhost:5173/node_modules/.vite/deps/gsap.js?v=17e164b4:88
+[  695769ms] [WARNING] Invalid scope @ http://localhost:5173/node_modules/.vite/deps/gsap.js?v=17e164b4:88
+[  695769ms] [WARNING] Invalid scope @ http://localhost:5173/node_modules/.vite/deps/gsap.js?v=17e164b4:88
+[  695802ms] [WARNING] Invalid scope @ http://localhost:5173/node_modules/.vite/deps/gsap.js?v=17e164b4:88
+[  695803ms] [WARNING] Invalid scope @ http://localhost:5173/node_modules/.vite/deps/gsap.js?v=17e164b4:88
+[  695803ms] [WARNING] GSAP target  not found. https://gsap.com @ http://localhost:5173/node_modules/.vite/deps/gsap.js?v=17e164b4:88
+[  695803ms] [WARNING] Invalid scope @ http://localhost:5173/node_modules/.vite/deps/gsap.js?v=17e164b4:88
+[  695803ms] [WARNING] Invalid scope @ http://localhost:5173/node_modules/.vite/deps/gsap.js?v=17e164b4:88
+[  695805ms] [WARNING] Invalid scope @ http://localhost:5173/node_modules/.vite/deps/gsap.js?v=17e164b4:88
+[  695805ms] [WARNING] Invalid scope @ http://localhost:5173/node_modules/.vite/deps/gsap.js?v=17e164b4:88
+[  695813ms] [WARNING] Invalid scope @ http://localhost:5173/node_modules/.vite/deps/gsap.js?v=17e164b4:88
+[  695813ms] [WARNING] Invalid scope @ http://localhost:5173/node_modules/.vite/deps/gsap.js?v=17e164b4:88
+[  695813ms] [WARNING] Invalid scope @ http://localhost:5173/node_modules/.vite/deps/gsap.js?v=17e164b4:88
+[  695813ms] [WARNING] GSAP target .animated-side-figure,.mobile-figure-dock not found. https://gsap.com @ http://localhost:5173/node_modules/.vite/deps/gsap.js?v=17e164b4:88
+[  695814ms] [WARNING] Invalid scope @ http://localhost:5173/node_modules/.vite/deps/gsap.js?v=17e164b4:88
+[  695814ms] [WARNING] Invalid scope @ http://localhost:5173/node_modules/.vite/deps/gsap.js?v=17e164b4:88
+[  695814ms] [WARNING] Invalid scope @ http://localhost:5173/node_modules/.vite/deps/gsap.js?v=17e164b4:88
+[  695814ms] [WARNING] GSAP target .animated-side-figure,.mobile-figure-dock not found. https://gsap.com @ http://localhost:5173/node_modules/.vite/deps/gsap.js?v=17e164b4:88
+[  695822ms] [WARNING] GSAP target  not found. https://gsap.com @ http://localhost:5173/node_modules/.vite/deps/gsap.js?v=17e164b4:88
+[  695823ms] [WARNING] GSAP target  not found. https://gsap.com @ http://localhost:5173/node_modules/.vite/deps/gsap.js?v=17e164b4:88
+[  695825ms] [WARNING] GSAP target  not found. https://gsap.com @ http://localhost:5173/node_modules/.vite/deps/gsap.js?v=17e164b4:88
+[  695829ms] NotFoundError: Failed to execute 'removeChild' on 'Node': The node to be removed is not a child of this node.
+    at removeChild (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=17e164b4:8456:26)
+    at commitDeletionEffectsOnFiber (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=17e164b4:17510:21)
+    at commitDeletionEffects (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=17e164b4:17477:13)
+    at recursivelyTraverseMutationEffects (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=17e164b4:17674:17)
+    at commitMutationEffectsOnFiber (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=17e164b4:17737:15)
+    at recursivelyTraverseMutationEffects (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=17e164b4:17685:15)
+    at commitMutationEffectsOnFiber (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=17e164b4:17737:15)
+    at recursivelyTraverseMutationEffects (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=17e164b4:17685:15)
+    at commitMutationEffectsOnFiber (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=17e164b4:17699:15)
+    at recursivelyTraverseMutationEffects (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=17e164b4:17685:15)
+    at commitMutationEffectsOnFiber (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=17e164b4:17737:15)
+    at recursivelyTraverseMutationEffects (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=17e164b4:17685:15)
+    at commitMutationEffectsOnFiber (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=17e164b4:17699:15)
+    at recursivelyTraverseMutationEffects (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=17e164b4:17685:15)
+    at commitMutationEffectsOnFiber (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=17e164b4:17896:15)
+    at recursivelyTraverseMutationEffects (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=17e164b4:17685:15)
+    at commitMutationEffectsOnFiber (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=17e164b4:17699:15)
+    at recursivelyTraverseMutationEffects (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=17e164b4:17685:15)
+    at commitMutationEffectsOnFiber (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=17e164b4:17896:15)
+    at recursivelyTraverseMutationEffects (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=17e164b4:17685:15)
+[  751077ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:5173/api/cms/config:0
+[  751079ms] [WARNING] Could not fetch remote CMS config, using defaults: Request failed with status code 500 @ http://localhost:5173/src/context/SiteConfigContext.jsx:51
+[  751085ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:5173/api/cms/config:0
+[  751088ms] [WARNING] Could not fetch remote CMS config, using defaults: Request failed with status code 500 @ http://localhost:5173/src/context/SiteConfigContext.jsx:51

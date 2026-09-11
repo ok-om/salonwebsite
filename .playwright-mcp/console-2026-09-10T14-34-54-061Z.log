@@ -1,0 +1,19 @@
+[     524ms] [LOG] %c Console Ninja extension is connected to Vite, background: rgb(30,30,30); color: rgb(255,213,92) see https://tinyurl.com/2vt8jxzw for more info. @ :0
+[     596ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=8ee06595:21550
+[    1223ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:5173/api/cms/config:0
+[    1227ms] [WARNING] Could not fetch remote CMS config, using defaults: Request failed with status code 500 @ http://localhost:5173/src/context/SiteConfigContext.jsx?t=1789050101867:51
+[    1229ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:5173/api/cms/config:0
+[    1231ms] [WARNING] Could not fetch remote CMS config, using defaults: Request failed with status code 500 @ http://localhost:5173/src/context/SiteConfigContext.jsx?t=1789050101867:51
+[  112400ms] [INFO] Slow network is detected. See https://www.chromestatus.com/feature/5636954674692096 for more details. Fallback font will be used while loading: https://fonts.gstatic.com/s/roboto/v51/KFO7CnqEu92Fr1ME7kSn66aGLdTylUAMa3yUBA.woff2 @ https://maps.gstatic.com/maps-api-v3/embed/js/66/4d/init_embed.js:153
+[ 1459127ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:5173/src/context/AuthContext.jsx?t=1789052352694:0
+[ 1459130ms] [ERROR] [hmr] Failed to reload /src/components/Admin/AdminDashboard.jsx. This could be due to syntax errors or importing non-existent modules. (see errors above) @ :0
+[ 1459132ms] [ERROR] [hmr] Failed to reload /src/context/AuthContext.jsx. This could be due to syntax errors or importing non-existent modules. (see errors above) @ :0
+[ 1459133ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:5173/src/App.jsx?t=1789052352739:0
+[ 1459134ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:5173/src/components/Three/Hero3DCanvas.jsx?t=1789052352736:0
+[ 1459134ms] [ERROR] [hmr] Failed to reload /src/App.jsx. This could be due to syntax errors or importing non-existent modules. (see errors above) @ :0
+[ 1459137ms] [ERROR] [hmr] Failed to reload /src/components/Three/Hero3DCanvas.jsx. This could be due to syntax errors or importing non-existent modules. (see errors above) @ :0
+[ 1459137ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:5173/src/context/SmoothScrollContext.jsx?t=1789052352745:0
+[ 1459139ms] [ERROR] [hmr] Failed to reload /src/context/SmoothScrollContext.jsx. This could be due to syntax errors or importing non-existent modules. (see errors above) @ :0
+[ 1459143ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:5173/src/components/StampCard.jsx?t=1789052352770:0
+[ 1459144ms] [ERROR] [hmr] Failed to reload /src/components/StampCard.jsx. This could be due to syntax errors or importing non-existent modules. (see errors above) @ :0
+[ 1459163ms] [LOG] [vite] server connection lost. Polling for restart... @ http://localhost:5173/@vite/client:559

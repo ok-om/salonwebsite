@@ -1,0 +1,41 @@
+[      68ms] [LOG] %c Console Ninja extension is connected to Vite, background: rgb(30,30,30); color: rgb(255,213,92) see https://tinyurl.com/2vt8jxzw for more info. @ :0
+[     614ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:4173/api/cms/config:0
+[     617ms] [WARNING] Could not fetch remote CMS config, using defaults: Request failed with status code 500 @ http://localhost:4173/assets/index-DaVQdfvb.js:48
+[  245384ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ http://localhost:4173/:0
+[  556326ms] [LOG] %c Console Ninja extension is connected to Vite, background: rgb(30,30,30); color: rgb(255,213,92) see https://tinyurl.com/2vt8jxzw for more info. @ :0
+[  556641ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:4173/api/cms/config:0
+[  556645ms] [WARNING] Could not fetch remote CMS config, using defaults: Request failed with status code 500 @ http://localhost:4173/assets/index-DaVQdfvb.js:48
+[ 1487596ms] [LOG] %c Console Ninja extension is connected to Vite, background: rgb(30,30,30); color: rgb(255,213,92) see https://tinyurl.com/2vt8jxzw for more info. @ :0
+[ 1487932ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:4173/api/cms/config:0
+[ 1487936ms] [WARNING] Could not fetch remote CMS config, using defaults: Request failed with status code 500 @ http://localhost:4173/assets/index-DB2MHRyv.js:48
+[ 1559445ms] [LOG] %c Console Ninja extension is connected to Vite, background: rgb(30,30,30); color: rgb(255,213,92) see https://tinyurl.com/2vt8jxzw for more info. @ :0
+[ 1559689ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:4173/api/cms/config:0
+[ 1559694ms] [WARNING] Could not fetch remote CMS config, using defaults: Request failed with status code 500 @ http://localhost:4173/assets/index-DB2MHRyv.js:48
+[ 1574666ms] [LOG] %c Console Ninja extension is connected to Vite, background: rgb(30,30,30); color: rgb(255,213,92) see https://tinyurl.com/2vt8jxzw for more info. @ :0
+[ 1574922ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:4173/api/cms/config:0
+[ 1574925ms] [WARNING] Could not fetch remote CMS config, using defaults: Request failed with status code 500 @ http://localhost:4173/assets/index-DB2MHRyv.js:48
+[ 1580118ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ http://localhost:4173/:0
+[ 2301605ms] [LOG] %c Console Ninja extension is connected to Vite, background: rgb(30,30,30); color: rgb(255,213,92) see https://tinyurl.com/2vt8jxzw for more info. @ :0
+[ 2301933ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:4173/api/cms/config:0
+[ 2301937ms] [WARNING] Could not fetch remote CMS config, using defaults: Request failed with status code 500 @ http://localhost:4173/assets/index-DWe3fihG.js:48
+[ 2313053ms] [LOG] %c Console Ninja extension is connected to Vite, background: rgb(30,30,30); color: rgb(255,213,92) see https://tinyurl.com/2vt8jxzw for more info. @ :0
+[ 2313400ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:4173/api/cms/config:0
+[ 2313404ms] [WARNING] Could not fetch remote CMS config, using defaults: Request failed with status code 500 @ http://localhost:4173/assets/index-DWe3fihG.js:48
+[ 2346420ms] [LOG] %c Console Ninja extension is connected to Vite, background: rgb(30,30,30); color: rgb(255,213,92) see https://tinyurl.com/2vt8jxzw for more info. @ :0
+[ 2346682ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:4173/api/cms/config:0
+[ 2346688ms] [WARNING] Could not fetch remote CMS config, using defaults: Request failed with status code 500 @ http://localhost:4173/assets/index-DWe3fihG.js:48
+[ 2356374ms] [LOG] %c Console Ninja extension is connected to Vite, background: rgb(30,30,30); color: rgb(255,213,92) see https://tinyurl.com/2vt8jxzw for more info. @ :0
+[ 2358582ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:4173/api/cms/config:0
+[ 2358625ms] [WARNING] Could not fetch remote CMS config, using defaults: Request failed with status code 500 @ http://localhost:4173/assets/index-DWe3fihG.js:48
+[ 2377285ms] [LOG] %c Console Ninja extension is connected to Vite, background: rgb(30,30,30); color: rgb(255,213,92) see https://tinyurl.com/2vt8jxzw for more info. @ :0
+[ 2379431ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:4173/api/cms/config:0
+[ 2379475ms] [WARNING] Could not fetch remote CMS config, using defaults: Request failed with status code 500 @ http://localhost:4173/assets/index-DWe3fihG.js:48
+[ 2392177ms] [LOG] %c Console Ninja extension is connected to Vite, background: rgb(30,30,30); color: rgb(255,213,92) see https://tinyurl.com/2vt8jxzw for more info. @ :0
+[ 2394278ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:4173/api/cms/config:0
+[ 2394322ms] [WARNING] Could not fetch remote CMS config, using defaults: Request failed with status code 500 @ http://localhost:4173/assets/index-DWe3fihG.js:48
+[ 2406167ms] [LOG] %c Console Ninja extension is connected to Vite, background: rgb(30,30,30); color: rgb(255,213,92) see https://tinyurl.com/2vt8jxzw for more info. @ :0
+[ 2408345ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:4173/api/cms/config:0
+[ 2408393ms] [WARNING] Could not fetch remote CMS config, using defaults: Request failed with status code 500 @ http://localhost:4173/assets/index-DWe3fihG.js:48
+[ 2420533ms] [LOG] %c Console Ninja extension is connected to Vite, background: rgb(30,30,30); color: rgb(255,213,92) see https://tinyurl.com/2vt8jxzw for more info. @ :0
+[ 2422660ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:4173/api/cms/config:0
+[ 2422705ms] [WARNING] Could not fetch remote CMS config, using defaults: Request failed with status code 500 @ http://localhost:4173/assets/index-DWe3fihG.js:48

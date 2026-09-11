@@ -1,0 +1,88 @@
+[     164ms] [LOG] %c Console Ninja extension is connected to Vite, background: rgb(30,30,30); color: rgb(255,213,92) see https://tinyurl.com/2vt8jxzw for more info. @ :0
+[     316ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=a621b25f:21550
+[     928ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:5173/api/cms/config:0
+[     933ms] [WARNING] Could not fetch remote CMS config, using defaults: Request failed with status code 500 @ http://localhost:5173/src/context/SiteConfigContext.jsx:51
+[     934ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:5173/api/cms/config:0
+[     935ms] [WARNING] Could not fetch remote CMS config, using defaults: Request failed with status code 500 @ http://localhost:5173/src/context/SiteConfigContext.jsx:51
+[  418200ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:5173/src/components/HairCutScrollShowcase.jsx?t=1788877100949:0
+[  418209ms] [ERROR] [hmr] Failed to reload /src/components/HairCutScrollShowcase.jsx. This could be due to syntax errors or importing non-existent modules. (see errors above) @ :0
+[  432720ms] ReferenceError: activeCardId is not defined
+    at http://localhost:5173/src/components/HairCutScrollShowcase.jsx?t=1788877115364:1231:34
+    at Array.map (<anonymous>)
+    at HairCutScrollShowcase (http://localhost:5173/src/components/HairCutScrollShowcase.jsx?t=1788877115364:1230:132)
+    at renderWithHooks (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=a621b25f:11548:26)
+    at mountIndeterminateComponent (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=a621b25f:14926:21)
+    at beginWork (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=a621b25f:15914:22)
+    at HTMLUnknownElement.callCallback2 (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=a621b25f:3674:22)
+    at Object.invokeGuardedCallbackDev (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=a621b25f:3699:24)
+    at invokeGuardedCallback (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=a621b25f:3733:39)
+    at beginWork$1 (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=a621b25f:19765:15)
+    at performUnitOfWork (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=a621b25f:19198:20)
+    at workLoopSync (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=a621b25f:19137:13)
+    at renderRootSync (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=a621b25f:19116:15)
+    at performSyncWorkOnRoot (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=a621b25f:18874:28)
+    at flushSyncCallbacks (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=a621b25f:9119:30)
+    at flushSync (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=a621b25f:18959:15)
+    at Object.scheduleRefresh (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=a621b25f:20004:13)
+    at http://localhost:5173/@react-refresh:228:17
+    at Set.forEach (<anonymous>)
+    at performReactRefresh (http://localhost:5173/@react-refresh:217:26)
+[  432724ms] ReferenceError: activeCardId is not defined
+    at http://localhost:5173/src/components/HairCutScrollShowcase.jsx?t=1788877115364:1231:34
+    at Array.map (<anonymous>)
+    at HairCutScrollShowcase (http://localhost:5173/src/components/HairCutScrollShowcase.jsx?t=1788877115364:1230:132)
+    at renderWithHooks (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=a621b25f:11548:26)
+    at mountIndeterminateComponent (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=a621b25f:14926:21)
+    at beginWork (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=a621b25f:15914:22)
+    at HTMLUnknownElement.callCallback2 (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=a621b25f:3674:22)
+    at Object.invokeGuardedCallbackDev (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=a621b25f:3699:24)
+    at invokeGuardedCallback (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=a621b25f:3733:39)
+    at beginWork$1 (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=a621b25f:19765:15)
+    at performUnitOfWork (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=a621b25f:19198:20)
+    at workLoopSync (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=a621b25f:19137:13)
+    at renderRootSync (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=a621b25f:19116:15)
+    at recoverFromConcurrentError (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=a621b25f:18736:28)
+    at performSyncWorkOnRoot (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=a621b25f:18879:28)
+    at flushSyncCallbacks (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=a621b25f:9119:30)
+    at flushSync (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=a621b25f:18959:15)
+    at Object.scheduleRefresh (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=a621b25f:20004:13)
+    at http://localhost:5173/@react-refresh:228:17
+    at Set.forEach (<anonymous>)
+[  432728ms] [ERROR] The above error occurred in the <HairCutScrollShowcase> component:
+
+    at HairCutScrollShowcase (http://localhost:5173/src/components/HairCutScrollShowcase.jsx?t=1788877115364:234:41)
+    at div
+    at MainContent (http://localhost:5173/src/App.jsx?t=1788876665448:34:46)
+    at SmoothScrollProvider (http://localhost:5173/src/context/SmoothScrollContext.jsx:37:40)
+    at SiteConfigProvider (http://localhost:5173/src/context/SiteConfigContext.jsx:21:38)
+    at AuthProvider (http://localhost:5173/src/context/AuthContext.jsx:21:32)
+    at App
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries. @ :0
+[  432765ms] ReferenceError: activeCardId is not defined
+    at http://localhost:5173/src/components/HairCutScrollShowcase.jsx?t=1788877115364:1231:34
+    at Array.map (<anonymous>)
+    at HairCutScrollShowcase (http://localhost:5173/src/components/HairCutScrollShowcase.jsx?t=1788877115364:1230:132)
+    at renderWithHooks (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=a621b25f:11548:26)
+    at mountIndeterminateComponent (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=a621b25f:14926:21)
+    at beginWork (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=a621b25f:15914:22)
+    at beginWork$1 (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=a621b25f:19753:22)
+    at performUnitOfWork (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=a621b25f:19198:20)
+    at workLoopSync (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=a621b25f:19137:13)
+    at renderRootSync (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=a621b25f:19116:15)
+    at recoverFromConcurrentError (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=a621b25f:18736:28)
+    at performSyncWorkOnRoot (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=a621b25f:18879:28)
+    at flushSyncCallbacks (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=a621b25f:9119:30)
+    at flushSync (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=a621b25f:18959:15)
+    at Object.scheduleRefresh (http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=a621b25f:20004:13)
+    at http://localhost:5173/@react-refresh:228:17
+    at Set.forEach (<anonymous>)
+    at performReactRefresh (http://localhost:5173/@react-refresh:217:26)
+    at http://localhost:5173/@react-refresh:608:3
+[  461286ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:5173/src/components/HairCutScrollShowcase.jsx?t=1788877144048:0
+[  461286ms] [ERROR] [hmr] Failed to reload /src/components/HairCutScrollShowcase.jsx. This could be due to syntax errors or importing non-existent modules. (see errors above) @ :0
+[  625955ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:5173/api/cms/config:0
+[  625958ms] [WARNING] Could not fetch remote CMS config, using defaults: Request failed with status code 500 @ http://localhost:5173/src/context/SiteConfigContext.jsx:51
+[  625964ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:5173/api/cms/config:0
+[  625964ms] [WARNING] Could not fetch remote CMS config, using defaults: Request failed with status code 500 @ http://localhost:5173/src/context/SiteConfigContext.jsx:51

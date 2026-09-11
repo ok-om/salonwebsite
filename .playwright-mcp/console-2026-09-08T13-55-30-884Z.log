@@ -1,0 +1,7 @@
+[      76ms] [LOG] %c Console Ninja extension is connected to Vite, background: rgb(30,30,30); color: rgb(255,213,92) see https://tinyurl.com/2vt8jxzw for more info. @ :0
+[     385ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/chunk-NUMECXU6.js?v=a621b25f:21550
+[    1210ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:5173/api/cms/config:0
+[    1215ms] [WARNING] Could not fetch remote CMS config, using defaults: Request failed with status code 500 @ http://localhost:5173/src/context/SiteConfigContext.jsx:51
+[    1300ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:5173/api/cms/config:0
+[    1302ms] [WARNING] Could not fetch remote CMS config, using defaults: Request failed with status code 500 @ http://localhost:5173/src/context/SiteConfigContext.jsx:51
+[   29999ms] [LOG] Running with experiment IDs: [106288167] @ https://maps.googleapis.com/maps-api-v3/api/js/66/3d/main.js:311

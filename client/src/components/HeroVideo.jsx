@@ -1,0 +1,451 @@
+import React, { useRef, useState, useEffect } from 'react';
+import { useSiteConfig } from '../context/SiteConfigContext';
+import { Hero3DCanvas } from './Three/Hero3DCanvas';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { Volume2, VolumeX, Sparkles, ChevronDown, Scissors } from 'lucide-react';
+
+gsap.registerPlugin(ScrollTrigger);
+
+export const HeroVideo = ({ onOpenLoyalty, onScrollToExperience, isReady = true }) => {
+  const { config } = useSiteConfig();
+  const heroSectionRef = useRef(null);
+  const videoRef = useRef(null);
+  const audioRef = useRef(null);
+  const [isPlayingMusic, setIsPlayingMusic] = useState(false);
+
+  // 1. Video Auto-Play and Auto-Pause on Offscreen
+  useEffect(() => {
+    const videoEl = videoRef.current;
+    if (!videoEl) return;
+
+    videoEl.defaultMuted = true;
+    videoEl.muted = true;
+    videoEl.play().catch(() => {});
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) {
+          videoEl.pause();
+        } else {
+          videoEl.play().catch(() => {});
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (heroSectionRef.current) {
+      observer.observe(heroSectionRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
+
+  const toggleAudio = () => {
+    if (!audioRef.current) return;
+
+    if (isPlayingMusic) {
+      audioRef.current.pause();
+      setIsPlayingMusic(false);
+      if (videoRef.current) videoRef.current.muted = true;
+    } else {
+      audioRef.current.volume = 0.55;
+      const playPromise = audioRef.current.play();
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            setIsPlayingMusic(true);
+            if (videoRef.current) videoRef.current.muted = false;
+          })
+          .catch((err) => {
+            console.warn('Audio autoplay blocked by browser:', err);
+          });
+      }
+    }
+  };
+
+
+  return (
+    <section
+      id="hero-section"
+      ref={heroSectionRef}
+      style={{
+        position: 'relative',
+        minHeight: '94vh',
+        width: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        overflow: 'hidden',
+        paddingTop: 'calc(var(--nav-height) + 1.5rem)',
+        paddingBottom: '3.5rem',
+        backgroundColor: '#0b0c10',
+      }}
+    >
+      {/* 1. Crystal Clear Background Video with Instant Luxury Poster */}
+      <video
+        ref={videoRef}
+        autoPlay
+        loop
+        muted
+        playsInline
+        preload="auto"
+        poster="/backgrounds/imgi_394_1000_F_675403262_HTWy014WRCcGlggsScfGJP0fYNZHbOYr.jpg"
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover',
+          opacity: 0.95, // Crystal clear & fully visible
+          filter: 'contrast(1.06) brightness(0.98)',
+          zIndex: 1,
+        }}
+        src={(!config.heroVideoUrl || config.heroVideoUrl === '/video1.mp4' || config.heroVideoUrl === '/backgroundvideo.mp4') ? '/video/backgroundvideo.mp4' : config.heroVideoUrl}
+      />
+
+      {/* 2. Matching Luxury Background Music (Optimized preload: none to save initial bandwidth) */}
+      <audio
+        ref={audioRef}
+        src="/music/salon-music.mp3"
+        loop
+        preload="none"
+      />
+
+      {/* 3. Ultra-Lightweight Transparent Gradient (Guarantees Sharp Video Clarity) */}
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          background: `
+            linear-gradient(90deg, 
+              rgba(7, 9, 13, 0.62) 0%, 
+              rgba(7, 9, 13, 0.32) 45%, 
+              rgba(7, 9, 13, 0.08) 70%, 
+              transparent 100%
+            ),
+            linear-gradient(180deg, 
+              rgba(7, 9, 13, 0.65) 0%, 
+              transparent 18%, 
+              transparent 84%, 
+              #0b0c10 100%
+            )
+          `,
+          pointerEvents: 'none',
+          zIndex: 2,
+        }}
+      />
+
+      {/* 4. Interactive Hero Layout: Dual Column (Typography + Three.js 3D Masterpiece) */}
+      <div
+        className="container"
+        style={{
+          position: 'relative',
+          zIndex: 10,
+          width: '100%',
+          maxWidth: '1240px',
+        }}
+      >
+        <div className="hero-grid-layout">
+          {/* Column A: High-Contrast Luxury Typography & CTAs */}
+          <div className="hero-text-col">
+            {/* Luxury Tagline Badge */}
+            <div
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.55rem',
+                background: 'rgba(14, 16, 23, 0.92)',
+                border: '1px solid rgba(212, 175, 55, 0.5)',
+                padding: '0.4rem 1.1rem',
+                borderRadius: 'var(--radius-full)',
+                backdropFilter: 'blur(14px)',
+                WebkitBackdropFilter: 'blur(14px)',
+                marginBottom: '1.2rem',
+                boxShadow: '0 4px 18px rgba(0, 0, 0, 0.65), 0 0 10px rgba(212, 175, 55, 0.2)',
+              }}
+            >
+              <Sparkles size={14} color="var(--gold-primary)" />
+              <span
+                style={{
+                  fontSize: 'clamp(0.7rem, 2vw, 0.8rem)',
+                  fontWeight: 700,
+                  letterSpacing: '0.18em',
+                  textTransform: 'uppercase',
+                  color: 'var(--gold-primary)',
+                }}
+              >
+                Artisan Gentleman Barbershop
+              </span>
+            </div>
+
+            {/* Main Salon Headline */}
+            <h1
+              style={{
+                fontSize: 'clamp(2.3rem, 5.5vw, 4.4rem)',
+                fontWeight: 800,
+                lineHeight: 1.08,
+                marginBottom: '1rem',
+                color: '#ffffff',
+                textShadow: '0 4px 24px rgba(0, 0, 0, 0.98), 0 2px 6px rgba(0, 0, 0, 0.9)',
+                fontFamily: 'var(--font-serif)',
+              }}
+            >
+              {config.salonName || 'The Classic Cut Salon'}
+            </h1>
+
+            {/* Hero Tagline */}
+            <p
+              style={{
+                fontSize: 'clamp(1.05rem, 2.3vw, 1.35rem)',
+                color: '#f8fafc',
+                lineHeight: 1.6,
+                fontWeight: 400,
+                marginBottom: '2rem',
+                textShadow: '0 2px 14px rgba(0, 0, 0, 0.98)',
+              }}
+            >
+              {config.tagline || 'Where Vintage Craftsmanship Meets Modern Luxury'}
+            </p>
+
+            {/* Action Buttons */}
+            <div
+              style={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                alignItems: 'center',
+                gap: '0.85rem',
+              }}
+            >
+              <button
+                onClick={onOpenLoyalty}
+                className="btn btn-primary hero-btn"
+                style={{
+                  fontSize: 'clamp(0.9rem, 2.5vw, 1.02rem)',
+                  padding: '0.8rem 1.75rem',
+                  boxShadow: '0 8px 24px rgba(212, 175, 55, 0.35)',
+                }}
+              >
+                <Scissors size={17} />
+                <span>Check My 5-Coupe Card</span>
+              </button>
+
+              <button
+                onClick={onScrollToExperience}
+                className="btn btn-outline hero-btn"
+                style={{
+                  fontSize: 'clamp(0.88rem, 2.5vw, 1rem)',
+                  padding: '0.8rem 1.6rem',
+                  background: 'rgba(15, 17, 24, 0.75)',
+                  backdropFilter: 'blur(10px)',
+                  borderColor: 'rgba(212, 175, 55, 0.4)',
+                }}
+              >
+                <span>Barber Journey</span>
+                <ChevronDown size={17} />
+              </button>
+            </div>
+          </div>
+
+          {/* Column B: Interactive Three.js 3D Showcase */}
+          <div className="hero-3d-col">
+            <Hero3DCanvas isReady={isReady} />
+          </div>
+        </div>
+
+        {/* Highlight Stats Bar */}
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+            gap: '1rem',
+            marginTop: '3rem',
+            background: 'rgba(15, 17, 24, 0.88)',
+            backdropFilter: 'blur(16px)',
+            WebkitBackdropFilter: 'blur(16px)',
+            border: '1px solid rgba(212, 175, 55, 0.3)',
+            borderRadius: 'var(--radius-md)',
+            padding: '1.2rem',
+            boxShadow: '0 12px 32px rgba(0, 0, 0, 0.75)',
+          }}
+        >
+          <div style={statItemStyle}>
+            <span style={statNumberStyle}>5 Visits = 1 Offer</span>
+            <span style={statLabelStyle}>Automatic Free Reward</span>
+          </div>
+          <div style={statItemStyle}>
+            <span style={statNumberStyle}>Master Craftsmen</span>
+            <span style={statLabelStyle}>Scissor & Razor Precision</span>
+          </div>
+          <div style={statItemStyle}>
+            <span style={statNumberStyle}>100% Satisfaction</span>
+            <span style={statLabelStyle}>Gentleman Luxury Standard</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Floating Gold Ambience Music Toggle Button */}
+      <button
+        onClick={toggleAudio}
+        aria-label="Toggle Salon Background Music"
+        style={{
+          position: 'absolute',
+          bottom: '1.5rem',
+          right: '1.25rem',
+          zIndex: 25,
+          background: isPlayingMusic
+            ? 'linear-gradient(135deg, rgba(212, 175, 55, 0.3) 0%, rgba(15, 17, 24, 0.95) 100%)'
+            : 'rgba(15, 17, 24, 0.88)',
+          backdropFilter: 'blur(14px)',
+          WebkitBackdropFilter: 'blur(14px)',
+          border: isPlayingMusic
+            ? '1.5px solid var(--gold-primary)'
+            : '1px solid rgba(212, 175, 55, 0.45)',
+          color: 'var(--gold-primary)',
+          borderRadius: '50px',
+          padding: '0.5rem 1rem',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.55rem',
+          cursor: 'pointer',
+          boxShadow: isPlayingMusic
+            ? '0 0 22px rgba(212, 175, 55, 0.5), 0 6px 20px rgba(0,0,0,0.7)'
+            : '0 4px 18px rgba(0,0,0,0.65)',
+          transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+        }}
+        title={isPlayingMusic ? 'Mute Music' : 'Play Salon Ambience Music'}
+      >
+        {isPlayingMusic ? (
+          <>
+            <Volume2 size={17} />
+            <span style={{ fontSize: '0.8rem', fontWeight: 600, letterSpacing: '0.02em', color: '#ffffff' }}>
+              Music On
+            </span>
+            <span
+              style={{
+                display: 'inline-flex',
+                alignItems: 'flex-end',
+                gap: '2.5px',
+                height: '13px',
+                marginLeft: '2px',
+              }}
+            >
+              <span
+                style={{
+                  width: '2.5px',
+                  background: 'var(--gold-primary)',
+                  borderRadius: '2px',
+                  animation: 'soundBar 0.8s ease-in-out infinite alternate',
+                  height: '100%',
+                }}
+              />
+              <span
+                style={{
+                  width: '2.5px',
+                  background: 'var(--gold-primary)',
+                  borderRadius: '2px',
+                  animation: 'soundBar 0.6s ease-in-out 0.2s infinite alternate',
+                  height: '60%',
+                }}
+              />
+              <span
+                style={{
+                  width: '2.5px',
+                  background: 'var(--gold-primary)',
+                  borderRadius: '2px',
+                  animation: 'soundBar 1s ease-in-out 0.4s infinite alternate',
+                  height: '80%',
+                }}
+              />
+            </span>
+          </>
+        ) : (
+          <>
+            <VolumeX size={17} />
+            <span style={{ fontSize: '0.8rem', fontWeight: 500, opacity: 0.9 }}>
+              Play Music
+            </span>
+          </>
+        )}
+      </button>
+
+      {/* Component Styles for Responsive Grid & Micro-Transitions */}
+      <style>{`
+        .hero-grid-layout {
+          display: grid;
+          grid-template-columns: minmax(320px, 1.2fr) minmax(280px, 1fr);
+          align-items: center;
+          gap: 2.5rem;
+        }
+
+        .hero-text-col {
+          text-align: left;
+        }
+
+        .hero-3d-col {
+          display: flex;
+          align-items: center;
+          justifyContent: center;
+        }
+
+        @media (max-width: 960px) {
+          .hero-grid-layout {
+            grid-template-columns: 1fr;
+            text-align: center;
+            gap: 1.5rem;
+          }
+
+          .hero-text-col {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+          }
+
+          .hero-btn {
+            justify-content: center;
+          }
+        }
+
+        @media (max-width: 768px) {
+          .hero-scrub-word {
+            opacity: 1 !important;
+            filter: none !important;
+            transform: none !important;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .hero-btn {
+            width: 100% !important;
+            max-width: 320px;
+          }
+        }
+      `}</style>
+    </section>
+  );
+};
+
+
+const statItemStyle = {
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  textAlign: 'center',
+};
+
+const statNumberStyle = {
+  fontFamily: 'var(--font-serif)',
+  fontSize: 'clamp(0.88rem, 2.5vw, 1.05rem)',
+  fontWeight: 700,
+  color: 'var(--gold-primary)',
+};
+
+const statLabelStyle = {
+  fontSize: '0.7rem',
+  color: '#cbd5e1',
+  letterSpacing: '0.02em',
+  marginTop: '0.15rem',
+};

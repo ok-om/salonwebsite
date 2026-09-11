@@ -1,0 +1,322 @@
+- generic [ref=f14e3]:
+  - banner [ref=f14e4]:
+    - generic [ref=f14e5]:
+      - generic [ref=f14e6] [cursor=pointer]:
+        - img "Logo" [ref=f14e7]
+        - generic [ref=f14e8]:
+          - generic [ref=f14e9]: The Classic Cut Salon
+          - generic [ref=f14e10]: Luxury Barber
+      - button "Open Navigation Menu" [ref=f14e12] [cursor=pointer]
+  - generic [ref=f14e14]:
+    - generic [ref=f14e16]:
+      - generic [ref=f14e18]:
+        - generic [ref=f14e19]: Artisan Gentleman Barbershop
+        - heading "The Classic Cut Salon" [level=1] [ref=f14e23]
+        - paragraph [ref=f14e24]: Where Vintage Craftsmanship Meets Modern Luxury
+        - generic [ref=f14e25]:
+          - button "Check My 5-Coupe Card" [ref=f14e26] [cursor=pointer]
+          - button "Barber Journey" [ref=f14e34] [cursor=pointer]
+      - generic [ref=f14e39]:
+        - generic [ref=f14e40]:
+          - generic [ref=f14e41]: 5 Visits = 1 Offer
+          - generic [ref=f14e42]: Automatic Free Reward
+        - generic [ref=f14e43]:
+          - generic [ref=f14e44]: Master Craftsmen
+          - generic [ref=f14e45]: Scissor & Razor Precision
+        - generic [ref=f14e46]:
+          - generic [ref=f14e47]: 100% Satisfaction
+          - generic [ref=f14e48]: Gentleman Luxury Standard
+    - button "Toggle Salon Background Music" [ref=f14e49] [cursor=pointer]:
+      - generic [ref=f14e54]: Play Music
+  - generic [ref=f14e55]:
+    - generic [ref=f14e58]:
+      - generic:
+        - img "Precision Matte Black Barber Suite"
+        - img "Classic Barber Mirrors & Stations"
+        - img "Artisan Wood Barber Tools Flatlay"
+        - img "Warm Ambient Salon Atmosphere"
+        - img "Gentleman Grooming Lounge & Mirrors"
+        - img "Vintage Leather Barber Station"
+        - img "Bespoke Wooden Salon Suite"
+        - img "Luxury Barber Chair Ensemble"
+        - generic: "📷 Salon Atmosphere: Precision Matte Black Barber Suite"
+      - generic [ref=f14e59]:
+        - generic [ref=f14e60]:
+          - generic [ref=f14e61]: Artisan Master Series · 7 Bespoke Cuts
+          - heading "The Master Cut Collection" [level=2] [ref=f14e71]:
+            - generic [ref=f14e72]: The
+            - generic [ref=f14e73]: Master
+            - generic [ref=f14e74]: Cut
+            - generic [ref=f14e75]: Collection
+          - paragraph [ref=f14e76]:
+            - generic [ref=f14e77]: Stage
+            - generic [ref=f14e78]: pinned
+            - generic [ref=f14e79]: in
+            - generic [ref=f14e80]: perspective.
+            - generic [ref=f14e81]: Each
+            - generic [ref=f14e82]: signature
+            - generic [ref=f14e83]: cut
+            - generic [ref=f14e84]: transitions
+            - generic [ref=f14e85]: into
+            - generic [ref=f14e86]: this
+            - generic [ref=f14e87]: spotlight
+            - generic [ref=f14e88]: with
+            - generic [ref=f14e89]: its
+            - generic [ref=f14e90]: own
+            - generic [ref=f14e91]: unique
+            - generic [ref=f14e92]: motion
+            - generic [ref=f14e93]: signature.
+        - generic [ref=f14e94]:
+          - button "01 Scissor Fade" [ref=f14e95] [cursor=pointer]:
+            - generic [ref=f14e96]: "01"
+            - generic [ref=f14e97]: Scissor Fade
+          - button "02 Executive Pomp" [ref=f14e98] [cursor=pointer]:
+            - generic [ref=f14e99]: "02"
+            - generic [ref=f14e100]: Executive Pomp
+          - button "03 Crop Fade" [ref=f14e101] [cursor=pointer]:
+            - generic [ref=f14e102]: "03"
+            - generic [ref=f14e103]: Crop Fade
+          - button "04 Classic Contour" [ref=f14e104] [cursor=pointer]:
+            - generic [ref=f14e105]: "04"
+            - generic [ref=f14e106]: Classic Contour
+          - button "05 Sculpted Quiff" [ref=f14e107] [cursor=pointer]:
+            - generic [ref=f14e108]: "05"
+            - generic [ref=f14e109]: Sculpted Quiff
+          - button "06 Textured Waves" [ref=f14e110] [cursor=pointer]:
+            - generic [ref=f14e111]: "06"
+            - generic [ref=f14e112]: Textured Waves
+          - button "07 Imperial Royal" [ref=f14e113] [cursor=pointer]:
+            - generic [ref=f14e114]: "07"
+            - generic [ref=f14e115]: Imperial Royal
+        - generic [ref=f14e117]:
+          - generic [ref=f14e118]:
+            - generic [ref=f14e119]:
+              - generic [ref=f14e120]: "🏛️ Salon Suite: Precision Matte Black Barber Suite"
+              - generic [ref=f14e121]: "✨ Motion: 3D Depth Zoom & Tilt"
+            - generic [ref=f14e122]: Cut 01 of 07
+          - generic [ref=f14e123]:
+            - generic [ref=f14e124]:
+              - img "Signature Precision Scissor Fade" [ref=f14e127]
+              - generic [ref=f14e128]: Trending Cut
+              - generic [ref=f14e129]: ₹499 • 35 mins
+            - generic [ref=f14e130]:
+              - generic [ref=f14e131]:
+                - generic [ref=f14e132]: Master Scissor Styling
+                - heading "Signature Precision Scissor Fade" [level=3] [ref=f14e133]
+                - paragraph [ref=f14e134]: Surgical sectioning with bespoke taper fade, scissor-textured crown, and clean beard blend.
+                - generic [ref=f14e140]:
+                  - strong [ref=f14e141]: "Card Motion Signature:"
+                  - text: Perspective Zoom (3D Depth Zoom & Tilt)
+              - generic [ref=f14e142]:
+                - generic [ref=f14e143]: Artisan Gentleman Craft
+                - generic [ref=f14e149]:
+                  - link "Book Cut" [ref=f14e150] [cursor=pointer]:
+                    - /url: https://wa.me/919876543210?text=Hello!%20I%20would%20like%20to%20book%20the%20"Signature%20Precision%20Scissor%20Fade"%20haircut.
+                  - button "+1 Stamp" [ref=f14e154] [cursor=pointer]
+        - generic [ref=f14e162]:
+          - button "Prev Style" [ref=f14e163] [cursor=pointer]
+          - button "Next Style" [ref=f14e169] [cursor=pointer]
+    - generic [ref=f14e173]:
+      - heading "Earn Any Of These Haircuts 100% Free" [level=3] [ref=f14e176]:
+        - text: Earn Any Of These Haircuts
+        - generic [ref=f14e177]: 100% Free
+      - paragraph [ref=f14e178]: Collect 1 Coupe Stamp every time you visit. After 5 visits, you unlock 1 Free Royal Cut Offer and stamps reset to 0!
+      - generic [ref=f14e179]:
+        - button "Open My 5-Coupe Card" [ref=f14e180] [cursor=pointer]
+        - link "Salon Location & Map" [ref=f14e188] [cursor=pointer]:
+          - /url: "#contact"
+  - generic [ref=f14e193]:
+    - generic [ref=f14e212]:
+      - generic [ref=f14e213]: Master Barber Artistry
+      - heading "CLASSIC CUTS, MODERN LOOKS THE BEST" [level=1] [ref=f14e216]
+      - paragraph [ref=f14e217]: we combine tradition with trend. From sharp fades to classic shaves — get a grooming experience built just for you.
+      - generic [ref=f14e218]:
+        - link "Book An Appointment" [ref=f14e219] [cursor=pointer]:
+          - /url: https://wa.me/919876543210?text=Hi!%20I%20would%20like%20to%20book%20an%20appointment%20for%20a%20modern%20haircut.
+        - button "Browse 2026 Trend Chart" [ref=f14e227] [cursor=pointer]
+    - generic [ref=f14e233]:
+      - generic [ref=f14e234]:
+        - generic [ref=f14e235]: 2026 Visual Cut Directory
+        - heading "POP ICONIC HAIR SHAPES" [level=2] [ref=f14e238]
+        - paragraph [ref=f14e239]: Every facial profile deserves its matching architectural shape. Tap any portrait to book your signature transformation.
+      - generic [ref=f14e240]:
+        - generic [ref=f14e241] [cursor=pointer]:
+          - img "Textured Crop Fade" [ref=f14e243]
+          - generic [ref=f14e244]:
+            - generic [ref=f14e245]: Textured Crop Fade
+            - generic [ref=f14e246]: Trending 2026
+        - generic [ref=f14e247] [cursor=pointer]:
+          - img "Mid Taper Fade" [ref=f14e249]
+          - generic [ref=f14e250]:
+            - generic [ref=f14e251]: Mid Taper Fade
+            - generic [ref=f14e252]: Clean Precision
+        - generic [ref=f14e253] [cursor=pointer]:
+          - img "Modern Executive Quiff" [ref=f14e255]
+          - generic [ref=f14e256]:
+            - generic [ref=f14e257]: Modern Executive Quiff
+            - generic [ref=f14e258]: Gentleman Classic
+        - generic [ref=f14e259] [cursor=pointer]:
+          - img "Slick Back Fade" [ref=f14e261]
+          - generic [ref=f14e262]:
+            - generic [ref=f14e263]: Slick Back Fade
+            - generic [ref=f14e264]: High Volume
+        - generic [ref=f14e265] [cursor=pointer]:
+          - img "Beard Fade Blend" [ref=f14e267]
+          - generic [ref=f14e268]:
+            - generic [ref=f14e269]: Beard Fade Blend
+            - generic [ref=f14e270]: Master Combo
+        - generic [ref=f14e271] [cursor=pointer]:
+          - img "Natural Wavy Flow" [ref=f14e273]
+          - generic [ref=f14e274]:
+            - generic [ref=f14e275]: Natural Wavy Flow
+            - generic [ref=f14e276]: Effortless Flow
+        - generic [ref=f14e277] [cursor=pointer]:
+          - img "Gentleman Contour" [ref=f14e279]
+          - generic [ref=f14e280]:
+            - generic [ref=f14e281]: Gentleman Contour
+            - generic [ref=f14e282]: Timeless Cut
+        - generic [ref=f14e283] [cursor=pointer]:
+          - img "French Crop Taper" [ref=f14e285]
+          - generic [ref=f14e286]:
+            - generic [ref=f14e287]: French Crop Taper
+            - generic [ref=f14e288]: Sharp Edges
+    - generic [ref=f14e290]:
+      - generic [ref=f14e291]:
+        - generic [ref=f14e292]:
+          - heading "Our Services" [level=2] [ref=f14e293]
+          - paragraph [ref=f14e294]: It's not just a service; it's an experience rooted in artistry, precision, and personalized attention. Going beyond the standard cut and rinse.
+        - link "See All Services" [ref=f14e296] [cursor=pointer]:
+          - /url: "#haircuts"
+      - generic [ref=f14e300]:
+        - generic [ref=f14e301]:
+          - generic [ref=f14e302]:
+            - img "Classic Haircut" [ref=f14e305]
+            - heading "Classic Haircut" [level=3] [ref=f14e306]
+            - paragraph [ref=f14e307]: Experience the pinnacle of grooming with our classic haircuts, where tradition meets contemporary style.
+          - generic [ref=f14e308]:
+            - button "More Details" [ref=f14e309] [cursor=pointer]
+            - generic [ref=f14e310]:
+              - generic [ref=f14e311]: ₹499
+              - generic [ref=f14e312]: 35 Mins
+        - generic [ref=f14e313]:
+          - generic [ref=f14e314]:
+            - img "Beard Trim Shape" [ref=f14e317]
+            - heading "Beard Trim Shape" [level=3] [ref=f14e318]
+            - paragraph [ref=f14e319]: Experience the pinnacle of grooming with our classic haircuts, where tradition meets contemporary style.
+          - generic [ref=f14e320]:
+            - button "More Details" [ref=f14e321] [cursor=pointer]
+            - generic [ref=f14e322]:
+              - generic [ref=f14e323]: ₹299
+              - generic [ref=f14e324]: 25 Mins
+        - generic [ref=f14e325]:
+          - generic [ref=f14e326]:
+            - img "Hot Towel Shave" [ref=f14e329]
+            - heading "Hot Towel Shave" [level=3] [ref=f14e330]
+            - paragraph [ref=f14e331]: Experience the pinnacle of grooming with our classic haircuts, where tradition meets contemporary style.
+          - generic [ref=f14e332]:
+            - button "More Details" [ref=f14e333] [cursor=pointer]
+            - generic [ref=f14e334]:
+              - generic [ref=f14e335]: ₹399
+              - generic [ref=f14e336]: 30 Mins
+    - generic [ref=f14e338]:
+      - generic [ref=f14e339]:
+        - generic [ref=f14e340]: Full Atelier Lookbook
+        - heading "The Master Barber Dossier & Style Blueprints" [level=2] [ref=f14e347]:
+          - text: The Master Barber
+          - generic [ref=f14e348]: Dossier & Style Blueprints
+        - paragraph [ref=f14e349]: From historical barber craftsmanship to 2026 trending fade blueprints. Tap any master chart to inspect full profiles and face-shape recommendations.
+      - generic [ref=f14e350]:
+        - generic [ref=f14e351] [cursor=pointer]:
+          - img "Vintage Barber Shop Art" [ref=f14e352]
+          - generic [ref=f14e353]:
+            - heading "💈 Try A Different Style" [level=4] [ref=f14e354]
+            - paragraph [ref=f14e355]: Authentic Vintage Barber Art
+        - generic [ref=f14e356] [cursor=pointer]:
+          - img "Boys Hair Styles 2026" [ref=f14e357]
+          - generic [ref=f14e358]:
+            - heading "✂️ 9 Trending Haircuts" [level=4] [ref=f14e359]
+            - paragraph [ref=f14e360]: Boys Hair Styles 2026 Guide
+        - generic [ref=f14e361] [cursor=pointer]:
+          - img "Handsome Men Hairstyle Ideas" [ref=f14e362]
+          - generic [ref=f14e363]:
+            - heading "⭐ Men's Trend Lookbook" [level=4] [ref=f14e364]
+            - paragraph [ref=f14e365]: Modern, Stylish & Timeless
+        - generic [ref=f14e366] [cursor=pointer]:
+          - img "Textured Slick Back Fade 2026" [ref=f14e367]
+          - generic [ref=f14e368]:
+            - heading "📐 2026 Fade Blueprint" [level=4] [ref=f14e369]
+            - paragraph [ref=f14e370]: Textured Slick Back 3-Angle Guide
+  - generic [ref=f14e372]:
+    - generic [ref=f14e373]:
+      - generic [ref=f14e374]: Visit The Salon
+      - heading "Prime Location & Timings" [level=2] [ref=f14e379]:
+        - text: Prime Location &
+        - generic [ref=f14e380]: Timings
+      - paragraph [ref=f14e381]: Walk into luxury or schedule your private grooming consultation directly.
+    - generic [ref=f14e382]:
+      - generic [ref=f14e383]:
+        - generic [ref=f14e384]:
+          - heading "Salon Address & Reservations" [level=3] [ref=f14e385]
+          - generic [ref=f14e391]:
+            - generic [ref=f14e392]: Physical Address
+            - paragraph [ref=f14e393]: Shop 14, Royal Heritage Arcade, High Street Boulevard, New Delhi, India
+          - generic [ref=f14e398]:
+            - generic [ref=f14e399]: Telephone / Reservations
+            - link "+91 98765 43210" [ref=f14e400] [cursor=pointer]:
+              - /url: tel:+91 98765 43210
+          - generic [ref=f14e405]:
+            - generic [ref=f14e406]: Direct WhatsApp Desk
+            - link "Chat on WhatsApp" [ref=f14e407] [cursor=pointer]:
+              - /url: https://wa.me/919876543210?text=Hello%20The%20Classic%20Cut%20Salon!
+          - generic [ref=f14e418]:
+            - generic [ref=f14e419]: Working Hours
+            - paragraph [ref=f14e420]: "Mon - Fri: 9:00 AM - 9:30 PM"
+            - paragraph [ref=f14e421]: "Sat - Sun: 8:30 AM - 10:00 PM"
+        - generic [ref=f14e422]:
+          - link "Call Salon" [ref=f14e423] [cursor=pointer]:
+            - /url: tel:+91 98765 43210
+          - link "WhatsApp" [ref=f14e427] [cursor=pointer]:
+            - /url: https://wa.me/919876543210
+      - iframe [ref=f14e432]
+  - contentinfo [ref=f14e433]:
+    - generic [ref=f14e434]:
+      - generic [ref=f14e435]:
+        - generic [ref=f14e436]:
+          - generic [ref=f14e437]:
+            - img "Logo" [ref=f14e438]
+            - generic [ref=f14e439]: The Classic Cut Salon
+          - paragraph [ref=f14e440]: Where Vintage Craftsmanship Meets Modern Luxury. Premier gentleman barber specializing in precision taper fades, traditional hot-towel straight-razor cuts, and exclusive loyalty rewards.
+        - generic [ref=f14e441]:
+          - heading "Quick Navigation" [level=4] [ref=f14e442]
+          - list [ref=f14e443]:
+            - listitem [ref=f14e444]:
+              - link "✂️ Barber Journey (Scroll Animation)" [ref=f14e445] [cursor=pointer]:
+                - /url: "#experience"
+            - listitem [ref=f14e446]:
+              - link "💈 Services Menu & Rates" [ref=f14e447] [cursor=pointer]:
+                - /url: "#services"
+            - listitem [ref=f14e448]:
+              - link "🧔 Master Barber & Story" [ref=f14e449] [cursor=pointer]:
+                - /url: "#owner"
+            - listitem [ref=f14e450]:
+              - link "📍 Salon Location & Google Map" [ref=f14e451] [cursor=pointer]:
+                - /url: "#contact"
+        - generic [ref=f14e452]:
+          - heading "Salon Hours" [level=4] [ref=f14e453]
+          - paragraph [ref=f14e454]: "Mon - Fri: 9:00 AM - 9:30 PM"
+          - paragraph [ref=f14e455]: "Sat - Sun: 8:30 AM - 10:00 PM"
+          - link "📞 Call +91 98765 43210" [ref=f14e456] [cursor=pointer]:
+            - /url: tel:+91 98765 43210
+        - generic [ref=f14e457]:
+          - heading "Staff & Salon Admin" [level=4] [ref=f14e458]
+          - paragraph [ref=f14e459]: Salon operators can access the Coupe Stamp registry, visit audit logs, and live CMS editor.
+          - button "Staff / Admin Portal" [ref=f14e460] [cursor=pointer]
+      - generic [ref=f14e465]:
+        - generic [ref=f14e466]: © 2026 The Classic Cut Salon. All Rights Reserved.
+        - generic [ref=f14e467]: Built with MERN Stack & Handcrafted GSAP Animation
+  - generic [ref=f14e468]:
+    - button "Home" [ref=f14e469] [cursor=pointer]
+    - button "Haircuts" [ref=f14e474] [cursor=pointer]
+    - button "5-Coupe" [ref=f14e482] [cursor=pointer]
+    - button "Location" [ref=f14e488] [cursor=pointer]
+    - button "Sign In" [ref=f14e492] [cursor=pointer]
