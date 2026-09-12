@@ -5,6 +5,7 @@ import {
   login,
   googleAuth,
   getProfile,
+  updateProfile,
 } from '../controllers/authController.js';
 import { protect } from '../middleware/authMiddleware.js';
 import { authLimiter, otpLimiter } from '../middleware/rateLimiter.js';
@@ -16,5 +17,6 @@ router.post('/register', authLimiter, registerWithOtp);
 router.post('/login', authLimiter, login);
 router.post('/google', authLimiter, googleAuth);
 router.get('/profile', protect, getProfile);
+router.put('/profile', protect, updateProfile);
 
 export default router;

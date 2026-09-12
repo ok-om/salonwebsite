@@ -1,11 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Scissors, Sparkles, MessageSquare, ArrowRight, CheckCircle2, Clock, X, ZoomIn, Eye, ShieldCheck, Flame } from 'lucide-react';
 import { useSiteConfig } from '../context/SiteConfigContext';
+import { useSmoothScroll } from '../context/SmoothScrollContext';
 
 export const ModernServicesExperience = () => {
   const { config } = useSiteConfig();
+  const { stopScroll, startScroll } = useSmoothScroll();
   const [activeServiceModal, setActiveServiceModal] = useState(null);
   const [selectedPoster, setSelectedPoster] = useState(null);
+
+  // Lock background scroll completely on both desktop and mobile when service modal or poster is open
+  useEffect(() => {
+    if (activeServiceModal || selectedPoster) {
+      stopScroll?.();
+      return () => {
+        startScroll?.();
+      };
+    }
+  }, [activeServiceModal, selectedPoster, stopScroll, startScroll]);
 
   // 3 Vibrant Shaped Cards (directly from Screenshot 2026-09-07 232400.png)
   const FEATURED_SERVICES = [
@@ -504,6 +516,7 @@ export const ModernServicesExperience = () => {
       {/* 4. "OUR SERVICES" 3 VIBRANT SHAPED CARDS (Screenshot 2026-09-07 232400.png) */}
       {/* ========================================================================= */}
       <div
+        id="services"
         style={{
           background: '#fef08a', // Creamy Butter-Yellow from Screenshot 2026-09-07 232400.png
           padding: '5rem 1.25rem',
@@ -684,11 +697,20 @@ export const ModernServicesExperience = () => {
                   </button>
 
                   <div style={{ textAlign: 'right' }}>
-                    <div style={{ fontSize: '1.35rem', fontWeight: 900, lineHeight: 1 }}>
-                      {srv.price}
-                    </div>
-                    <div style={{ fontSize: '0.72rem', opacity: 0.85 }}>
-                      {srv.duration}
+                    <div
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.35rem',
+                        background: 'rgba(255, 255, 255, 0.18)',
+                        padding: '0.42rem 0.85rem',
+                        borderRadius: 'var(--radius-full)',
+                        fontSize: '0.8rem',
+                        fontWeight: 700,
+                      }}
+                    >
+                      <Clock size={13} />
+                      <span>{srv.duration}</span>
                     </div>
                   </div>
                 </div>
@@ -848,6 +870,7 @@ export const ModernServicesExperience = () => {
       {/* ========================================================================= */}
       {activeServiceModal && (
         <div
+          data-lenis-prevent="true"
           style={{
             position: 'fixed',
             inset: 0,
@@ -858,10 +881,18 @@ export const ModernServicesExperience = () => {
             alignItems: 'center',
             justifyContent: 'center',
             padding: '1rem',
+            overscrollBehavior: 'contain',
+            touchAction: 'none',
           }}
           onClick={() => setActiveServiceModal(null)}
+          onTouchMove={(e) => {
+            if (e.target === e.currentTarget) {
+              e.preventDefault();
+            }
+          }}
         >
           <div
+            data-lenis-prevent="true"
             onClick={(e) => e.stopPropagation()}
             style={{
               background: '#0d111a',
@@ -869,17 +900,19 @@ export const ModernServicesExperience = () => {
               borderRadius: '24px',
               maxWidth: '520px',
               width: '100%',
-              maxHeight: '92vh',
+              maxHeight: '90vh',
               overflow: 'hidden',
               boxShadow: `0 25px 60px rgba(0, 0, 0, 0.95), 0 0 30px ${activeServiceModal.color}44`,
               position: 'relative',
               display: 'flex',
               flexDirection: 'column',
+              overscrollBehavior: 'contain',
             }}
           >
             {/* Modal Header */}
             <div
               style={{
+                flexShrink: 0,
                 padding: '1.25rem 1.5rem',
                 borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
                 display: 'flex',
@@ -906,6 +939,7 @@ export const ModernServicesExperience = () => {
               </div>
               <button
                 onClick={() => setActiveServiceModal(null)}
+                aria-label="Close modal"
                 style={{
                   background: 'rgba(255, 255, 255, 0.08)',
                   border: '1px solid rgba(255, 255, 255, 0.15)',
@@ -917,6 +951,7 @@ export const ModernServicesExperience = () => {
                   alignItems: 'center',
                   justifyContent: 'center',
                   cursor: 'pointer',
+                  flexShrink: 0,
                 }}
               >
                 <X size={18} />
@@ -924,7 +959,18 @@ export const ModernServicesExperience = () => {
             </div>
 
             {/* Modal Body */}
-            <div style={{ padding: '1.4rem 1.5rem', overflowY: 'auto' }}>
+            <div
+              data-lenis-prevent="true"
+              style={{
+                flex: 1,
+                minHeight: 0,
+                padding: '1.4rem 1.5rem',
+                overflowY: 'auto',
+                WebkitOverflowScrolling: 'touch',
+                overscrollBehavior: 'contain',
+                touchAction: 'pan-y',
+              }}
+            >
               {/* Photo preview */}
               <div
                 style={{
@@ -961,7 +1007,7 @@ export const ModernServicesExperience = () => {
                 </div>
               </div>
 
-              {/* Price & Duration */}
+              {/* Duration Info */}
               <div
                 style={{
                   display: 'flex',
@@ -973,13 +1019,8 @@ export const ModernServicesExperience = () => {
                   border: '1px solid rgba(255, 255, 255, 0.08)',
                 }}
               >
-                <div>
-                  <span style={{ fontSize: '0.7rem', color: '#94a3b8', display: 'block' }}>All-Inclusive Price</span>
-                  <span style={{ fontSize: '1.5rem', fontWeight: 900, color: 'var(--gold-primary)' }}>
-                    {activeServiceModal.price}
-                  </span>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#cbd5e1', fontSize: '0.82rem' }}>
+                <span style={{ fontSize: '0.82rem', color: '#cbd5e1' }}>Service Duration</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--gold-primary)', fontSize: '0.88rem', fontWeight: 700 }}>
                   <Clock size={16} />
                   <span>{activeServiceModal.duration}</span>
                 </div>
@@ -989,6 +1030,7 @@ export const ModernServicesExperience = () => {
             {/* Modal Footer */}
             <div
               style={{
+                flexShrink: 0,
                 padding: '1rem 1.5rem',
                 borderTop: '1px solid rgba(255, 255, 255, 0.08)',
                 display: 'flex',
@@ -997,7 +1039,7 @@ export const ModernServicesExperience = () => {
               }}
             >
               <a
-                href={`https://wa.me/${config.whatsapp?.replace(/[^0-9]/g, '')}?text=Hello!%20I%20want%20to%20book%20the%20"${encodeURIComponent(activeServiceModal.title)}"%20service%20(${activeServiceModal.price}).`}
+                href={`https://wa.me/${config.whatsapp?.replace(/[^0-9]/g, '') || '919322188848'}?text=Hello!%20I%20want%20to%20book%20the%20"${encodeURIComponent(activeServiceModal.title)}"%20service.`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn btn-primary"
@@ -1016,6 +1058,7 @@ export const ModernServicesExperience = () => {
       {/* ========================================================================= */}
       {selectedPoster && (
         <div
+          data-lenis-prevent="true"
           style={{
             position: 'fixed',
             inset: 0,
@@ -1026,10 +1069,18 @@ export const ModernServicesExperience = () => {
             alignItems: 'center',
             justifyContent: 'center',
             padding: '1rem',
+            overscrollBehavior: 'contain',
+            touchAction: 'none',
           }}
           onClick={() => setSelectedPoster(null)}
+          onTouchMove={(e) => {
+            if (e.target === e.currentTarget) {
+              e.preventDefault();
+            }
+          }}
         >
           <div
+            data-lenis-prevent="true"
             onClick={(e) => e.stopPropagation()}
             style={{
               background: '#0d111a',
@@ -1043,10 +1094,12 @@ export const ModernServicesExperience = () => {
               position: 'relative',
               display: 'flex',
               flexDirection: 'column',
+              overscrollBehavior: 'contain',
             }}
           >
             <div
               style={{
+                flexShrink: 0,
                 padding: '0.85rem 1.25rem',
                 borderBottom: '1px solid rgba(212, 175, 55, 0.25)',
                 display: 'flex',
@@ -1065,6 +1118,7 @@ export const ModernServicesExperience = () => {
               </div>
               <button
                 onClick={() => setSelectedPoster(null)}
+                aria-label="Close modal"
                 style={{
                   background: 'rgba(255, 255, 255, 0.08)',
                   border: '1px solid rgba(255, 255, 255, 0.15)',
@@ -1083,7 +1137,21 @@ export const ModernServicesExperience = () => {
               </button>
             </div>
 
-            <div style={{ padding: '0.75rem', textAlign: 'center', background: '#05070a', overflow: 'auto', maxHeight: '62vh' }}>
+            <div
+              data-lenis-prevent="true"
+              style={{
+                flex: 1,
+                minHeight: 0,
+                padding: '0.75rem',
+                textAlign: 'center',
+                background: '#05070a',
+                overflowY: 'auto',
+                WebkitOverflowScrolling: 'touch',
+                overscrollBehavior: 'contain',
+                touchAction: 'pan-y',
+                maxHeight: '62vh',
+              }}
+            >
               <img
                 src={selectedPoster.url}
                 alt={selectedPoster.title}
@@ -1101,6 +1169,7 @@ export const ModernServicesExperience = () => {
 
             <div
               style={{
+                flexShrink: 0,
                 padding: '0.85rem 1.25rem',
                 borderTop: '1px solid rgba(212, 175, 55, 0.2)',
                 display: 'flex',

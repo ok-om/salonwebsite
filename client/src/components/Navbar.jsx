@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { useSiteConfig } from '../context/SiteConfigContext';
 import { Scissors, User as UserIcon, Menu, X, Phone, MessageSquare, ShieldCheck, MapPin, Clock, LogOut } from 'lucide-react';
 
-export const Navbar = ({ onOpenAuth, onOpenAdmin, onOpenLoyalty }) => {
+export const Navbar = ({ onOpenAuth, onOpenAdmin, onOpenLoyalty, onOpenProfile }) => {
   const { user, isAdmin, isAuthenticated, logout } = useAuth();
   const { config } = useSiteConfig();
   const [scrolled, setScrolled] = useState(false);
@@ -141,9 +141,11 @@ export const Navbar = ({ onOpenAuth, onOpenAdmin, onOpenLoyalty }) => {
             <button onClick={() => scrollToSection('haircuts')} style={desktopLinkStyle}>
               Haircut Collection
             </button>
-            <button onClick={onOpenLoyalty} style={desktopLinkStyle}>
-              5-Coupe Card
-            </button>
+            {!isAdmin && (
+              <button onClick={onOpenLoyalty} style={desktopLinkStyle}>
+                5-Coupe Card
+              </button>
+            )}
             <button onClick={() => scrollToSection('contact')} style={desktopLinkStyle}>
               Location & Hours
             </button>
@@ -151,18 +153,16 @@ export const Navbar = ({ onOpenAuth, onOpenAdmin, onOpenLoyalty }) => {
 
           {/* Desktop Right Action Pill Group */}
           <div className="desktop-actions" style={{ display: 'none', alignItems: 'center', gap: '0.6rem' }}>
-            {config.whatsapp && (
-              <a
-                href={`https://wa.me/${config.whatsapp.replace(/[^0-9]/g, '')}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn btn-outline btn-sm"
-                style={{ padding: '0.4rem 0.85rem', fontSize: '0.8rem' }}
-              >
-                <MessageSquare size={14} />
-                <span>WhatsApp</span>
-              </a>
-            )}
+            <a
+              href={`https://wa.me/${config.whatsapp?.replace(/[^0-9]/g, '') || '919322188848'}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-outline btn-sm"
+              style={{ padding: '0.4rem 0.85rem', fontSize: '0.8rem' }}
+            >
+              <MessageSquare size={14} />
+              <span>WhatsApp</span>
+            </a>
 
             {isAdmin && (
               <button
@@ -176,29 +176,78 @@ export const Navbar = ({ onOpenAuth, onOpenAdmin, onOpenLoyalty }) => {
             )}
 
             {isAuthenticated ? (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
                 <button
-                  onClick={onOpenLoyalty}
-                  className="btn btn-primary btn-sm"
-                  style={{ padding: '0.4rem 0.9rem', fontSize: '0.8rem' }}
+                  onClick={() => (onOpenProfile ? onOpenProfile('profile') : onOpenLoyalty())}
+                  className="btn btn-outline btn-sm"
+                  style={{
+                    padding: '0.35rem 0.85rem 0.35rem 0.45rem',
+                    fontSize: '0.82rem',
+                    borderRadius: '24px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.45rem',
+                    border: '1px solid rgba(212, 175, 55, 0.45)',
+                    background: 'rgba(212, 175, 55, 0.08)',
+                    boxShadow: '0 0 14px rgba(212, 175, 55, 0.15)',
+                    cursor: 'pointer',
+                  }}
+                  title="Click to view your Profile & 5-Coupe Card"
                 >
-                  <Scissors size={14} />
-                  <span>{user?.currentStamps || 0}/5 Stamps</span>
+                  <div
+                    style={{
+                      width: '24px',
+                      height: '24px',
+                      borderRadius: '50%',
+                      background: 'var(--gold-gradient)',
+                      color: '#0b0c10',
+                      fontWeight: 800,
+                      fontSize: '0.72rem',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                    }}
+                  >
+                    {(user?.name || 'U').charAt(0).toUpperCase()}
+                  </div>
+                  <span style={{ fontWeight: 600, color: '#ffffff', maxWidth: '100px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {user?.name?.split(' ')[0] || 'Profile'}
+                  </span>
+                  {!isAdmin && (
+                    <span
+                      style={{
+                        background: 'rgba(212, 175, 55, 0.25)',
+                        color: 'var(--gold-primary)',
+                        fontSize: '0.72rem',
+                        fontWeight: 700,
+                        padding: '0.12rem 0.4rem',
+                        borderRadius: '10px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.2rem',
+                      }}
+                    >
+                      <Scissors size={11} />
+                      {user?.currentStamps || 0}/5
+                    </span>
+                  )}
                 </button>
+
                 <button
                   onClick={logout}
                   className="btn btn-secondary btn-sm"
-                  style={{ padding: '0.4rem 0.6rem', fontSize: '0.75rem' }}
+                  style={{ padding: '0.42rem 0.65rem', fontSize: '0.78rem', borderRadius: '8px' }}
                   title="Logout"
                 >
-                  <LogOut size={13} />
+                  <LogOut size={14} />
                 </button>
               </div>
             ) : (
               <button
                 onClick={onOpenAuth}
                 className="btn btn-primary btn-sm"
-                style={{ padding: '0.4rem 1rem', fontSize: '0.82rem' }}
+                style={{ padding: '0.42rem 1.05rem', fontSize: '0.82rem', borderRadius: '20px' }}
               >
                 <UserIcon size={14} />
                 <span>Login</span>
@@ -206,8 +255,77 @@ export const Navbar = ({ onOpenAuth, onOpenAdmin, onOpenLoyalty }) => {
             )}
           </div>
 
-          {/* Mobile Right: Single Sleek Hamburger Menu Button (Handberg) */}
+          {/* Mobile Right: Stamp Count Badge (when logged in) / Login + Sleek Hamburger Menu Button */}
           <div className="mobile-only-header">
+            {isAuthenticated ? (
+              <button
+                onClick={() => (onOpenProfile ? onOpenProfile('profile') : onOpenLoyalty())}
+                className="mobile-stamp-badge"
+                title="View Profile & 5-Coupe Card"
+                style={{
+                  background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.22) 0%, rgba(18, 21, 30, 0.95) 100%)',
+                  border: '1.5px solid var(--gold-primary)',
+                  borderRadius: '20px',
+                  color: 'var(--gold-primary)',
+                  padding: '0.25rem 0.6rem 0.25rem 0.35rem',
+                  fontSize: '0.76rem',
+                  fontWeight: 700,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.32rem',
+                  cursor: 'pointer',
+                  boxShadow: '0 0 12px rgba(212, 175, 55, 0.25)',
+                  whiteSpace: 'nowrap',
+                  flexShrink: 0,
+                  transition: 'all 0.2s ease',
+                }}
+              >
+                <div
+                  style={{
+                    width: '20px',
+                    height: '20px',
+                    borderRadius: '50%',
+                    background: 'var(--gold-gradient)',
+                    color: '#0b0c10',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '0.68rem',
+                    fontWeight: 800,
+                    flexShrink: 0,
+                  }}
+                >
+                  {(user?.name || 'U').charAt(0).toUpperCase()}
+                </div>
+                <span>{user?.name?.split(' ')[0] || 'Profile'}</span>
+                {!isAdmin && <span style={{ opacity: 0.85, fontSize: '0.7rem' }}>({user?.currentStamps || 0}/5)</span>}
+              </button>
+            ) : (
+              <button
+                onClick={onOpenAuth}
+                className="mobile-login-badge"
+                title="Login / Register"
+                style={{
+                  background: 'rgba(255, 255, 255, 0.05)',
+                  border: '1px solid rgba(212, 175, 55, 0.35)',
+                  borderRadius: '16px',
+                  color: '#ffffff',
+                  padding: '0.34rem 0.62rem',
+                  fontSize: '0.74rem',
+                  fontWeight: 600,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.3rem',
+                  cursor: 'pointer',
+                  whiteSpace: 'nowrap',
+                  flexShrink: 0,
+                }}
+              >
+                <UserIcon size={12} />
+                <span>Login</span>
+              </button>
+            )}
+
             <button
               onClick={() => setMobileDrawerOpen(true)}
               aria-label="Open Navigation Menu"
@@ -216,16 +334,17 @@ export const Navbar = ({ onOpenAuth, onOpenAdmin, onOpenLoyalty }) => {
                 border: '1px solid rgba(212, 175, 55, 0.4)',
                 borderRadius: '8px',
                 color: 'var(--gold-primary)',
-                width: '42px',
-                height: '42px',
+                width: '38px',
+                height: '38px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 cursor: 'pointer',
                 transition: 'all 0.2s ease',
+                flexShrink: 0,
               }}
             >
-              <Menu size={22} strokeWidth={2.2} />
+              <Menu size={20} strokeWidth={2.2} />
             </button>
           </div>
         </div>
@@ -311,33 +430,71 @@ export const Navbar = ({ onOpenAuth, onOpenAdmin, onOpenLoyalty }) => {
               {isAuthenticated ? (
                 <div
                   style={{
-                    background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.15) 0%, rgba(20, 23, 32, 0.9) 100%)',
+                    background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.14) 0%, rgba(20, 23, 32, 0.95) 100%)',
                     border: '1px solid rgba(212, 175, 55, 0.35)',
                     borderRadius: 'var(--radius-sm)',
-                    padding: '0.85rem',
+                    padding: '0.9rem',
                     marginBottom: '1rem',
                   }}
                 >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                    <span style={{ fontSize: '0.88rem', fontWeight: 600, color: '#ffffff' }}>
-                      {user?.name}
-                    </span>
-                    <span className="badge badge-gold" style={{ fontSize: '0.7rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginBottom: '0.65rem' }}>
+                    <div
+                      style={{
+                        width: '42px',
+                        height: '42px',
+                        borderRadius: '50%',
+                        background: 'var(--gold-gradient)',
+                        color: '#0b0c10',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontWeight: 800,
+                        fontSize: '1.1rem',
+                        border: '1.5px solid #ffffff',
+                        flexShrink: 0,
+                      }}
+                    >
+                      {(user?.name || 'U').charAt(0).toUpperCase()}
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: '0.94rem', fontWeight: 700, color: '#ffffff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {user?.name}
+                      </div>
+                      <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {user?.email}
+                      </div>
+                    </div>
+                    <span className="badge badge-gold" style={{ fontSize: '0.68rem', flexShrink: 0 }}>
                       {user?.currentStamps || 0}/5 Stamps
                     </span>
                   </div>
 
-                  <button
-                    onClick={() => {
-                      setMobileDrawerOpen(false);
-                      onOpenLoyalty();
-                    }}
-                    className="btn btn-primary btn-sm"
-                    style={{ width: '100%', padding: '0.5rem', fontSize: '0.8rem', marginBottom: '0.4rem' }}
-                  >
-                    <Scissors size={14} />
-                    <span>View 5-Coupe Card</span>
-                  </button>
+                  <div style={{ display: 'flex', gap: '0.45rem', marginTop: '0.5rem', marginBottom: '0.45rem' }}>
+                    <button
+                      onClick={() => {
+                        setMobileDrawerOpen(false);
+                        onOpenProfile ? onOpenProfile('profile') : onOpenLoyalty();
+                      }}
+                      className="btn btn-primary btn-sm"
+                      style={{ flex: 1, padding: '0.45rem', fontSize: '0.78rem' }}
+                    >
+                      <UserIcon size={14} />
+                      <span>My Profile</span>
+                    </button>
+                    {!isAdmin && (
+                      <button
+                        onClick={() => {
+                          setMobileDrawerOpen(false);
+                          onOpenProfile ? onOpenProfile('stamps') : onOpenLoyalty();
+                        }}
+                        className="btn btn-outline btn-sm"
+                        style={{ flex: 1, padding: '0.45rem', fontSize: '0.78rem' }}
+                      >
+                        <Scissors size={14} />
+                        <span>5-Coupe Card</span>
+                      </button>
+                    )}
+                  </div>
 
                   <button
                     onClick={() => {
@@ -345,7 +502,7 @@ export const Navbar = ({ onOpenAuth, onOpenAdmin, onOpenLoyalty }) => {
                       logout();
                     }}
                     className="btn btn-secondary btn-sm"
-                    style={{ width: '100%', padding: '0.4rem', fontSize: '0.75rem' }}
+                    style={{ width: '100%', padding: '0.38rem', fontSize: '0.74rem', color: '#ff8080' }}
                   >
                     Logout
                   </button>
@@ -383,19 +540,21 @@ export const Navbar = ({ onOpenAuth, onOpenAdmin, onOpenLoyalty }) => {
                 <button onClick={() => scrollToSection('haircuts')} style={mobileMenuItemStyle}>
                   <span>✂️</span> The Master Haircut Gallery
                 </button>
-                <button
-                  onClick={() => {
-                    setMobileDrawerOpen(false);
-                    onOpenLoyalty();
-                  }}
-                  style={{
-                    ...mobileMenuItemStyle,
-                    borderColor: 'rgba(212, 175, 55, 0.3)',
-                    color: 'var(--gold-primary)',
-                  }}
-                >
-                  <span>🎟️</span> 5-Coupe Stamp Card
-                </button>
+                {!isAdmin && (
+                  <button
+                    onClick={() => {
+                      setMobileDrawerOpen(false);
+                      onOpenLoyalty();
+                    }}
+                    style={{
+                      ...mobileMenuItemStyle,
+                      borderColor: 'rgba(212, 175, 55, 0.3)',
+                      color: 'var(--gold-primary)',
+                    }}
+                  >
+                    <span>🎟️</span> 5-Coupe Stamp Card
+                  </button>
+                )}
                 <button onClick={() => scrollToSection('contact')} style={mobileMenuItemStyle}>
                   <span>📍</span> Location & Timings
                 </button>
@@ -424,7 +583,7 @@ export const Navbar = ({ onOpenAuth, onOpenAdmin, onOpenLoyalty }) => {
               <div style={{ marginTop: '1.5rem', paddingTop: '1rem', borderTop: '1px solid rgba(255, 255, 255, 0.08)' }}>
                 <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.8rem' }}>
                   <a
-                    href={`tel:${config.phone}`}
+                    href={`tel:${config.phone?.replace(/[^0-9+]/g, '') || '9322188848'}`}
                     className="btn btn-outline btn-sm"
                     style={{ flex: 1, padding: '0.5rem', fontSize: '0.78rem' }}
                   >
@@ -432,7 +591,7 @@ export const Navbar = ({ onOpenAuth, onOpenAdmin, onOpenLoyalty }) => {
                     <span>Call</span>
                   </a>
                   <a
-                    href={`https://wa.me/${config.whatsapp?.replace(/[^0-9]/g, '')}`}
+                    href={`https://wa.me/${config.whatsapp?.replace(/[^0-9]/g, '') || '919322188848'}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="btn btn-primary btn-sm"
@@ -451,7 +610,7 @@ export const Navbar = ({ onOpenAuth, onOpenAdmin, onOpenLoyalty }) => {
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
                     <MapPin size={12} color="var(--gold-primary)" />
                     <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {config.address || 'Royal Heritage Boulevard'}
+                      {config.address || 'At Gevrai jategaon road Rohithal, Tq gevrai dist beed 431127 Maharashtra'}
                     </span>
                   </div>
                 </div>
@@ -482,7 +641,25 @@ export const Navbar = ({ onOpenAuth, onOpenAdmin, onOpenLoyalty }) => {
             display: none !important;
           }
           .mobile-only-header {
-            display: block !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 0.45rem !important;
+          }
+        }
+        @media (max-width: 380px) {
+          .stamp-badge-count-long {
+            display: none !important;
+          }
+          .stamp-badge-count-short {
+            display: inline !important;
+          }
+        }
+        @media (min-width: 381px) {
+          .stamp-badge-count-long {
+            display: inline !important;
+          }
+          .stamp-badge-count-short {
+            display: none !important;
           }
         }
       `}</style>

@@ -42,12 +42,13 @@ export const requestOtp = async (req, res) => {
 
     // Send email
     const emailResult = await sendOtpEmail(cleanEmail, otpCode);
+    if (!emailResult.success) {
+      await Otp.deleteMany({ email: cleanEmail });
+      return res.status(500).json({ message: 'Failed to deliver verification code to this email. Please verify your email address.' });
+    }
 
     res.status(200).json({
-      message: 'OTP sent to your email successfully',
-      mode: emailResult.mode,
-      // Provide devOtp only in development when SMTP is not configured
-      devOtp: process.env.NODE_ENV !== 'production' ? otpCode : undefined,
+      message: 'A 6-digit verification code has been sent to your email address.',
     });
   } catch (error) {
     console.error('Request OTP Error:', error);
@@ -65,32 +66,77 @@ export const registerWithOtp = async (req, res) => {
     }
 
     const cleanEmail = email.toLowerCase().trim();
+    const cleanOtp = String(otp || '').trim().replace(/[^0-9]/g, '');
 
-    // Verify OTP
-    const validOtp = await Otp.findOne({ email: cleanEmail, otp });
-    if (!validOtp) {
-      return res.status(400).json({ message: 'Invalid or expired OTP' });
+    if (cleanOtp.length !== 6) {
+      return res.status(400).json({ message: 'Please enter a valid 6-digit OTP.' });
     }
 
     // Check if user already exists
     let user = await User.findOne({ email: cleanEmail });
-    if (user && user.isVerified) {
-      return res.status(400).json({ message: 'User already exists with this email' });
+    if (user && user.isVerified && !user.isDeleted) {
+      return res.status(400).json({ message: 'User already exists with this email. Please login instead.' });
+    }
+
+    // Verify OTP: Match against active, unexpired OTPs
+    const matchingOtp = await Otp.findOne({
+      email: cleanEmail,
+      otp: cleanOtp,
+      expiresAt: { $gt: new Date() },
+    });
+
+    if (!matchingOtp) {
+      // Determine exact reason to give clear, non-misleading feedback
+      const latestOtp = await Otp.findOne({ email: cleanEmail }).sort({ createdAt: -1 });
+      if (!latestOtp) {
+        return res.status(400).json({
+          message: 'No active OTP found for this email. Please request a new verification code.',
+        });
+      }
+      if (new Date() > new Date(latestOtp.expiresAt)) {
+        return res.status(400).json({
+          message: 'Your verification code has expired. Please click Resend OTP for a fresh code.',
+        });
+      }
+      return res.status(400).json({
+        message: 'Incorrect OTP code. Please check the 6-digit code in your email and try again.',
+      });
+    }
+
+    // Validate and sanitize phone number if provided
+    let cleanPhone = '';
+    if (phone && phone.trim()) {
+      if (/[a-zA-Z]/.test(phone)) {
+        return res.status(400).json({ message: 'Mobile number cannot contain alphabets/letters. Please enter a valid 10-digit number.' });
+      }
+      const digits = String(phone).replace(/[^0-9]/g, '');
+      const validDigits = digits.length === 12 && digits.startsWith('91') ? digits.slice(2) : digits;
+      if (validDigits.length !== 10) {
+        return res.status(400).json({ message: 'Mobile number must be a valid 10-digit number.' });
+      }
+      cleanPhone = '+91 ' + validDigits;
     }
 
     if (user) {
-      // Update existing unverified user
+      // Update existing unverified user or reactivate soft-deleted account
       user.name = name;
-      user.phone = phone || '';
+      user.phone = cleanPhone;
       user.password = password;
       user.isVerified = true;
+      if (user.isDeleted) {
+        user.isDeleted = false;
+        user.deletedAt = null;
+        user.restoreExpiresAt = null;
+        user.currentStamps = 0;
+        user.archivedStamps = 0;
+      }
       await user.save();
     } else {
       // Create new user
       user = await User.create({
         name,
         email: cleanEmail,
-        phone: phone || '',
+        phone: cleanPhone,
         password,
         isVerified: true,
       });
@@ -140,6 +186,22 @@ export const login = async (req, res) => {
       return res.status(401).json({ message: 'Invalid email or password' });
     }
 
+    // Ensure admin role if matches configured admin email
+    const adminEmail = (process.env.ADMIN_EMAIL || 'ok8023361@gmail.com').toLowerCase().trim();
+    if ((cleanEmail === adminEmail || cleanEmail === 'ok8023361@gmail.com') && user.role !== 'admin') {
+      user.role = 'admin';
+    }
+
+    // If customer account was in deleted state, allow login but restart Coupe Stamps from 0
+    if (user.isDeleted) {
+      user.isDeleted = false;
+      user.deletedAt = null;
+      user.restoreExpiresAt = null;
+      user.currentStamps = 0;
+      user.archivedStamps = 0;
+    }
+    await user.save();
+
     const token = generateToken(user._id);
 
     res.status(200).json({
@@ -169,65 +231,79 @@ export const googleAuth = async (req, res) => {
       return res.status(400).json({ message: 'Google credential token is required' });
     }
 
-    let payload;
-    try {
-      const ticket = await googleClient.verifyIdToken({
-        idToken: credential,
-        audience: process.env.GOOGLE_CLIENT_ID,
-      });
-      payload = ticket.getPayload();
-    } catch (err) {
-      // Fallback for decoded token in case client is test/mock
-      const decoded = jwt.decode(credential);
-      if (decoded && decoded.email) {
-        payload = decoded;
-      } else {
-        return res.status(400).json({ message: 'Invalid Google authentication token' });
-      }
+    // Strictly verify token against Google OAuth servers
+    const ticket = await googleClient.verifyIdToken({
+      idToken: credential,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+    const payload = ticket.getPayload();
+
+    if (!payload || !payload.email) {
+      return res.status(401).json({ message: 'Invalid or expired Google authentication token' });
     }
 
-    const { email, name, sub: googleId, picture } = payload;
+    const { email, name, sub: googleId } = payload;
     const cleanEmail = email.toLowerCase().trim();
 
+    // Check if user is configured as Admin
+    const adminEmail = (process.env.ADMIN_EMAIL || 'ok8023361@gmail.com').toLowerCase().trim();
+    const isAdmin = cleanEmail === adminEmail || cleanEmail === 'ok8023361@gmail.com';
+
     let user = await User.findOne({ email: cleanEmail });
+    const isNewUser = !user;
 
     if (!user) {
-      // Create new Google verified user
+      // Create new Google verified user with real name and email from Google (NO avatar stored)
       user = await User.create({
         name: name || 'Valued Guest',
         email: cleanEmail,
         googleId,
-        avatar: picture || '',
+        role: isAdmin ? 'admin' : 'user',
         isVerified: true,
       });
     } else {
-      // Link Google ID if missing
+      // Ensure admin privileges if email matches admin
+      if (isAdmin && user.role !== 'admin') {
+        user.role = 'admin';
+      }
       if (!user.googleId) {
         user.googleId = googleId;
-        if (!user.avatar && picture) user.avatar = picture;
-        await user.save();
       }
+      if (name) {
+        user.name = name;
+      }
+      // If customer account was in deleted state, allow login but restart Coupe Stamps from 0
+      if (user.isDeleted) {
+        user.isDeleted = false;
+        user.deletedAt = null;
+        user.restoreExpiresAt = null;
+        user.currentStamps = 0;
+        user.archivedStamps = 0;
+      }
+      await user.save();
     }
 
     const token = generateToken(user._id);
 
     res.status(200).json({
-      message: 'Google Sign-In successful',
+      message: isNewUser ? 'Account registered with Google' : 'Welcome back! Signed in with Google',
+      isNewUser,
       user: {
         _id: user._id,
         name: user.name,
         email: user.email,
-        phone: user.phone,
+        phone: user.phone || '',
         role: user.role,
-        avatar: user.avatar,
         currentStamps: user.currentStamps,
         lifetimeVisits: user.lifetimeVisits,
+        isNewUser,
+        needsPhone: isNewUser && !user.phone, // ONLY true for brand-new users without a phone
       },
       token,
     });
   } catch (error) {
-    console.error('Google Auth Error:', error);
-    res.status(500).json({ message: 'Google Authentication failed. ' + error.message });
+    console.error('Google Auth Verification Error:', error.message);
+    res.status(401).json({ message: 'Google Authentication failed: ' + error.message });
   }
 };
 
@@ -238,5 +314,53 @@ export const getProfile = async (req, res) => {
     res.status(200).json(user);
   } catch (error) {
     res.status(500).json({ message: 'Failed to fetch user profile' });
+  }
+};
+
+// 6. Update User Profile (e.g., Mobile Number, Name)
+export const updateProfile = async (req, res) => {
+  try {
+    const { phone, name } = req.body;
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    if (phone !== undefined) {
+      if (phone.trim()) {
+        if (/[a-zA-Z]/.test(phone)) {
+          return res.status(400).json({ message: 'Mobile number cannot contain alphabets/letters. Please enter a valid 10-digit number.' });
+        }
+        const digits = String(phone).replace(/[^0-9]/g, '');
+        const validDigits = digits.length === 12 && digits.startsWith('91') ? digits.slice(2) : digits;
+        if (validDigits.length !== 10) {
+          return res.status(400).json({ message: 'Mobile number must be a valid 10-digit number.' });
+        }
+        user.phone = '+91 ' + validDigits;
+      } else {
+        user.phone = '';
+      }
+    }
+    if (name !== undefined && name.trim()) {
+      user.name = name.trim();
+    }
+
+    await user.save();
+
+    res.status(200).json({
+      message: 'Profile updated successfully',
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        role: user.role,
+        currentStamps: user.currentStamps,
+        lifetimeVisits: user.lifetimeVisits,
+      },
+    });
+  } catch (error) {
+    console.error('Update Profile Error:', error);
+    res.status(500).json({ message: 'Failed to update profile' });
   }
 };

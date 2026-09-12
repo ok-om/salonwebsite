@@ -8,19 +8,24 @@ export const seedInitialData = async () => {
       console.log('ℹ️ MongoDB not connected yet. Seeder will run when database connection is established.');
       return;
     }
-    // 1. Seed Admin User if none exists
-    const adminExists = await User.findOne({ role: 'admin' });
-    if (!adminExists) {
-      console.log('⚡ Seeding initial default Admin account...');
+    // 1. Seed or promote Admin User
+    const targetAdminEmail = (process.env.ADMIN_EMAIL || 'ok8023361@gmail.com').toLowerCase().trim();
+    let adminUser = await User.findOne({ email: targetAdminEmail });
+    if (!adminUser) {
+      console.log(`⚡ Seeding Admin account: ${targetAdminEmail}...`);
       await User.create({
         name: 'Master Barber (Salon Admin)',
-        email: process.env.ADMIN_EMAIL || 'admin@classiccut.com',
-        phone: '+919876543210',
+        email: targetAdminEmail,
+        phone: '+919322188848',
         password: process.env.ADMIN_PASSWORD || 'admin12345',
         role: 'admin',
         isVerified: true,
       });
-      console.log('✅ Default Admin seeded: admin@classiccut.com / admin12345');
+      console.log(`✅ Admin account created: ${targetAdminEmail}`);
+    } else if (adminUser.role !== 'admin') {
+      adminUser.role = 'admin';
+      await adminUser.save();
+      console.log(`✅ Admin role granted to: ${targetAdminEmail}`);
     }
 
     // 2. Seed Site Config if none exists
@@ -31,11 +36,12 @@ export const seedInitialData = async () => {
         salonName: 'The Classic Cut Salon',
         tagline: 'Where Vintage Craftsmanship Meets Modern Luxury',
         aboutStory: 'Founded on the timeless traditions of classic gentleman grooming, The Classic Cut Salon delivers unmatched scissor craftsmanship, soothing hair therapy, and precision straight-razor beard styling in an ambiance of refined sophistication.',
-        phone: '+91 98765 43210',
-        whatsapp: '+919876543210',
-        email: 'contact@classiccutsalon.com',
-        address: 'Shop 14, Royal Heritage Arcade, High Street Boulevard, New Delhi, India',
-        mapEmbedUrl: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3502.482084055276!2d77.2195022!3d28.6152436!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390cfd37b9277f97%3A0x6b8f36c4b2ffb39c!2sConnaught%20Place!5e0!3m2!1sen!2sin!4v1700000000000',
+        phone: '+91 93221 88848',
+        whatsapp: '+919322188848',
+        email: 'sraut7285@gmail.com',
+        address: 'At Gevrai jategaon road Rohithal, Tq gevrai dist beed 431127 Maharashtra',
+        mapDirectionsUrl: 'https://www.google.com/maps/dir/?api=1&destination=19.2528181,75.8555902',
+        mapEmbedUrl: 'https://maps.google.com/maps?q=19.2528181,75.8555902&hl=en&z=15&output=embed',
         openingHours: {
           weekday: 'Mon - Fri: 9:00 AM - 9:30 PM',
           weekend: 'Sat - Sun: 8:30 AM - 10:00 PM',

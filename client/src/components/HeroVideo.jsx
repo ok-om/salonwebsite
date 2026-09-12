@@ -1,13 +1,15 @@
 import React, { useRef, useState, useEffect } from 'react';
+import { useAuth } from '../context/AuthContext';
 import { useSiteConfig } from '../context/SiteConfigContext';
 import { Hero3DCanvas } from './Three/Hero3DCanvas';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Volume2, VolumeX, Sparkles, ChevronDown, Scissors } from 'lucide-react';
+import { Volume2, VolumeX, Sparkles, ChevronDown, Scissors, ShieldCheck } from 'lucide-react';
 
 gsap.registerPlugin(ScrollTrigger);
 
-export const HeroVideo = ({ onOpenLoyalty, onScrollToExperience, isReady = true }) => {
+export const HeroVideo = ({ onOpenLoyalty, onOpenAdmin, onScrollToExperience, isReady = true }) => {
+  const { isAdmin } = useAuth();
   const { config } = useSiteConfig();
   const heroSectionRef = useRef(null);
   const videoRef = useRef(null);
@@ -219,18 +221,35 @@ export const HeroVideo = ({ onOpenLoyalty, onScrollToExperience, isReady = true 
                 gap: '0.85rem',
               }}
             >
-              <button
-                onClick={onOpenLoyalty}
-                className="btn btn-primary hero-btn"
-                style={{
-                  fontSize: 'clamp(0.9rem, 2.5vw, 1.02rem)',
-                  padding: '0.8rem 1.75rem',
-                  boxShadow: '0 8px 24px rgba(212, 175, 55, 0.35)',
-                }}
-              >
-                <Scissors size={17} />
-                <span>Check My 5-Coupe Card</span>
-              </button>
+              {isAdmin ? (
+                <button
+                  onClick={onOpenAdmin || onOpenLoyalty}
+                  className="btn btn-primary hero-btn"
+                  style={{
+                    fontSize: 'clamp(0.9rem, 2.5vw, 1.02rem)',
+                    padding: '0.8rem 1.75rem',
+                    boxShadow: '0 8px 24px rgba(212, 175, 55, 0.35)',
+                    background: 'linear-gradient(135deg, #c52222 0%, #991b1b 100%)',
+                    borderColor: '#ff4d4d',
+                  }}
+                >
+                  <ShieldCheck size={17} />
+                  <span>Admin Central Command</span>
+                </button>
+              ) : (
+                <button
+                  onClick={onOpenLoyalty}
+                  className="btn btn-primary hero-btn"
+                  style={{
+                    fontSize: 'clamp(0.9rem, 2.5vw, 1.02rem)',
+                    padding: '0.8rem 1.75rem',
+                    boxShadow: '0 8px 24px rgba(212, 175, 55, 0.35)',
+                  }}
+                >
+                  <Scissors size={17} />
+                  <span>Check My 5-Coupe Card</span>
+                </button>
+              )}
 
               <button
                 onClick={onScrollToExperience}
@@ -257,6 +276,7 @@ export const HeroVideo = ({ onOpenLoyalty, onScrollToExperience, isReady = true 
 
         {/* Highlight Stats Bar */}
         <div
+          className="hero-highlight-stats-bar"
           style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
@@ -417,10 +437,46 @@ export const HeroVideo = ({ onOpenLoyalty, onScrollToExperience, isReady = true 
           }
         }
 
-        @media (max-width: 480px) {
+        /* Unified Responsive Compact Mobile Composition (<= 860px) */
+        @media (max-width: 860px) {
+          #hero-section {
+            padding-top: calc(var(--nav-height) + clamp(0.25rem, 0.9vh, 0.75rem)) !important;
+            padding-bottom: calc(64px + clamp(0.4rem, 1.2vh, 1rem)) !important;
+            min-height: auto !important;
+          }
+          .hero-grid-layout {
+            gap: clamp(0.35rem, 1vh, 0.85rem) !important;
+          }
+          .hero-text-col > div:first-child {
+            margin-bottom: clamp(0.25rem, 0.8vh, 0.6rem) !important;
+            padding: clamp(0.2rem, 0.5vh, 0.3rem) clamp(0.65rem, 1.8vw, 0.9rem) !important;
+          }
+          .hero-text-col h1 {
+            font-size: clamp(1.5rem, 4.8vw, 2.2rem) !important;
+            margin-bottom: clamp(0.18rem, 0.6vh, 0.45rem) !important;
+            line-height: 1.1 !important;
+          }
+          .hero-text-col p {
+            font-size: clamp(0.8rem, 2.2vw, 0.98rem) !important;
+            margin-bottom: clamp(0.45rem, 1.2vh, 0.85rem) !important;
+            line-height: 1.35 !important;
+            max-width: 480px !important;
+          }
+          .hero-text-col > div:last-child {
+            gap: clamp(0.35rem, 0.9vh, 0.65rem) !important;
+          }
           .hero-btn {
-            width: 100% !important;
-            max-width: 320px;
+            padding: clamp(0.38rem, 1vh, 0.65rem) clamp(0.85rem, 2.2vw, 1.3rem) !important;
+            font-size: clamp(0.76rem, 2vw, 0.88rem) !important;
+          }
+          .hero-3d-responsive-canvas {
+            height: clamp(100px, 16vh, 185px) !important;
+          }
+          .hero-highlight-stats-bar {
+            grid-template-columns: repeat(3, 1fr) !important;
+            margin-top: clamp(0.45rem, 1.4vh, 1.15rem) !important;
+            padding: clamp(0.38rem, 1vh, 0.75rem) clamp(0.45rem, 1.5vw, 0.85rem) !important;
+            gap: clamp(0.25rem, 0.8vh, 0.6rem) !important;
           }
         }
       `}</style>

@@ -289,6 +289,7 @@ h1, h2, h3, h4, .font-serif {
   z-index: 9999;
   padding: 1rem;
   animation: fadeIn 0.2s ease-out;
+  overscroll-behavior: contain;
 }
 
 .modal-content {
@@ -302,6 +303,9 @@ h1, h2, h3, h4, .font-serif {
   position: relative;
   max-height: 90vh;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
 }
 
 /* Inputs */

@@ -1,10 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Scissors, Sparkles, MessageSquare, ArrowUpRight, ZoomIn, X, Eye, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ScrollToPlugin } from 'gsap/ScrollToPlugin';
+import { Scissors, Sparkles, MessageSquare, ArrowUpRight, ZoomIn, X, Eye, ChevronLeft, ChevronRight, ShieldCheck } from 'lucide-react';
 import { useSiteConfig } from '../context/SiteConfigContext';
+import { useAuth } from '../context/AuthContext';
 
-gsap.registerPlugin(ScrollTrigger);
+gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
 
 // Haircut Photos List with Bespoke Animations
 const HAIRCUTS = [
@@ -297,43 +299,62 @@ const ShowcaseHeader = React.memo(() => (
   </div>
 ));
 
-const CoupeBanner = React.memo(({ onOpenLoyalty }) => (
-  <div
-    id="coupe-banner-card"
-    style={{
-      marginTop: '4.5rem',
-      background: '#07090e',
-      backgroundImage: 'linear-gradient(145deg, #0f131c 0%, #05070a 100%)',
-      border: '2px solid var(--gold-primary)',
-      borderRadius: 'var(--radius-lg)',
-      padding: '2.75rem 1.5rem',
-      textAlign: 'center',
-      boxShadow: '0 25px 60px rgba(0, 0, 0, 0.98), 0 0 35px rgba(212, 175, 55, 0.22)',
-      position: 'relative',
-      zIndex: 15,
-    }}
-  >
-    <Sparkles size={26} color="var(--gold-primary)" style={{ margin: '0 auto 0.6rem', display: 'block' }} />
-    <h3 style={{ fontSize: 'clamp(1.3rem, 3.8vw, 2rem)', marginBottom: '0.4rem' }}>
-      Earn Any Of These Haircuts <span className="gold-text">100% Free</span>
-    </h3>
-    <p style={{ color: '#cbd5e1', maxWidth: '580px', margin: '0 auto 1.25rem', fontSize: '0.88rem' }}>
-      Collect 1 Coupe Stamp every time you visit. After 5 visits, you unlock 1 Free Royal Cut Offer and stamps reset to 0!
-    </p>
-    <div style={{ display: 'flex', justifyContent: 'center', gap: '0.65rem', flexWrap: 'wrap' }}>
-      <button onClick={onOpenLoyalty} className="btn btn-primary btn-sm" style={{ padding: '0.6rem 1.4rem' }}>
-        <Scissors size={15} />
-        <span>Open My 5-Coupe Card</span>
-      </button>
-      <a href="#contact" className="btn btn-outline btn-sm" style={{ padding: '0.6rem 1.2rem' }}>
-        <span>Salon Location & Map</span>
-        <ArrowUpRight size={15} />
-      </a>
+const CoupeBanner = React.memo(({ onOpenLoyalty, onOpenAdmin }) => {
+  const { isAdmin } = useAuth();
+  if (isAdmin) return null;
+  return (
+    <div
+      id="coupe-banner-card"
+      style={{
+        marginTop: '4.5rem',
+        background: '#07090e',
+        backgroundImage: 'linear-gradient(145deg, #0f131c 0%, #05070a 100%)',
+        border: '2px solid var(--gold-primary)',
+        borderRadius: 'var(--radius-lg)',
+        padding: '2.75rem 1.5rem',
+        textAlign: 'center',
+        boxShadow: '0 25px 60px rgba(0, 0, 0, 0.98), 0 0 35px rgba(212, 175, 55, 0.22)',
+        position: 'relative',
+        zIndex: 15,
+      }}
+    >
+      <Sparkles size={26} color="var(--gold-primary)" style={{ margin: '0 auto 0.6rem', display: 'block' }} />
+      <h3 style={{ fontSize: 'clamp(1.3rem, 3.8vw, 2rem)', marginBottom: '0.4rem' }}>
+        Earn Any Of These Haircuts <span className="gold-text">100% Free</span>
+      </h3>
+      <p style={{ color: '#cbd5e1', maxWidth: '580px', margin: '0 auto 1.25rem', fontSize: '0.88rem' }}>
+        Collect 1 Coupe Stamp every time you visit. After 5 visits, you unlock 1 Free Royal Cut Offer and stamps reset to 0!
+      </p>
+      <div style={{ display: 'flex', justifyContent: 'center', gap: '0.65rem', flexWrap: 'wrap' }}>
+        {isAdmin ? (
+          <button
+            onClick={onOpenAdmin || onOpenLoyalty}
+            className="btn btn-primary btn-sm"
+            style={{
+              padding: '0.6rem 1.4rem',
+              background: 'linear-gradient(135deg, #c52222 0%, #991b1b 100%)',
+              borderColor: '#ff4d4d',
+            }}
+          >
+            <ShieldCheck size={15} />
+            <span>Admin Central Command</span>
+          </button>
+        ) : (
+          <button onClick={onOpenLoyalty} className="btn btn-primary btn-sm" style={{ padding: '0.6rem 1.4rem' }}>
+            <Scissors size={15} />
+            <span>Open My 5-Coupe Card</span>
+          </button>
+        )}
+        <a href="#contact" className="btn btn-outline btn-sm" style={{ padding: '0.6rem 1.2rem' }}>
+          <span>Salon Location & Map</span>
+          <ArrowUpRight size={15} />
+        </a>
+      </div>
     </div>
-  </div>
-));
+  );
+});
 
-export const HairCutScrollShowcase = ({ onOpenLoyalty }) => {
+export const HairCutScrollShowcase = ({ onOpenLoyalty, onOpenAdmin }) => {
   const { config } = useSiteConfig();
   const sectionRef = useRef(null);
   const bgContainerRef = useRef(null);
@@ -350,6 +371,16 @@ export const HairCutScrollShowcase = ({ onOpenLoyalty }) => {
 
   const activeIndexRef = useRef(0);
   const activeBgRef = useRef(0);
+  const isProgrammaticScrollRef = useRef(false);
+  const targetIndexRef = useRef(0);
+  const targetScrollYRef = useRef(0);
+  const stableCardIndexRef = useRef(0);
+  const gestureStartCardRef = useRef(0);
+  const isTouchingRef = useRef(false);
+  const isUserGestureActiveRef = useRef(false);
+  const gestureResetTimeoutRef = useRef(null);
+  const scrollEndTimeoutRef = useRef(null);
+  const handleSelectCutRef = useRef(null);
   const currentStage = JOURNEY_STAGES[currentStageIdx] || JOURNEY_STAGES[0];
   const activeCut = HAIRCUTS[activeCardIndex] || HAIRCUTS[0];
 
@@ -358,12 +389,87 @@ export const HairCutScrollShowcase = ({ onOpenLoyalty }) => {
     HAIRCUTS.forEach((cut) => {
       const img = new Image();
       img.src = cut.image;
-      if (img.decode) img.decode().catch(() => {});
+      if (img.decode) img.decode().catch(() => { });
     });
   }, []);
 
   useEffect(() => {
     ScrollTrigger.config({ ignoreMobileResize: true });
+
+    let touchStartY = 0;
+    let touchStartX = 0;
+    let isSwipeTriggered = false;
+
+    const handleTouchStart = (e) => {
+      if (!e.touches || e.touches.length === 0) return;
+      const isInsideElement = (pinnedStageRef.current && pinnedStageRef.current.contains(e.target)) || (sectionRef.current && sectionRef.current.contains(e.target));
+      if (!isInsideElement) return;
+      touchStartY = e.touches[0].clientY;
+      touchStartX = e.touches[0].clientX;
+      isSwipeTriggered = false;
+    };
+
+    const handleTouchMove = (e) => {
+      if (!e.touches || e.touches.length === 0) return;
+      const isInsideElement = (pinnedStageRef.current && pinnedStageRef.current.contains(e.target)) || (sectionRef.current && sectionRef.current.contains(e.target));
+      if (!isInsideElement) return;
+
+      const st = scrollTriggerRef.current;
+      const isInside = st && (st.isActive || (st.progress >= 0 && st.progress <= 1 && window.scrollY >= st.start - 10 && window.scrollY <= st.end + 10));
+      if (!isInside) return;
+
+      const currentY = e.touches[0].clientY;
+      const currentX = e.touches[0].clientX;
+      const deltaY = currentY - touchStartY;
+      const deltaX = currentX - touchStartX;
+
+      // Ignore predominantly horizontal gestures (e.g. style pill scrolling)
+      if (Math.abs(deltaX) > Math.abs(deltaY) * 1.1) return;
+
+      const currentIdx = activeIndexRef.current;
+
+      // Swiping UP (finger moves up -> scroll down intent -> Next Card)
+      if (deltaY < 0) {
+        if (currentIdx < HAIRCUTS.length - 1) {
+          // Inside showcase (cards 1-6): cancel native fling scroll so we step exactly 1 card
+          if (e.cancelable) {
+            e.preventDefault();
+          }
+          if (deltaY <= -25 && !isSwipeTriggered) {
+            isSwipeTriggered = true;
+            if (handleSelectCutRef.current) {
+              handleSelectCutRef.current(currentIdx + 1);
+            }
+          }
+        }
+        // If already at Card 7: allow native scroll down into CoupeBanner & rest of page
+      }
+      // Swiping DOWN (finger moves down -> scroll up intent -> Prev Card)
+      else if (deltaY > 0) {
+        if (currentIdx > 0) {
+          // Inside showcase (cards 2-7): cancel native fling scroll so we step exactly 1 card
+          if (e.cancelable) {
+            e.preventDefault();
+          }
+          if (deltaY >= 25 && !isSwipeTriggered) {
+            isSwipeTriggered = true;
+            if (handleSelectCutRef.current) {
+              handleSelectCutRef.current(currentIdx - 1);
+            }
+          }
+        }
+        // If already at Card 1: allow native scroll up into Hero
+      }
+    };
+
+    const handleTouchEnd = () => {
+      isSwipeTriggered = false;
+    };
+
+    window.addEventListener('touchstart', handleTouchStart, { passive: true });
+    window.addEventListener('touchmove', handleTouchMove, { passive: false });
+    window.addEventListener('touchend', handleTouchEnd, { passive: true });
+    window.addEventListener('touchcancel', handleTouchEnd, { passive: true });
 
     const ctx = gsap.context(() => {
       // 1. SALON BACKGROUND PARALLAX (Gentle scale as user scrolls through showcase)
@@ -464,30 +570,85 @@ export const HairCutScrollShowcase = ({ onOpenLoyalty }) => {
 
       // 3. PINNED STAGE: Screen locks in place with generous mobile travel & snap
       const isMobile = window.innerWidth <= 860;
+
       const st = ScrollTrigger.create({
         trigger: pinnedTrackRef.current,
         start: 'top top',
         end: () => `+=${window.innerHeight * (isMobile ? 5.5 : 4.0)}px`,
         pin: pinnedStageRef.current,
         pinSpacing: true,
-        scrub: 0.5,
+        scrub: isMobile ? true : 0.5,
         anticipatePin: 1,
         snap: {
-          snapTo: (progress) => Math.round(progress * (HAIRCUTS.length - 1)) / (HAIRCUTS.length - 1),
-          duration: { min: 0.18, max: 0.42 },
-          delay: 0.05,
+          snapTo: (progress) => {
+            return Math.round(progress * (HAIRCUTS.length - 1)) / (HAIRCUTS.length - 1);
+          },
+          inertia: false,
+          duration: { min: 0.15, max: 0.35 },
+          delay: 0.04,
           ease: 'power1.out',
+          onComplete: () => {
+            if (scrollTriggerRef.current) {
+              const settledIdx = Math.max(
+                0,
+                Math.min(
+                  HAIRCUTS.length - 1,
+                  Math.round(scrollTriggerRef.current.progress * (HAIRCUTS.length - 1))
+                )
+              );
+              gestureStartCardRef.current = settledIdx;
+              stableCardIndexRef.current = settledIdx;
+              targetIndexRef.current = settledIdx;
+              activeIndexRef.current = settledIdx;
+              isUserGestureActiveRef.current = false;
+            }
+          },
+        },
+        onEnter: () => {
+          gestureStartCardRef.current = 0;
+          stableCardIndexRef.current = 0;
+          isUserGestureActiveRef.current = false;
+        },
+        onEnterBack: () => {
+          gestureStartCardRef.current = HAIRCUTS.length - 1;
+          stableCardIndexRef.current = HAIRCUTS.length - 1;
+          isUserGestureActiveRef.current = false;
+        },
+        onLeave: () => {
+          gestureStartCardRef.current = HAIRCUTS.length - 1;
+          stableCardIndexRef.current = HAIRCUTS.length - 1;
+          isUserGestureActiveRef.current = false;
+        },
+        onLeaveBack: () => {
+          gestureStartCardRef.current = 0;
+          stableCardIndexRef.current = 0;
+          isUserGestureActiveRef.current = false;
         },
         onUpdate: (self) => {
+          if (isProgrammaticScrollRef.current) {
+            return;
+          }
+
           const rawIdx = self.progress * (HAIRCUTS.length - 1);
           const idx = Math.max(0, Math.min(HAIRCUTS.length - 1, Math.round(rawIdx)));
           if (idx !== activeIndexRef.current) {
             activeIndexRef.current = idx;
+            targetIndexRef.current = idx;
             switchCardAndBg(idx);
           }
         },
       });
       scrollTriggerRef.current = st;
+      if (typeof window !== 'undefined') {
+        window.__HAIRCUT_DEBUG__ = {
+          getScrollTrigger: () => scrollTriggerRef.current,
+          getGestureStartCard: () => gestureStartCardRef.current,
+          getStableCardIndex: () => stableCardIndexRef.current,
+          getActiveIndex: () => activeIndexRef.current,
+          getIsUserGestureActive: () => isUserGestureActiveRef.current,
+          selectCut: (idx) => handleSelectCut(idx),
+        };
+      }
 
       // 4. GSAP ScrollTrigger Title Sequence - 100% GPU Accelerated (NO CPU Blur Filter)
       // Step A: Header physically glides UP into viewport
@@ -545,12 +706,32 @@ export const HairCutScrollShowcase = ({ onOpenLoyalty }) => {
       );
     }, sectionRef);
 
-    return () => ctx.revert();
+    return () => {
+      window.removeEventListener('touchstart', handleTouchStart);
+      window.removeEventListener('touchmove', handleTouchMove);
+      window.removeEventListener('touchend', handleTouchEnd);
+      window.removeEventListener('touchcancel', handleTouchEnd);
+      if (scrollEndTimeoutRef.current) {
+        clearTimeout(scrollEndTimeoutRef.current);
+      }
+      if (gestureResetTimeoutRef.current) {
+        clearTimeout(gestureResetTimeoutRef.current);
+      }
+      if (typeof window !== 'undefined') {
+        delete window.__HAIRCUT_DEBUG__;
+      }
+      ctx.revert();
+    };
   }, []);
 
   const handleSelectCut = (idx) => {
     const safeIdx = Math.max(0, Math.min(HAIRCUTS.length - 1, idx));
+    targetIndexRef.current = safeIdx;
     activeIndexRef.current = safeIdx;
+    stableCardIndexRef.current = safeIdx;
+    gestureStartCardRef.current = safeIdx;
+    isUserGestureActiveRef.current = false;
+    isProgrammaticScrollRef.current = true;
     const targetBgIdx = safeIdx % BACKGROUND_IMAGES.length;
 
     // Single atomic state update to prevent multi-pass re-renders
@@ -567,7 +748,7 @@ export const HairCutScrollShowcase = ({ onOpenLoyalty }) => {
     if (bgSlides[targetBgIdx]) {
       gsap.to(bgSlides[targetBgIdx], {
         opacity: 1,
-        duration: 0.5,
+        duration: 0.45,
         ease: 'power2.out',
         overwrite: 'auto',
       });
@@ -575,7 +756,7 @@ export const HairCutScrollShowcase = ({ onOpenLoyalty }) => {
     if (prevBgIdx !== targetBgIdx && bgSlides[prevBgIdx]) {
       gsap.to(bgSlides[prevBgIdx], {
         opacity: 0,
-        duration: 0.5,
+        duration: 0.45,
         ease: 'power2.out',
         overwrite: 'auto',
       });
@@ -586,7 +767,7 @@ export const HairCutScrollShowcase = ({ onOpenLoyalty }) => {
         if (currentOp > 0.01) {
           gsap.to(slide, {
             opacity: 0,
-            duration: 0.5,
+            duration: 0.45,
             ease: 'power2.out',
             overwrite: 'auto',
           });
@@ -597,24 +778,39 @@ export const HairCutScrollShowcase = ({ onOpenLoyalty }) => {
     gsap.fromTo(
       ['.figure-card-bounce', '.mobile-figure-bounce'],
       { scale: 0.88, y: 10 },
-      { scale: 1, y: 0, duration: 0.45, ease: 'back.out(2)' }
+      { scale: 1, y: 0, duration: 0.4, ease: 'back.out(2)' }
     );
 
     if (scrollTriggerRef.current) {
       const st = scrollTriggerRef.current;
       const progress = safeIdx / (HAIRCUTS.length - 1);
-      const targetScrollY = st.start + progress * (st.end - st.start);
-      window.scrollTo({ top: targetScrollY, behavior: 'smooth' });
+      const targetScrollY = Math.round(st.start + progress * (st.end - st.start));
+      targetScrollYRef.current = targetScrollY;
+
+      st.scroll(targetScrollY);
+      window.scrollTo(0, targetScrollY);
+
+      if (scrollEndTimeoutRef.current) {
+        clearTimeout(scrollEndTimeoutRef.current);
+      }
+
+      scrollEndTimeoutRef.current = setTimeout(() => {
+        isProgrammaticScrollRef.current = false;
+      }, 100);
+    } else {
+      isProgrammaticScrollRef.current = false;
     }
   };
 
+  handleSelectCutRef.current = handleSelectCut;
+
   const handlePrev = () => {
-    const prevIdx = (activeCardIndex - 1 + HAIRCUTS.length) % HAIRCUTS.length;
+    const prevIdx = (targetIndexRef.current - 1 + HAIRCUTS.length) % HAIRCUTS.length;
     handleSelectCut(prevIdx);
   };
 
   const handleNext = () => {
-    const nextIdx = (activeCardIndex + 1) % HAIRCUTS.length;
+    const nextIdx = (targetIndexRef.current + 1) % HAIRCUTS.length;
     handleSelectCut(nextIdx);
   };
 
@@ -1409,21 +1605,11 @@ export const HairCutScrollShowcase = ({ onOpenLoyalty }) => {
                           target="_blank"
                           rel="noopener noreferrer"
                           className="btn btn-primary btn-sm"
-                          style={{ padding: '0.42rem 0.85rem', fontSize: '0.78rem' }}
+                          style={{ padding: '0.48rem 1.1rem', fontSize: '0.82rem' }}
                         >
-                          <MessageSquare size={13} />
+                          <MessageSquare size={14} />
                           <span>Book Cut</span>
                         </a>
-
-                        <button
-                          onClick={onOpenLoyalty}
-                          className="btn btn-outline btn-sm"
-                          title="Collect 1 stamp on this haircut"
-                          style={{ padding: '0.42rem 0.75rem', fontSize: '0.78rem' }}
-                        >
-                          <Scissors size={13} />
-                          <span>+1 Stamp</span>
-                        </button>
                       </div>
                     </div>
                   </div>
@@ -1474,8 +1660,8 @@ export const HairCutScrollShowcase = ({ onOpenLoyalty }) => {
         </div>
       </div>
 
-        {/* Bottom Banner: 5-Coupe Card & Location (Solid Deep Luxury Dark) */}
-        <CoupeBanner onOpenLoyalty={onOpenLoyalty} />
+      {/* Bottom Banner: 5-Coupe Card & Location (Solid Deep Luxury Dark) */}
+      <CoupeBanner onOpenLoyalty={onOpenLoyalty} onOpenAdmin={onOpenAdmin} />
 
       {/* Responsive Styles Injection */}
       <style>{`
@@ -1777,129 +1963,119 @@ export const HairCutScrollShowcase = ({ onOpenLoyalty }) => {
           transition: width 0.3s ease-out;
         }
 
-        /* Mobile Layout (<= 860px) - Perfectly Compact & Full Card In View */
+        /* Unified Responsive Compact Mobile Composition (<= 860px) */
         @media (max-width: 860px) {
-          .pinned-stage-wrapper {
+          div.pinned-stage-wrapper {
             min-height: 100dvh !important;
-            padding: 58px 0.75rem 68px !important;
-            justify-content: center !important;
+            padding-top: clamp(68px, 9vh, 76px) !important; /* Always clears 62px top navbar with 6-14px clearance */
+            padding-bottom: calc(64px + clamp(8px, 1.5vh, 16px)) !important; /* Always clears 64px bottom nav with 8-16px clearance */
+            padding-left: clamp(0.5rem, 2vw, 0.85rem) !important;
+            padding-right: clamp(0.5rem, 2vw, 0.85rem) !important;
+            justify-content: flex-start !important;
           }
-          .salon-atmosphere-badge {
-            display: none !important;
-          }
-          .animated-side-figure {
-            display: none !important;
-          }
-          .mobile-figure-dock {
-            display: none !important;
-          }
-          .section-subtitle {
-            display: none !important;
-          }
-          .section-title {
-            font-size: 1.35rem !important;
-            margin-bottom: 0.2rem !important;
-          }
-          .master-cut-title-badge {
-            padding: 0.18rem 0.55rem !important;
-            font-size: 0.65rem !important;
-            margin-bottom: 0.3rem !important;
-          }
-          .style-pills-container {
-            margin-bottom: 0.45rem !important;
-            padding: 0.2rem 0.4rem !important;
-            gap: 0.35rem !important;
-          }
-          .style-pill-btn {
-            padding: 0.22rem 0.55rem !important;
-            font-size: 0.68rem !important;
-          }
-          .active-cut-card {
-            padding: 0.65rem 0.75rem !important;
-            border-radius: 14px !important;
-          }
-          .card-suite-badge {
-            display: none !important;
-          }
-          .card-artisan-label {
-            display: none !important;
-          }
+          .salon-atmosphere-badge,
+          .animated-side-figure,
+          .mobile-figure-dock,
+          .section-subtitle,
+          .card-suite-badge,
+          .card-artisan-label,
           .card-motion-badge-box {
             display: none !important;
           }
-          .card-top-info-strip {
-            margin-bottom: 0.4rem !important;
+          div.pinned-stage-wrapper .section-header {
+            margin-bottom: clamp(0.2rem, 0.8vh, 0.35rem) !important;
           }
-          .haircut-card-grid {
+          div.pinned-stage-wrapper .master-cut-title-badge {
+            margin-bottom: clamp(0.12rem, 0.4vh, 0.22rem) !important;
+            padding: clamp(0.14rem, 0.4vh, 0.2rem) clamp(0.45rem, 1.5vw, 0.65rem) !important;
+            white-space: nowrap !important;
+            max-width: 95% !important;
+          }
+          div.pinned-stage-wrapper .master-cut-title-badge span {
+            font-size: clamp(0.55rem, 1.8vw, 0.68rem) !important;
+            letter-spacing: 0.05em !important;
+          }
+          div.pinned-stage-wrapper .section-title {
+            font-size: clamp(1.15rem, 3.8vw, 1.45rem) !important;
+            margin-bottom: clamp(0.08rem, 0.3vh, 0.15rem) !important;
+            line-height: 1.15 !important;
+          }
+          div.pinned-stage-wrapper .style-pills-container {
+            margin-bottom: clamp(0.35rem, 1vh, 0.55rem) !important;
+            padding: 0.16rem 0.4rem !important;
+            gap: clamp(0.25rem, 0.8vw, 0.35rem) !important;
+          }
+          div.pinned-stage-wrapper .style-pill-btn {
+            padding: clamp(0.16rem, 0.4vh, 0.22rem) clamp(0.45rem, 1.2vw, 0.55rem) !important;
+            font-size: clamp(0.62rem, 1.8vw, 0.68rem) !important;
+          }
+          div.pinned-stage-wrapper .active-cut-card {
+            padding: clamp(0.55rem, 1.5vh, 0.95rem) clamp(0.7rem, 2.2vw, 1.1rem) !important; /* Luxury card padding - spacious breathing room */
+            border-radius: clamp(14px, 2vw, 18px) !important;
+          }
+          div.pinned-stage-wrapper .card-top-info-strip {
+            margin-bottom: clamp(0.35rem, 1vh, 0.65rem) !important; /* Generous breathing room above photo - NOT chipka hua */
+          }
+          div.pinned-stage-wrapper .card-motion-chip {
+            font-size: clamp(0.65rem, 1.9vw, 0.72rem) !important;
+            padding: 0.18rem 0.55rem !important;
+          }
+          div.pinned-stage-wrapper .haircut-card-grid {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 0.55rem !important;
+            gap: clamp(0.3rem, 0.8vh, 0.55rem) !important;
           }
-          .haircut-img {
-            height: 145px !important;
+          div.pinned-stage-wrapper .haircut-card-grid > div:last-child {
+            gap: clamp(0.25rem, 0.8vh, 0.65rem) !important;
           }
-          .haircut-card-title {
-            font-size: 1.15rem !important;
-            line-height: 1.25 !important;
-            margin-bottom: 0.22rem !important;
+          div.pinned-stage-wrapper .haircut-img {
+            height: clamp(82px, 14.5vh, 155px) !important;
           }
-          .haircut-desc-text {
-            font-size: 0.76rem !important;
-            line-height: 1.35 !important;
-            margin-bottom: 0.4rem !important;
+          div.pinned-stage-wrapper .haircut-card-title {
+            font-size: clamp(0.95rem, 2.8vw, 1.18rem) !important;
+            line-height: 1.18 !important;
+            margin-bottom: clamp(0.08rem, 0.3vh, 0.16rem) !important;
+          }
+          div.pinned-stage-wrapper .haircut-desc-text {
+            font-size: clamp(0.68rem, 1.9vw, 0.78rem) !important;
+            line-height: 1.3 !important;
+            margin-bottom: clamp(0.2rem, 0.6vh, 0.35rem) !important;
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
           }
-          .card-action-bar {
-            padding-top: 0.45rem !important;
+          div.pinned-stage-wrapper .card-action-bar {
+            padding-top: clamp(0.25rem, 0.6vh, 0.38rem) !important;
             justify-content: center !important;
           }
-          .card-action-buttons {
+          div.pinned-stage-wrapper .card-action-buttons {
             width: 100%;
             display: flex;
             justify-content: stretch;
-            gap: 0.5rem;
+            gap: 0.45rem;
           }
-          .card-action-buttons > * {
+          div.pinned-stage-wrapper .card-action-buttons .btn {
             flex: 1;
             text-align: center;
             justify-content: center;
+            padding: clamp(0.28rem, 0.7vh, 0.38rem) clamp(0.55rem, 1.4vw, 0.8rem) !important;
+            font-size: clamp(0.7rem, 1.9vw, 0.76rem) !important;
           }
-          .stage-nav-control-bar {
-            margin-top: 0.65rem !important;
-            padding: 0.35rem 0.65rem !important;
-            max-width: 360px !important;
+          div.pinned-stage-wrapper .stage-nav-control-bar {
+            margin-top: clamp(0.25rem, 0.8vh, 0.65rem) !important;
+            padding: clamp(0.22rem, 0.6vh, 0.42rem) clamp(0.65rem, 2vw, 1rem) !important;
+            max-width: clamp(290px, 85vw, 360px) !important;
           }
-          .stage-nav-btn {
-            padding: 0.35rem 0.8rem !important;
-            font-size: 0.76rem !important;
+          div.pinned-stage-wrapper .stage-nav-btn {
+            padding: clamp(0.26rem, 0.7vh, 0.38rem) clamp(0.65rem, 2vw, 0.85rem) !important;
+            font-size: clamp(0.7rem, 1.9vw, 0.76rem) !important;
           }
-          .stage-mini-progress {
-            width: 40px !important;
+          div.pinned-stage-wrapper .counter-numbers {
+            font-size: clamp(0.68rem, 1.8vw, 0.76rem) !important;
           }
-        }
-
-        /* Blueprint Card Hover */
-        .blueprint-card-hover:hover {
-          transform: translateY(-4px) scale(1.02);
-          border-color: var(--gold-primary) !important;
-          box-shadow: 0 16px 36px rgba(0,0,0,0.95), 0 0 20px rgba(212, 175, 55, 0.3) !important;
-        }
-
-        /* 360px and smaller phones */
-        @media (max-width: 360px) {
-          .haircut-img {
-            height: 130px !important;
-          }
-          .stage-nav-control-bar {
-            max-width: 310px !important;
-            gap: 0.4rem !important;
-          }
-          .stage-nav-btn {
-            padding: 0.3rem 0.65rem !important;
-            font-size: 0.72rem !important;
+          div.pinned-stage-wrapper .stage-mini-progress {
+            width: 36px !important;
           }
         }
       `}</style>

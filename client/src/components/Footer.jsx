@@ -65,11 +65,6 @@ export const Footer = ({ onOpenAdminLogin }) => {
                 </a>
               </li>
               <li>
-                <a href="#owner" style={{ color: 'inherit', textDecoration: 'none' }}>
-                  🧔 Master Barber & Story
-                </a>
-              </li>
-              <li>
                 <a href="#contact" style={{ color: 'inherit', textDecoration: 'none' }}>
                   📍 Salon Location & Google Map
                 </a>
@@ -77,23 +72,26 @@ export const Footer = ({ onOpenAdminLogin }) => {
             </ul>
           </div>
 
-          {/* Col 3: Hours & Booking */}
+          {/* Col 3: Hours & Contact */}
           <div>
             <h4 style={{ color: '#ffffff', fontSize: '1rem', marginBottom: '1rem', fontFamily: 'var(--font-serif)' }}>
-              Salon Hours
+              Salon Hours & Contact
             </h4>
             <p style={{ fontSize: '0.85rem', color: '#cbd5e1', marginBottom: '0.3rem' }}>
               {config.openingHours?.weekday || 'Mon - Fri: 9:00 AM - 9:30 PM'}
             </p>
-            <p style={{ fontSize: '0.85rem', color: '#cbd5e1', marginBottom: '1.2rem' }}>
+            <p style={{ fontSize: '0.85rem', color: '#cbd5e1', marginBottom: '0.5rem' }}>
               {config.openingHours?.weekend || 'Sat - Sun: 8:30 AM - 10:00 PM'}
             </p>
+            <p style={{ fontSize: '0.82rem', color: '#94a3b8', marginBottom: '0.8rem' }}>
+              📧 <a href={`mailto:${config.email || 'sraut7285@gmail.com'}`} style={{ color: 'inherit', textDecoration: 'none' }}>{config.email || 'sraut7285@gmail.com'}</a>
+            </p>
             <a
-              href={`tel:${config.phone}`}
+              href={`tel:${config.phone?.replace(/[^0-9+]/g, '') || '9322188848'}`}
               className="btn btn-outline btn-sm"
               style={{ padding: '0.4rem 0.9rem' }}
             >
-              📞 Call {config.phone}
+              📞 Call {config.phone || '+91 93221 88848'}
             </a>
           </div>
 

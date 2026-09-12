@@ -18,21 +18,37 @@ export const SmoothScrollProvider = ({ children }) => {
   const lenisRef = useRef(null);
 
   useEffect(() => {
-    const isMobile = typeof window !== 'undefined' && (window.innerWidth < 860 || ('ontouchstart' in window) || navigator.maxTouchPoints > 0);
+    const isMobile = typeof window !== 'undefined' && (
+      window.innerWidth < 860 ||
+      ('ontouchstart' in window) ||
+      navigator.maxTouchPoints > 0
+    );
 
-    // 1. Initialize Lenis:
-    // On mobile touch: Disable virtual touch scroll interception so native 120Hz kinetic scroll runs smoothly
-    // On desktop/laptop: Use refined smooth wheel physics
+    // On mobile devices, disable Lenis completely so native 120Hz touch kinetic scroll
+    // runs purely through the browser and does not conflict with touch gestures or cause reverse snaps.
+    if (isMobile) {
+      return;
+    }
+
     const lenis = new Lenis({
-      duration: isMobile ? 0.6 : 0.95,
+      duration: 0.95,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       orientation: 'vertical',
       gestureOrientation: 'vertical',
-      smoothWheel: !isMobile,
+      smoothWheel: true,
       wheelMultiplier: 0.85,
       syncTouch: false,
-      touchMultiplier: isMobile ? 0 : 1.0,
+      touchMultiplier: 1.0,
       infinite: false,
+      prevent: (node) => {
+        if (!node) return false;
+        return (
+          node.hasAttribute?.('data-lenis-prevent') ||
+          node.closest?.('[data-lenis-prevent="true"]') ||
+          node.closest?.('.modal-overlay') ||
+          node.closest?.('.modal-content')
+        );
+      },
     });
 
     lenisRef.current = lenis;
@@ -74,14 +90,48 @@ export const SmoothScrollProvider = ({ children }) => {
     }
   };
 
+  const lockCountRef = useRef(0);
+  const scrollYRef = useRef(0);
+
   const stopScroll = () => {
-    lenisRef.current?.stop();
-    document.body.classList.add('lenis-stopped');
+    lockCountRef.current += 1;
+    if (lockCountRef.current === 1) {
+      scrollYRef.current = window.scrollY || window.pageYOffset || 0;
+      lenisRef.current?.stop();
+      document.body.classList.add('lenis-stopped');
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollYRef.current}px`;
+      document.body.style.left = '0';
+      document.body.style.right = '0';
+      document.body.style.width = '100%';
+      document.body.style.overflow = 'hidden';
+      document.documentElement.style.overflow = 'hidden';
+    }
   };
 
   const startScroll = () => {
-    lenisRef.current?.start();
-    document.body.classList.remove('lenis-stopped');
+    if (lockCountRef.current > 0) {
+      lockCountRef.current -= 1;
+    }
+    if (lockCountRef.current === 0) {
+      const top = document.body.style.top;
+      document.body.classList.remove('lenis-stopped');
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.left = '';
+      document.body.style.right = '';
+      document.body.style.width = '';
+      document.body.style.overflow = '';
+      document.documentElement.style.overflow = '';
+      if (top) {
+        const y = Math.abs(parseInt(top, 10)) || scrollYRef.current || 0;
+        window.scrollTo(0, y);
+        if (lenisRef.current) {
+          lenisRef.current.scrollTo(y, { immediate: true });
+        }
+      }
+      lenisRef.current?.start();
+    }
   };
 
   return (

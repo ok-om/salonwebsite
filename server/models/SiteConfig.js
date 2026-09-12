@@ -17,23 +17,27 @@ const siteConfigSchema = new mongoose.Schema(
     },
     phone: {
       type: String,
-      default: '+91 98765 43210',
+      default: '+91 93221 88848',
     },
     whatsapp: {
       type: String,
-      default: '+919876543210',
+      default: '+919322188848',
     },
     email: {
       type: String,
-      default: 'contact@classiccutsalon.com',
+      default: 'sraut7285@gmail.com',
     },
     address: {
       type: String,
-      default: 'Shop 14, Royal Heritage Arcade, High Street Boulevard, New Delhi, India',
+      default: 'At Gevrai jategaon road Rohithal, Tq gevrai dist beed 431127 Maharashtra',
+    },
+    mapDirectionsUrl: {
+      type: String,
+      default: 'https://www.google.com/maps/dir/?api=1&destination=19.2528181,75.8555902',
     },
     mapEmbedUrl: {
       type: String,
-      default: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3502.482084055276!2d77.2195022!3d28.6152436!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390cfd37b9277f97%3A0x6b8f36c4b2ffb39c!2sConnaught%20Place!5e0!3m2!1sen!2sin!4v1700000000000',
+      default: 'https://maps.google.com/maps?q=19.2528181,75.8555902&hl=en&z=15&output=embed',
     },
     openingHours: {
       weekday: {

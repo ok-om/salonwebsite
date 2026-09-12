@@ -19,6 +19,14 @@ const userSchema = new mongoose.Schema(
       type: String,
       trim: true,
       default: '',
+      validate: {
+        validator: function (v) {
+          if (!v) return true;
+          // Must only contain digits and optional +91 prefix (NO alphabets allowed)
+          return !/[a-zA-Z]/.test(v) && /^\+?[0-9\s-]{10,15}$/.test(v);
+        },
+        message: 'Mobile number must contain digits only and cannot contain letters/alphabets.',
+      },
     },
     password: {
       type: String,
@@ -49,9 +57,26 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: null,
     },
-    avatar: {
-      type: String,
-      default: '',
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
+    deletedAt: {
+      type: Date,
+      default: null,
+    },
+    restoreExpiresAt: {
+      type: Date,
+      default: null,
+      index: true,
+    },
+    archivedStamps: {
+      type: Number,
+      default: 0,
+    },
+    archivedVisits: {
+      type: Number,
+      default: 0,
     },
   },
   { timestamps: true }

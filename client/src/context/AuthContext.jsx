@@ -31,6 +31,14 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     loadUser();
+
+    const handleFocus = () => {
+      if (localStorage.getItem('classic_cut_token')) {
+        loadUser();
+      }
+    };
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
   }, []);
 
   // 1. Request OTP
@@ -69,7 +77,16 @@ export const AuthProvider = ({ children }) => {
     return res.data;
   };
 
-  // 5. Logout
+  // 5. Update Profile
+  const updateProfile = async (profileData) => {
+    const res = await API.put('/auth/profile', profileData);
+    if (res.data.user) {
+      setUser(res.data.user);
+    }
+    return res.data;
+  };
+
+  // 6. Logout
   const logout = () => {
     localStorage.removeItem('classic_cut_token');
     setToken(null);
@@ -88,6 +105,7 @@ export const AuthProvider = ({ children }) => {
         registerWithOtp,
         login,
         googleLogin,
+        updateProfile,
         logout,
         refreshUser: loadUser,
       }}

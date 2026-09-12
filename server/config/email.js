@@ -37,17 +37,11 @@ export const sendOtpEmail = async (email, otp) => {
       console.log(`✉️ Real OTP email sent successfully to ${email}`);
       return { success: true, mode: 'smtp' };
     } else {
-      // Development mode fallback: Log OTP prominently to terminal
-      console.log(`\n======================================================`);
-      console.log(`🔑 DEV MODE OTP for [${email}]: >>> ${otp} <<<`);
-      console.log(`(Configure EMAIL_HOST, EMAIL_USER, EMAIL_PASS in server/.env for live delivery)`);
-      console.log(`======================================================\n`);
-      return { success: true, mode: 'dev_mock', otp };
+      console.warn(`⚠️ EMAIL_HOST, EMAIL_USER, or EMAIL_PASS not configured in .env.`);
+      return { success: false, error: 'Email service is not configured' };
     }
   } catch (error) {
     console.error(`Error sending OTP email: ${error.message}`);
-    // Still log OTP in development so user isn't stuck
-    console.log(`🔑 FALLBACK OTP for [${email}]: >>> ${otp} <<<`);
-    return { success: false, error: error.message, fallbackOtp: otp };
+    return { success: false, error: error.message };
   }
 };

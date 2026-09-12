@@ -18,6 +18,7 @@ const PORT = process.env.PORT || 5000;
 // Security & Utility Middlewares
 app.use(helmet({
   crossOriginResourcePolicy: false,
+  crossOriginOpenerPolicy: false,
 }));
 app.use(cors({
   origin: true, // Allow frontend during dev & configured domains in prod
@@ -33,7 +34,16 @@ app.use('/api/loyalty', loyaltyRoutes);
 app.use('/api/cms', cmsRoutes);
 app.use('/api/services', serviceRoutes);
 
-// Health check endpoint
+// Root & Health check endpoints
+app.get('/', (req, res) => {
+  res.status(200).json({
+    message: '💈 The Classic Cut Salon API Server is Live & Running!',
+    status: 'online',
+    health: '/api/health',
+    timestamp: new Date().toISOString(),
+  });
+});
+
 app.get('/api/health', (req, res) => {
   res.status(200).json({
     status: 'online',

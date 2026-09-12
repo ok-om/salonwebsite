@@ -143,76 +143,121 @@ export const Hero3DCanvas = ({ isReady = true }) => {
     const particles = new THREE.Points(particleGeo, particleMat);
     scene.add(particles);
 
-    // 6. Smooth Mouse Hover Parallax Tilt (Disabled if user prefers reduced motion)
-    const isReducedMotion = capabilities.prefersReducedMotion;
-    const hoverTilt = { x: 0, y: 0, targetX: 0, targetY: 0 };
+    // 6. Interactive Pointer/Touch Drag to Spin along Y-Axis
+    let isDragging = false;
+    let prevPointerX = 0;
+    let dragVelocity = 0;
 
-    const onPointerMove = (e) => {
-      if (isReducedMotion) return;
-      const rect = container.getBoundingClientRect();
-      const x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-      const y = -(((e.clientY - rect.top) / rect.height) * 2 - 1);
-      hoverTilt.targetX = x * 0.35;
-      hoverTilt.targetY = y * 0.25;
+    const onPointerDown = (e) => {
+      isDragging = true;
+      prevPointerX = e.clientX;
+      dragVelocity = 0;
+      if (container) container.style.cursor = 'grabbing';
     };
 
-    if (!isReducedMotion) {
-      window.addEventListener('pointermove', onPointerMove);
-    }
+    const onPointerMove = (e) => {
+      if (!isDragging) return;
+      const deltaX = e.clientX - prevPointerX;
+      prevPointerX = e.clientX;
+      dragVelocity = deltaX * 0.007;
+      if (modelWrapper) {
+        modelWrapper.rotation.y += dragVelocity;
+      }
+    };
 
-    // 7. GSAP ScrollTrigger Integration (Parallax during hero scroll)
+    const onPointerUp = () => {
+      isDragging = false;
+      if (container) container.style.cursor = 'grab';
+    };
+
+    container.addEventListener('pointerdown', onPointerDown);
+    window.addEventListener('pointermove', onPointerMove);
+    window.addEventListener('pointerup', onPointerUp);
+    window.addEventListener('pointercancel', onPointerUp);
+
+    // 7. Hero Scroll Integration: Model position remains strictly locked at (0,0,0) - NO vertical head displacement or tilt
+    masterGroup.position.set(0, 0, 0);
+    masterGroup.rotation.set(0, 0, 0);
+
     const scrollTrigger = ScrollTrigger.create({
       trigger: '#hero-section',
       start: 'top top',
       end: 'bottom top',
       scrub: 1.2,
       onUpdate: (self) => {
-        if (isReducedMotion) return;
-        const p = self.progress;
-        masterGroup.position.y = -p * 1.5;
-        masterGroup.position.z = -p * 1.8;
-        masterGroup.scale.setScalar(1 - p * 0.35);
+        // Position remains strictly (0, 0, 0) - Zero vertical shift or tilt during scroll
+        masterGroup.position.set(0, 0, 0);
+        masterGroup.rotation.set(0, 0, 0);
+        if (particleMat) {
+          particleMat.opacity = Math.max(0.2, 0.85 * (1 - self.progress));
+        }
       },
     });
 
-    // 8. Render Loop with Offscreen Pause for 0% CPU overhead while browsing
+    // Expose model ref for verified runtime inspection
+    if (typeof window !== 'undefined') {
+      window.__HERO_3D_MODEL__ = {
+        getModelWrapper: () => modelWrapper,
+        getMasterGroup: () => masterGroup,
+        getCamera: () => camera,
+        getScene: () => scene,
+      };
+    }
+
+    // 8. Robust Render Loop with Offscreen Pause (guaranteed continuous rotation)
+    const checkVisibility = () => {
+      if (!container) return false;
+      const rect = container.getBoundingClientRect();
+      return rect.bottom > -100 && rect.top < window.innerHeight + 100;
+    };
+
     let isVisible = true;
     let animationFrameId = null;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        isVisible = entry.isIntersecting;
-        if (isVisible && !animationFrameId) {
-          animate();
+        if (entry) {
+          isVisible = entry.isIntersecting;
+          if (isVisible && !animationFrameId) {
+            animate();
+          }
         }
       },
-      { threshold: 0.05 }
+      { threshold: 0.01, rootMargin: '120px' }
     );
     observer.observe(container);
 
     const animate = () => {
-      if (!isVisible) {
+      if (!isVisible && !checkVisibility()) {
         animationFrameId = null;
         return;
       }
 
       animationFrameId = requestAnimationFrame(animate);
 
-      if (!isReducedMotion) {
-        // Rotate model smoothly along Y-AXIS continuously as requested
-        if (modelWrapper) {
-          modelWrapper.rotation.y += 0.008;
+      // Continuous automatic rotation strictly along Y-AXIS only
+      if (!isDragging) {
+        if (Math.abs(dragVelocity) > 0.0005) {
+          dragVelocity *= 0.92;
+          if (modelWrapper) modelWrapper.rotation.y += dragVelocity;
+        } else {
+          dragVelocity = 0;
+          if (modelWrapper) {
+            modelWrapper.rotation.y += 0.015;
+          }
         }
+      }
 
-        // Swirling particles
+      if (modelWrapper) {
+        modelWrapper.rotation.x = 0;
+        modelWrapper.rotation.z = 0;
+      }
+      masterGroup.rotation.set(0, 0, 0);
+      masterGroup.position.set(0, 0, 0);
+
+      // Swirling particles
+      if (particles) {
         particles.rotation.y = performance.now() * 0.0003;
-
-        // Gentle spring lerp for hover tilt
-        hoverTilt.x += (hoverTilt.targetX - hoverTilt.x) * 0.05;
-        hoverTilt.y += (hoverTilt.targetY - hoverTilt.y) * 0.05;
-
-        masterGroup.rotation.y = hoverTilt.x * 0.6;
-        masterGroup.rotation.x = -hoverTilt.y * 0.45;
       }
 
       renderer.render(scene, camera);
@@ -256,7 +301,13 @@ export const Hero3DCanvas = ({ isReady = true }) => {
     window.addEventListener('resize', handleResize);
 
     return () => {
+      if (typeof window !== 'undefined') {
+        delete window.__HERO_3D_MODEL__;
+      }
+      container.removeEventListener('pointerdown', onPointerDown);
       window.removeEventListener('pointermove', onPointerMove);
+      window.removeEventListener('pointerup', onPointerUp);
+      window.removeEventListener('pointercancel', onPointerUp);
       window.removeEventListener('resize', handleResize);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       observer.disconnect();
@@ -286,8 +337,13 @@ export const Hero3DCanvas = ({ isReady = true }) => {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        pointerEvents: 'none',
+        pointerEvents: 'auto',
+        touchAction: 'pan-y',
+        cursor: 'grab',
+        userSelect: 'none',
+        WebkitUserSelect: 'none',
       }}
+      title="360° Artisan Cut Avatar — Drag to spin"
     >
       {/* Ambient luxury halo backing behind 3D quiff avatar */}
       <div

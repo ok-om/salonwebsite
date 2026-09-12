@@ -23,7 +23,18 @@ const MainContent = ({ isLoading }) => {
 
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [stampCardOpen, setStampCardOpen] = useState(false);
+  const [stampCardTab, setStampCardTab] = useState('profile');
   const [adminDashboardOpen, setAdminDashboardOpen] = useState(false);
+
+  const handleOpenLoyalty = (tab = 'stamps') => {
+    setStampCardTab(tab);
+    setStampCardOpen(true);
+  };
+
+  const handleOpenProfile = (tab = 'profile') => {
+    setStampCardTab(tab);
+    setStampCardOpen(true);
+  };
 
   // Lock smooth scroll when any modal dialog is active
   React.useEffect(() => {
@@ -44,19 +55,22 @@ const MainContent = ({ isLoading }) => {
       <Navbar
         onOpenAuth={() => setAuthModalOpen(true)}
         onOpenAdmin={() => setAdminDashboardOpen(true)}
-        onOpenLoyalty={() => setStampCardOpen(true)}
+        onOpenLoyalty={() => handleOpenLoyalty('stamps')}
+        onOpenProfile={(tab) => handleOpenProfile(tab || 'profile')}
       />
 
       {/* 2. Hero Section with Crystal Clear Video Directly Under Navbar */}
       <HeroVideo
-        onOpenLoyalty={() => setStampCardOpen(true)}
+        onOpenLoyalty={() => handleOpenLoyalty('stamps')}
+        onOpenAdmin={() => setAdminDashboardOpen(true)}
         onScrollToExperience={scrollToHaircuts}
         isReady={!isLoading}
       />
 
       {/* 3. The Centerpiece Master Haircut Scroll Experience */}
       <HairCutScrollShowcase
-        onOpenLoyalty={() => setStampCardOpen(true)}
+        onOpenLoyalty={() => handleOpenLoyalty('stamps')}
+        onOpenAdmin={() => setAdminDashboardOpen(true)}
       />
 
       {/* 4. Modern Services Experience (Scalloped canopy, Scissor ribbon headline, 8 Pop Shapes, 3 Vibrant Cards, and Extra Atelier Art) */}
@@ -91,14 +105,25 @@ const MainContent = ({ isLoading }) => {
           <span>Haircuts</span>
         </button>
 
-        <button
-          onClick={() => setStampCardOpen(true)}
-          className="mobile-nav-item"
-          style={{ color: 'var(--gold-primary)' }}
-        >
-          <Gift size={20} />
-          <span style={{ fontWeight: 700 }}>5-Coupe</span>
-        </button>
+        {isAdmin ? (
+          <button
+            onClick={() => setAdminDashboardOpen(true)}
+            className="mobile-nav-item"
+            style={{ color: '#ff8080' }}
+          >
+            <ShieldCheck size={20} />
+            <span style={{ fontWeight: 700 }}>Admin CMS</span>
+          </button>
+        ) : (
+          <button
+            onClick={() => handleOpenLoyalty('stamps')}
+            className="mobile-nav-item"
+            style={{ color: 'var(--gold-primary)' }}
+          >
+            <Gift size={20} />
+            <span style={{ fontWeight: 700 }}>5-Coupe</span>
+          </button>
+        )}
 
         <button
           onClick={() => {
@@ -116,7 +141,7 @@ const MainContent = ({ isLoading }) => {
             if (isAdmin) {
               setAdminDashboardOpen(true);
             } else if (isAuthenticated) {
-              setStampCardOpen(true);
+              handleOpenProfile('profile');
             } else {
               setAuthModalOpen(true);
             }
@@ -134,11 +159,11 @@ const MainContent = ({ isLoading }) => {
           <AuthModal
             isOpen={authModalOpen}
             onClose={() => setAuthModalOpen(false)}
-            onAuthSuccess={() => {
-              if (user?.role === 'admin') {
+            onAuthSuccess={(authResultUser) => {
+              setAuthModalOpen(false);
+              const activeUser = authResultUser || user;
+              if (activeUser?.role === 'admin' || activeUser?.email === 'ok8023361@gmail.com') {
                 setAdminDashboardOpen(true);
-              } else {
-                setStampCardOpen(true);
               }
             }}
           />
@@ -147,8 +172,13 @@ const MainContent = ({ isLoading }) => {
         {stampCardOpen && (
           <StampCard
             isOpen={stampCardOpen}
+            initialTab={stampCardTab}
             onClose={() => setStampCardOpen(false)}
             onOpenAuth={() => setAuthModalOpen(true)}
+            onOpenAdmin={() => {
+              setStampCardOpen(false);
+              setAdminDashboardOpen(true);
+            }}
           />
         )}
 

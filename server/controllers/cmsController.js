@@ -1,34 +1,35 @@
 import { SiteConfig } from '../models/SiteConfig.js';
 
+const defaultCMS = {
+  salonName: 'The Classic Cut Salon',
+  tagline: 'Where Vintage Craftsmanship Meets Modern Luxury',
+  aboutStory: 'Founded on the timeless traditions of classic gentleman grooming, The Classic Cut Salon delivers unmatched scissor craftsmanship, soothing hair therapy, and precision straight-razor beard styling in an ambiance of refined sophistication.',
+  phone: '+91 93221 88848',
+  whatsapp: '+919322188848',
+  email: 'sraut7285@gmail.com',
+  address: 'At Gevrai jategaon road Rohithal, Tq gevrai dist beed 431127 Maharashtra',
+  mapDirectionsUrl: 'https://www.google.com/maps/dir/?api=1&destination=19.2528181,75.8555902',
+  mapEmbedUrl: 'https://maps.google.com/maps?q=19.2528181,75.8555902&hl=en&z=15&output=embed',
+  openingHours: {
+    weekday: 'Mon - Fri: 9:00 AM - 9:30 PM',
+    weekend: 'Sat - Sun: 8:30 AM - 10:00 PM',
+  },
+  heroVideoUrl: '/video/backgroundvideo.mp4',
+  defaultOfferTitle: 'Complimentary Royal Haircut & Beard Sculpting',
+  defaultOfferDiscount: '100% OFF / FREE SERVICE',
+};
+
 // 1. Public: Get Active Site Configuration
 export const getSiteConfig = async (req, res) => {
   try {
     let config = await SiteConfig.findOne();
     if (!config) {
-      config = await SiteConfig.create({
-        salonName: 'The Classic Cut Salon',
-        tagline: 'Where Vintage Craftsmanship Meets Modern Luxury',
-        phone: '+91 98765 43210',
-        whatsapp: '+919876543210',
-        email: 'contact@classiccutsalon.com',
-        address: 'Shop 14, Royal Heritage Arcade, High Street Boulevard, New Delhi, India',
-        openingHours: {
-          weekday: 'Mon - Fri: 9:00 AM - 9:30 PM',
-          weekend: 'Sat - Sun: 8:30 AM - 10:00 PM',
-        },
-        ownerName: 'Master Barber Alex Thorne',
-        ownerTitle: 'Founder & Chief Barber',
-        ownerBio: 'With over 15 years mastering British and Italian scissor sculpting and straight-razor artistry, Alex founded The Classic Cut Salon to bring authentic gentleman luxury and personalized grooming back to the modern man.',
-        ownerImage: '',
-        heroVideoUrl: '/video/backgroundvideo.mp4',
-        defaultOfferTitle: 'Complimentary Royal Haircut & Beard Sculpting',
-        defaultOfferDiscount: '100% OFF / FREE SERVICE',
-      });
+      config = await SiteConfig.create(defaultCMS);
     }
     res.status(200).json(config);
   } catch (error) {
-    console.error('Get Site Config Error:', error);
-    res.status(500).json({ message: 'Failed to retrieve site configuration' });
+    // If MongoDB is offline/connecting, gracefully return defaults with 200 OK
+    res.status(200).json(defaultCMS);
   }
 };
 
@@ -50,10 +51,6 @@ export const updateSiteConfig = async (req, res) => {
       'address',
       'mapEmbedUrl',
       'openingHours',
-      'ownerName',
-      'ownerTitle',
-      'ownerBio',
-      'ownerImage',
       'heroVideoUrl',
       'defaultOfferTitle',
       'defaultOfferDiscount',
