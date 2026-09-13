@@ -20,7 +20,6 @@ export const AuthModal = ({ isOpen, onClose, onAuthSuccess }) => {
   const [successMsg, setSuccessMsg] = useState('');
   const [resendCooldown, setResendCooldown] = useState(0);
   const [resendLoading, setResendLoading] = useState(false);
-  const [fallbackOtpNotice, setFallbackOtpNotice] = useState('');
 
   // Reset states when modal is reopened/closed
   useEffect(() => {
@@ -30,7 +29,6 @@ export const AuthModal = ({ isOpen, onClose, onAuthSuccess }) => {
       setSuccessMsg('');
       setResendCooldown(0);
       setResendLoading(false);
-      setFallbackOtpNotice('');
       setName('');
       setEmail('');
       setPhone('');
@@ -87,18 +85,11 @@ export const AuthModal = ({ isOpen, onClose, onAuthSuccess }) => {
     setLoading(true);
     try {
       const data = await requestOtp(email);
-      if (data?.otp) {
-        setOtp(data.otp);
-        setFallbackOtpNotice(data.otp);
-        setSuccessMsg(data.message || `Verification Code: ${data.otp}`);
-      } else {
-        setFallbackOtpNotice('');
-        setSuccessMsg('6-Digit OTP has been dispatched to your email address!');
-      }
+      setSuccessMsg(data?.message || 'A 6-digit verification code has been sent to your email inbox!');
       setResendCooldown(30);
       setStep(2);
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to send OTP email.');
+      setError(err.response?.data?.message || 'Failed to send OTP email. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -112,14 +103,7 @@ export const AuthModal = ({ isOpen, onClose, onAuthSuccess }) => {
     setResendLoading(true);
     try {
       const data = await requestOtp(email);
-      if (data?.otp) {
-        setOtp(data.otp);
-        setFallbackOtpNotice(data.otp);
-        setSuccessMsg(data.message || `Fresh Verification Code: ${data.otp}`);
-      } else {
-        setFallbackOtpNotice('');
-        setSuccessMsg('A fresh 6-digit OTP code has been sent to your email!');
-      }
+      setSuccessMsg(data?.message || 'A fresh 6-digit verification code has been sent to your email inbox!');
       setResendCooldown(30);
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to resend OTP. Please try again.');
@@ -599,25 +583,23 @@ export const AuthModal = ({ isOpen, onClose, onAuthSuccess }) => {
             </form>
           ) : (
             <form onSubmit={handleVerifyRegister}>
-              {fallbackOtpNotice && (
-                <div
-                  style={{
-                    background: 'rgba(212, 175, 55, 0.12)',
-                    border: '1px solid rgba(212, 175, 55, 0.4)',
-                    padding: '0.75rem 1rem',
-                    borderRadius: '8px',
-                    marginBottom: '1rem',
-                    textAlign: 'center',
-                  }}
-                >
-                  <div style={{ color: 'var(--gold-primary)', fontWeight: 700, fontSize: '0.88rem' }}>
-                    🔑 Verification Code: <span style={{ fontSize: '1.25rem', letterSpacing: '0.12em', color: '#ffffff' }}>{fallbackOtpNotice}</span>
-                  </div>
-                  <div style={{ fontSize: '0.72rem', color: '#cbd5e1', marginTop: '0.25rem' }}>
-                    Code is auto-filled below! Click "Verify & Create Account" to finish.
-                  </div>
+              <div
+                style={{
+                  background: 'rgba(212, 175, 55, 0.08)',
+                  border: '1px solid rgba(212, 175, 55, 0.25)',
+                  padding: '0.75rem 1rem',
+                  borderRadius: '8px',
+                  marginBottom: '1.25rem',
+                  textAlign: 'center',
+                }}
+              >
+                <div style={{ color: 'var(--gold-primary)', fontWeight: 600, fontSize: '0.85rem' }}>
+                  📩 Check Your Email Inbox
                 </div>
-              )}
+                <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '0.25rem' }}>
+                  Enter the 6-digit code sent to <strong style={{ color: '#f4f4f6' }}>{email}</strong> (also check your Spam/Junk folder).
+                </div>
+              </div>
 
               <div className="input-group" style={{ textAlign: 'center' }}>
                 <label className="input-label">Enter 6-Digit Email OTP</label>

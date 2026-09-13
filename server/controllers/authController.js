@@ -45,19 +45,18 @@ export const requestOtp = async (req, res) => {
     // Send email
     const emailResult = await sendOtpEmail(cleanEmail, otpCode);
     if (!emailResult.success) {
-      console.warn(`⚠️ [OTP DISPATCH] Outbound email failed for ${cleanEmail} (${emailResult.error}). Activating instant verification fallback.`);
-      // Retain OTP in MongoDB so the user can verify without interruption!
-      return res.status(200).json({
-        success: true,
-        fallback: true,
-        otp: otpCode,
-        message: `Your 6-digit verification code is: ${otpCode}. (Render Free blocks raw SMTP). Please enter below to finish registration!`,
+      console.error(`❌ [OTP DISPATCH] Outbound email failed for ${cleanEmail}: ${emailResult.error}`);
+      // Strictly delete OTP from MongoDB so unverified requests cannot bypass security
+      await Otp.deleteMany({ email: cleanEmail });
+      return res.status(500).json({
+        success: false,
+        message: 'Failed to deliver verification code to this email address. Please check your email configuration or try again.',
       });
     }
 
     res.status(200).json({
       success: true,
-      message: 'A 6-digit verification code has been sent to your email address.',
+      message: 'A 6-digit verification code has been sent to your email inbox.',
     });
   } catch (error) {
     console.error('Request OTP Error:', error);
