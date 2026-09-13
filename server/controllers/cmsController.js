@@ -11,12 +11,13 @@ const defaultCMS = {
   mapDirectionsUrl: 'https://www.google.com/maps/dir/?api=1&destination=19.2528181,75.8555902',
   mapEmbedUrl: 'https://maps.google.com/maps?q=19.2528181,75.8555902&hl=en&z=15&output=embed',
   openingHours: {
-    weekday: 'Mon - Fri: 9:00 AM - 9:30 PM',
-    weekend: 'Sat - Sun: 8:30 AM - 10:00 PM',
+    weekday: 'Tuesday to Friday: 9:30 AM - 9:00 PM',
+    weekend: 'Saturday & Sunday: 8:30 AM - 10:00 PM',
+    monday: 'CLOSED (Shop is closed on every Monday)',
   },
   heroVideoUrl: '/video/backgroundvideo.mp4',
-  defaultOfferTitle: 'Complimentary Royal Haircut & Beard Sculpting',
-  defaultOfferDiscount: '100% OFF / FREE SERVICE',
+  defaultOfferTitle: 'Luxury Grooming Offer Coupon',
+  defaultOfferDiscount: '30% to 40% OFF',
 };
 
 // 1. Public: Get Active Site Configuration

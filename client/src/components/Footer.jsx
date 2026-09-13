@@ -138,9 +138,6 @@ export const Footer = ({ onOpenAdminLogin }) => {
           <div>
             © {new Date().getFullYear()} {config.salonName || 'The Classic Cut Salon'}. All Rights Reserved.
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-            Built with MERN Stack & Handcrafted GSAP Animation
-          </div>
         </div>
       </div>
     </footer>

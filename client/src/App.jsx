@@ -9,6 +9,7 @@ import { ModernServicesExperience } from './components/ModernServicesExperience'
 import { LocationContact } from './components/LocationContact';
 import { Footer } from './components/Footer';
 import { Home, Scissors, Gift, Phone, User, ShieldCheck } from 'lucide-react';
+import { LoadingScreen } from './components/LoadingScreen';
 
 // Code-split interactive modals on-demand to reduce initial JS payload
 const StampCard = React.lazy(() => import('./components/StampCard').then(m => ({ default: m.StampCard })));
@@ -193,11 +194,14 @@ const MainContent = ({ isLoading }) => {
 };
 
 export default function App() {
+  const [isLoading, setIsLoading] = useState(true);
+
   return (
     <AuthProvider>
       <SiteConfigProvider>
         <SmoothScrollProvider>
-          <MainContent isLoading={false} />
+          {isLoading && <LoadingScreen onComplete={() => setIsLoading(false)} />}
+          <MainContent isLoading={isLoading} />
         </SmoothScrollProvider>
       </SiteConfigProvider>
     </AuthProvider>

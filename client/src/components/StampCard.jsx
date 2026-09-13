@@ -1153,7 +1153,11 @@ export const StampCard = ({
                           <div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', marginBottom: '0.25rem', flexWrap: 'wrap' }}>
                               <p style={{ fontSize: '0.84rem', color: '#f1f5f9', fontWeight: 600, margin: 0 }}>
-                                {coupon.title || config.defaultOfferTitle}
+                                {(() => {
+                                  const rawTitle = coupon.title || config.defaultOfferTitle || 'Luxury Grooming Offer Coupon';
+                                  const cleaned = rawTitle.replace(/Complimentary\s*/gi, '').trim();
+                                  return cleaned && !cleaned.toLowerCase().includes('royal haircut') ? cleaned : 'Luxury Grooming Offer Coupon';
+                                })()}
                               </p>
                               <span
                                 style={{
@@ -1166,7 +1170,10 @@ export const StampCard = ({
                                   letterSpacing: '0.02em',
                                 }}
                               >
-                                {coupon.discountType || '30% to 40% OFF'}
+                                {(() => {
+                                  const rawDiscount = coupon.discountType || config.defaultOfferDiscount || '30% to 40% OFF';
+                                  return rawDiscount.includes('100%') || rawDiscount.toLowerCase().includes('free') ? '30% to 40% OFF' : rawDiscount;
+                                })()}
                               </span>
                             </div>
                             <span style={{ fontSize: '0.72rem', color: '#94a3b8' }}>

@@ -352,7 +352,7 @@ export const AuthModal = ({ isOpen, onClose, onAuthSuccess }) => {
               ? 'Link your phone number to receive appointment confirmations & loyalty stamps'
               : mode === 'login'
               ? 'Access your 5-Coupon Card, appointment history & 30% to 40% OFF rewards'
-              : 'Register to unlock automated visit stamps & complimentary offers'}
+              : 'Register to unlock automated visit stamps & 30% to 40% OFF grooming offers'}
           </p>
         </div>
 

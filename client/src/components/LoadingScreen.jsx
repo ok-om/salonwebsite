@@ -7,12 +7,18 @@ export const LoadingScreen = ({ onComplete }) => {
   const [isFadingOut, setIsFadingOut] = useState(false);
 
   useEffect(() => {
-    // Ultra-smooth, high-efficiency progress simulation that completes in ~750ms
+    // Proactively wake up backend server at the exact instant loading screen appears
+    try {
+      const apiUrl = import.meta.env.VITE_API_URL || (typeof window !== 'undefined' && window.location.hostname !== 'localhost' ? 'https://salonwebsite-kxc1.onrender.com/api' : '/api');
+      fetch(`${apiUrl}/health`, { mode: 'cors' }).catch(() => {});
+    } catch (e) {}
+
+    // Ultra-smooth, high-efficiency progress simulation that completes in ~850ms
     const stages = [
       { p: 25, text: 'Initializing Artisan Suite...', delay: 100 },
-      { p: 55, text: 'Polishing Signature Blades...', delay: 250 },
-      { p: 85, text: 'Calibrating Precision Styling...', delay: 450 },
-      { p: 100, text: 'Artisan Suite Ready', delay: 700 },
+      { p: 55, text: 'Waking up Server & Assets...', delay: 300 },
+      { p: 85, text: 'Calibrating Precision Styling...', delay: 550 },
+      { p: 100, text: 'Artisan Suite Ready', delay: 800 },
     ];
 
     const timeouts = stages.map(({ p, text, delay }) =>

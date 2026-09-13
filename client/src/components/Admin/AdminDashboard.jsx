@@ -1179,7 +1179,7 @@ export const AdminDashboard = ({ isOpen, onClose }) => {
                 Counter Offer Coupon Redemption
               </h4>
               <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '1.5rem', lineHeight: 1.5 }}>
-                Scan the customer's QR code using your camera or enter their 6-character coupon code below to verify and redeem their complimentary grooming reward.
+                Scan the customer's QR code using your camera or enter their 6-character coupon code below to verify and redeem their 30% to 40% OFF grooming reward coupon.
               </p>
 
               {/* QR Scanner Controls */}

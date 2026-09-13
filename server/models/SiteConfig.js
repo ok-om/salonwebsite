@@ -75,11 +75,11 @@ const siteConfigSchema = new mongoose.Schema(
     },
     defaultOfferTitle: {
       type: String,
-      default: 'Exclusive 5-Stamp Reward Offer',
+      default: 'Luxury Grooming Offer Coupon',
     },
     defaultOfferDiscount: {
       type: String,
-      default: '30% - 40% OFF',
+      default: '30% to 40% OFF',
     },
   },
   { timestamps: true }

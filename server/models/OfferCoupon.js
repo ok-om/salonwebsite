@@ -16,11 +16,11 @@ const offerCouponSchema = new mongoose.Schema(
     },
     title: {
       type: String,
-      default: 'Exclusive 5-Stamp Reward Offer',
+      default: 'Luxury Grooming Offer Coupon',
     },
     discountType: {
       type: String,
-      default: '30% to 40% OFF Luxury Grooming',
+      default: '30% to 40% OFF',
     },
     isRedeemed: {
       type: Boolean,

@@ -28,6 +28,14 @@
         href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap"
       />
     </noscript>
+    <!-- Early Backend Wake-Up / Warm-Up Trigger (Pings Render during initial HTML parse) -->
+    <script>
+      try {
+        var host = window.location.hostname;
+        var api = host !== 'localhost' && host !== '127.0.0.1' ? 'https://salonwebsite-kxc1.onrender.com/api' : '/api';
+        fetch(api + '/health', { mode: 'cors' }).catch(function(){});
+      } catch (e) {}
+    </script>
     <title>The Classic Cut Salon | Luxury Gentleman Grooming</title>
   </head>
   <body>

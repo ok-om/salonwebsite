@@ -95,8 +95,8 @@ export const addVisitStamp = async (req, res) => {
 
       // Get salon default offer settings from CMS
       const siteConfig = await SiteConfig.findOne();
-      const offerTitle = siteConfig?.defaultOfferTitle || 'Exclusive 5-Stamp Reward Offer';
-      const offerDiscount = siteConfig?.defaultOfferDiscount || '30% - 40% OFF';
+      const offerTitle = siteConfig?.defaultOfferTitle || 'Luxury Grooming Offer Coupon';
+      const offerDiscount = siteConfig?.defaultOfferDiscount || '30% to 40% OFF';
 
       // Generate unique coupon
       let uniqueCode = generateCouponCode();

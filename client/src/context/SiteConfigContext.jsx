@@ -20,8 +20,8 @@ export const SiteConfigProvider = ({ children }) => {
       monday: 'CLOSED (Shop is closed on every Monday)',
     },
     heroVideoUrl: '/video/backgroundvideo.mp4',
-    defaultOfferTitle: 'Exclusive 5-Stamp Reward Offer',
-    defaultOfferDiscount: '30% - 40% OFF',
+    defaultOfferTitle: 'Luxury Grooming Offer Coupon',
+    defaultOfferDiscount: '30% to 40% OFF',
   });
   const [loading, setLoading] = useState(true);
 

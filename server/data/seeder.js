@@ -1,6 +1,7 @@
 import { User } from '../models/User.js';
 import { SiteConfig } from '../models/SiteConfig.js';
 import { Service } from '../models/Service.js';
+import { OfferCoupon } from '../models/OfferCoupon.js';
 
 export const seedInitialData = async () => {
   try {
@@ -25,13 +26,13 @@ export const seedInitialData = async () => {
     } else if (adminUser.role !== 'superadmin') {
       adminUser.role = 'superadmin';
       await adminUser.save();
-      console.log(`✅ Super Admin role granted to: ${targetAdminEmail}`);
+      console.log(`✅ Promoted existing account to Super Admin: ${targetAdminEmail}`);
     }
 
     // 2. Seed Site Config if none exists
     const configExists = await SiteConfig.findOne();
     if (!configExists) {
-      console.log('⚡ Seeding default Site CMS configuration...');
+      console.log('⚡ Seeding Default Site CMS Configuration...');
       await SiteConfig.create({
         salonName: 'The Classic Cut Salon',
         tagline: 'Where Vintage Craftsmanship Meets Modern Luxury',
@@ -52,8 +53,8 @@ export const seedInitialData = async () => {
         ownerBio: 'With over 15 years mastering British and Italian scissor sculpting and straight-razor artistry, Alex founded The Classic Cut Salon to bring authentic gentleman luxury and personalized grooming back to the modern man.',
         ownerImage: '',
         heroVideoUrl: '/video/backgroundvideo.mp4',
-        defaultOfferTitle: 'Exclusive 5-Stamp Reward Offer',
-        defaultOfferDiscount: '30% - 40% OFF',
+        defaultOfferTitle: 'Luxury Grooming Offer Coupon',
+        defaultOfferDiscount: '30% to 40% OFF',
       });
       console.log('✅ Default Site CMS config seeded');
     } else {
@@ -67,14 +68,24 @@ export const seedInitialData = async () => {
         };
         updated = true;
       }
-      if (configExists.defaultOfferDiscount?.includes('100%')) {
-        configExists.defaultOfferDiscount = '30% - 40% OFF';
+      if (!configExists.defaultOfferTitle || configExists.defaultOfferTitle.includes('Complimentary') || configExists.defaultOfferTitle.includes('Royal Haircut') || configExists.defaultOfferTitle.includes('Exclusive 5-Stamp')) {
+        configExists.defaultOfferTitle = 'Luxury Grooming Offer Coupon';
+        updated = true;
+      }
+      if (!configExists.defaultOfferDiscount || configExists.defaultOfferDiscount.includes('100%') || configExists.defaultOfferDiscount.includes('30% - 40%')) {
+        configExists.defaultOfferDiscount = '30% to 40% OFF';
         updated = true;
       }
       if (updated) {
         await configExists.save();
-        console.log('✅ Synchronized Site CMS config with updated hours and 30%-40% offer');
+        console.log('✅ Synchronized Site CMS config with updated hours and 30% to 40% offer');
       }
+
+      // Also clean up any legacy coupons in database
+      await OfferCoupon.updateMany(
+        { $or: [{ title: /Complimentary/i }, { discountType: /100%/i }] },
+        { $set: { title: 'Luxury Grooming Offer Coupon', discountType: '30% to 40% OFF' } }
+      );
     }
 
     // 3. Seed Services if empty
