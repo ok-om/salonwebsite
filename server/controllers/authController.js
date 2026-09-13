@@ -40,11 +40,15 @@ export const requestOtp = async (req, res) => {
       otp: otpCode,
     });
 
+    console.log(`🔑 [OTP DISPATCH] Generated 6-digit code for ${cleanEmail}: ${otpCode}`);
+
     // Send email
     const emailResult = await sendOtpEmail(cleanEmail, otpCode);
     if (!emailResult.success) {
       await Otp.deleteMany({ email: cleanEmail });
-      return res.status(500).json({ message: 'Failed to deliver verification code to this email. Please verify your email address.' });
+      return res.status(500).json({
+        message: `Failed to deliver verification code to this email (${emailResult.error || 'delivery error'}). Please verify your email address.`,
+      });
     }
 
     res.status(200).json({
@@ -52,7 +56,7 @@ export const requestOtp = async (req, res) => {
     });
   } catch (error) {
     console.error('Request OTP Error:', error);
-    res.status(500).json({ message: 'Failed to send OTP. ' + error.message });
+    res.status(500).json({ message: 'Failed to send OTP: ' + error.message });
   }
 };
 
