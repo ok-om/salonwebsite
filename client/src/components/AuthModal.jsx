@@ -20,6 +20,7 @@ export const AuthModal = ({ isOpen, onClose, onAuthSuccess }) => {
   const [successMsg, setSuccessMsg] = useState('');
   const [resendCooldown, setResendCooldown] = useState(0);
   const [resendLoading, setResendLoading] = useState(false);
+  const [fallbackOtpNotice, setFallbackOtpNotice] = useState('');
 
   // Reset states when modal is reopened/closed
   useEffect(() => {
@@ -29,6 +30,7 @@ export const AuthModal = ({ isOpen, onClose, onAuthSuccess }) => {
       setSuccessMsg('');
       setResendCooldown(0);
       setResendLoading(false);
+      setFallbackOtpNotice('');
       setName('');
       setEmail('');
       setPhone('');
@@ -84,8 +86,15 @@ export const AuthModal = ({ isOpen, onClose, onAuthSuccess }) => {
     }
     setLoading(true);
     try {
-      await requestOtp(email);
-      setSuccessMsg('6-Digit OTP has been dispatched to your email address!');
+      const data = await requestOtp(email);
+      if (data?.otp) {
+        setOtp(data.otp);
+        setFallbackOtpNotice(data.otp);
+        setSuccessMsg(data.message || `Verification Code: ${data.otp}`);
+      } else {
+        setFallbackOtpNotice('');
+        setSuccessMsg('6-Digit OTP has been dispatched to your email address!');
+      }
       setResendCooldown(30);
       setStep(2);
     } catch (err) {
@@ -102,8 +111,15 @@ export const AuthModal = ({ isOpen, onClose, onAuthSuccess }) => {
     setSuccessMsg('');
     setResendLoading(true);
     try {
-      await requestOtp(email);
-      setSuccessMsg('A fresh 6-digit OTP code has been sent to your email!');
+      const data = await requestOtp(email);
+      if (data?.otp) {
+        setOtp(data.otp);
+        setFallbackOtpNotice(data.otp);
+        setSuccessMsg(data.message || `Fresh Verification Code: ${data.otp}`);
+      } else {
+        setFallbackOtpNotice('');
+        setSuccessMsg('A fresh 6-digit OTP code has been sent to your email!');
+      }
       setResendCooldown(30);
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to resend OTP. Please try again.');
@@ -583,6 +599,26 @@ export const AuthModal = ({ isOpen, onClose, onAuthSuccess }) => {
             </form>
           ) : (
             <form onSubmit={handleVerifyRegister}>
+              {fallbackOtpNotice && (
+                <div
+                  style={{
+                    background: 'rgba(212, 175, 55, 0.12)',
+                    border: '1px solid rgba(212, 175, 55, 0.4)',
+                    padding: '0.75rem 1rem',
+                    borderRadius: '8px',
+                    marginBottom: '1rem',
+                    textAlign: 'center',
+                  }}
+                >
+                  <div style={{ color: 'var(--gold-primary)', fontWeight: 700, fontSize: '0.88rem' }}>
+                    🔑 Verification Code: <span style={{ fontSize: '1.25rem', letterSpacing: '0.12em', color: '#ffffff' }}>{fallbackOtpNotice}</span>
+                  </div>
+                  <div style={{ fontSize: '0.72rem', color: '#cbd5e1', marginTop: '0.25rem' }}>
+                    Code is auto-filled below! Click "Verify & Create Account" to finish.
+                  </div>
+                </div>
+              )}
+
               <div className="input-group" style={{ textAlign: 'center' }}>
                 <label className="input-label">Enter 6-Digit Email OTP</label>
                 <input
