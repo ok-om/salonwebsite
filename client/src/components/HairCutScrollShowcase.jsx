@@ -1279,7 +1279,7 @@ export const HairCutScrollShowcase = ({ onOpenLoyalty, onOpenAdmin }) => {
                   key={idx}
                   src={bg.url}
                   alt={bg.title}
-                  loading={idx === 0 ? 'eager' : 'lazy'}
+                  loading="lazy"
                   decoding="async"
                   className="salon-bg-slide"
                   style={{
@@ -1494,7 +1494,7 @@ export const HairCutScrollShowcase = ({ onOpenLoyalty, onOpenAdmin }) => {
                           key={cut.id}
                           src={cut.image}
                           alt={cut.title}
-                          loading={cIdx === 0 ? "eager" : "lazy"}
+                          loading="lazy"
                           decoding="async"
                           className="haircut-img"
                           style={{
