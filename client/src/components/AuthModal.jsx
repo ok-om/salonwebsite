@@ -164,7 +164,10 @@ export const AuthModal = ({ isOpen, onClose, onAuthSuccess }) => {
     }
   };
 
-  const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || '520418077500-r7aao8hd4o3dgjlmte6dn6fcfa9k9gav.apps.googleusercontent.com';
+  const googleClientId = String(
+    import.meta.env.VITE_GOOGLE_CLIENT_ID ||
+      '520418077500-r7aao8hd4o3dgjlmte6dn6fcfa9k9gav.apps.googleusercontent.com'
+  ).trim();
   const googleBtnRef = useRef(null);
   const googleAuthCallbackRef = useRef();
 
