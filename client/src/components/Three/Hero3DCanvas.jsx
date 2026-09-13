@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import gsap from 'gsap';
@@ -13,6 +13,7 @@ THREE.Cache.enabled = true;
 export const Hero3DCanvas = ({ isReady = true }) => {
   const mountRef = useRef(null);
   const maxDimRef = useRef(null);
+  const [isLoaded, setIsLoaded] = useState(false);
 
   const getResponsiveScale = () => {
     const w = typeof window !== 'undefined' ? window.innerWidth : 1200;
@@ -78,47 +79,73 @@ export const Hero3DCanvas = ({ isReady = true }) => {
     const masterGroup = new THREE.Group();
     scene.add(masterGroup);
 
-    // 4. Load Downloaded 3D GLB Model
+    // 4. Load Downloaded 3D GLB Model with Multi-URL Fallback & Auto-Retry
     const modelWrapper = new THREE.Group();
     masterGroup.add(modelWrapper);
 
     const loader = new GLTFLoader();
-    const modelPath = '/3d model/my_face__quiff_hairstyle.glb';
+    const modelCandidates = [
+      '/3d-model/my_face__quiff_hairstyle.glb',
+      '/models/my_face__quiff_hairstyle.glb',
+      '/3d model/my_face__quiff_hairstyle.glb',
+      encodeURI('/3d model/my_face__quiff_hairstyle.glb'),
+    ];
 
-    loader.load(
-      modelPath,
-      (gltf) => {
-        const loadedModel = gltf.scene;
+    let candidateIdx = 0;
+    let isDisposed = false;
 
-        // Auto-center the model using its Bounding Box
-        const box = new THREE.Box3().setFromObject(loadedModel);
-        const center = box.getCenter(new THREE.Vector3());
-        const size = box.getSize(new THREE.Vector3());
+    const tryLoadModel = () => {
+      if (isDisposed) return;
+      const currentPath = modelCandidates[candidateIdx];
 
-        loadedModel.position.set(-center.x, -center.y, -center.z);
+      loader.load(
+        currentPath,
+        (gltf) => {
+          if (isDisposed) return;
+          const loadedModel = gltf.scene;
 
-        // Normalize scale to fit viewport responsively
-        const maxDim = Math.max(size.x, size.y, size.z);
-        maxDimRef.current = maxDim;
-        const targetScale = getResponsiveScale() / (maxDim || 1);
-        modelWrapper.scale.setScalar(targetScale);
+          // Auto-center the model using its Bounding Box
+          const box = new THREE.Box3().setFromObject(loadedModel);
+          const center = box.getCenter(new THREE.Vector3());
+          const size = box.getSize(new THREE.Vector3());
 
-        // Enhance materials
-        loadedModel.traverse((node) => {
-          if (node.isMesh && node.material) {
-            node.material.envMapIntensity = 1.5;
+          loadedModel.position.set(-center.x, -center.y, -center.z);
+
+          // Normalize scale to fit viewport responsively
+          const maxDim = Math.max(size.x, size.y, size.z);
+          maxDimRef.current = maxDim;
+          const targetScale = getResponsiveScale() / (maxDim || 1);
+          modelWrapper.scale.setScalar(targetScale);
+
+          // Enhance materials
+          loadedModel.traverse((node) => {
+            if (node.isMesh && node.material) {
+              node.material.envMapIntensity = 1.5;
+            }
+          });
+
+          modelWrapper.add(loadedModel);
+          setIsLoaded(true);
+
+          // Render initial visual frame immediately so model is painted
+          renderScene();
+
+          if (isLoopActive && !animationFrameId) {
+            animate();
           }
-        });
+        },
+        undefined,
+        (err) => {
+          console.warn(`Could not load 3D model from ${currentPath}:`, err);
+          if (candidateIdx < modelCandidates.length - 1 && !isDisposed) {
+            candidateIdx++;
+            setTimeout(tryLoadModel, 150);
+          }
+        }
+      );
+    };
 
-        modelWrapper.add(loadedModel);
-        // Initial visual paint: immediately render once so model is visible without blocking CPU thread
-        renderer.render(scene, camera);
-      },
-      undefined,
-      (err) => {
-        console.warn('Could not load 3D model in hero canvas:', err);
-      }
-    );
+    tryLoadModel();
 
     // 5. Ambient Champagne Gold Floating Particles
     const particleCount = window.innerWidth < 640 ? 30 : 60;
@@ -348,10 +375,21 @@ export const Hero3DCanvas = ({ isReady = true }) => {
 
     window.addEventListener('resize', handleResize);
 
+    // Watch container size changes via ResizeObserver to fix unmeasured 0px layout issues
+    let resizeObserver = null;
+    if (typeof ResizeObserver !== 'undefined' && container) {
+      resizeObserver = new ResizeObserver(() => {
+        handleResize();
+      });
+      resizeObserver.observe(container);
+    }
+
     return () => {
+      isDisposed = true;
       if (typeof window !== 'undefined') {
         delete window.__HERO_3D_MODEL__;
       }
+      if (resizeObserver) resizeObserver.disconnect();
       detachActivationListeners();
       container.removeEventListener('pointerdown', onPointerDown);
       window.removeEventListener('pointermove', onPointerMove);
@@ -406,6 +444,46 @@ export const Hero3DCanvas = ({ isReady = true }) => {
           zIndex: 0,
         }}
       />
+
+      {/* Subtle luxury loader while 3D GLB model loads */}
+      {!isLoaded && (
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            pointerEvents: 'none',
+            zIndex: 1,
+          }}
+        >
+          <div
+            style={{
+              width: '36px',
+              height: '36px',
+              borderRadius: '50%',
+              border: '2px solid rgba(212, 175, 55, 0.25)',
+              borderTopColor: 'var(--gold-primary)',
+              animation: 'spin 0.9s linear infinite',
+            }}
+          />
+          <span
+            style={{
+              marginTop: '0.55rem',
+              fontFamily: 'var(--font-serif)',
+              fontSize: '0.62rem',
+              color: 'var(--gold-primary)',
+              letterSpacing: '0.1em',
+              textTransform: 'uppercase',
+              fontWeight: 600,
+            }}
+          >
+            Loading 3D Avatar...
+          </span>
+        </div>
+      )}
     </div>
   );
 };

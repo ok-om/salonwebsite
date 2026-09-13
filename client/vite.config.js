@@ -11,7 +11,7 @@ function serveCustomAssetFolders() {
       server.middlewares.use((req, res, next) => {
         const rawUrl = req.url.split('?')[0];
         const decodedUrl = decodeURIComponent(rawUrl);
-        const prefixes = ['/3d model', '/video', '/hair-cut', '/backgrounds', '/extra', '/figures', '/logo', '/music'];
+        const prefixes = ['/3d-model', '/models', '/3d model', '/video', '/hair-cut', '/backgrounds', '/extra', '/figures', '/logo', '/music'];
         for (const prefix of prefixes) {
           if (decodedUrl.startsWith(prefix)) {
             const relPath = decodedUrl.replace(prefix, '');

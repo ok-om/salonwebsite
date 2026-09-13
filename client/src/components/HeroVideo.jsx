@@ -5,7 +5,18 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Volume2, VolumeX, Sparkles, ChevronDown, Scissors, ShieldCheck } from 'lucide-react';
 
-const Hero3DCanvas = React.lazy(() =>
+const lazyWithRetry = (componentImport) =>
+  React.lazy(async () => {
+    try {
+      return await componentImport();
+    } catch (err) {
+      console.warn('Initial 3D canvas chunk load failed, retrying in 350ms...', err);
+      await new Promise((resolve) => setTimeout(resolve, 350));
+      return await componentImport();
+    }
+  });
+
+const Hero3DCanvas = lazyWithRetry(() =>
   import('./Three/Hero3DCanvas').then((m) => ({ default: m.Hero3DCanvas }))
 );
 
