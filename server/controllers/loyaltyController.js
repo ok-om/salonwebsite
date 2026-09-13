@@ -106,7 +106,7 @@ export const getAllCustomers = async (req, res) => {
 
     const users = await User.find(query)
       .select('-password')
-      .sort({ updatedAt: -1 });
+      .sort({ createdAt: -1 });
 
     // Attach latest visit and coupon counts to each customer
     const customerData = await Promise.all(

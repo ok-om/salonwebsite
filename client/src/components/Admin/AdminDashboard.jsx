@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useSiteConfig } from '../../context/SiteConfigContext';
 import API from '../../services/api';
+import jsQR from 'jsqr';
 import {
   ShieldCheck,
   Users,
@@ -22,6 +23,10 @@ import {
   Lock,
   ChevronLeft,
   ChevronRight,
+  Camera,
+  Upload,
+  Sparkles,
+  RefreshCw,
 } from 'lucide-react';
 
 const PaginationControl = ({
@@ -197,8 +202,15 @@ export const AdminDashboard = ({ isOpen, onClose }) => {
   const [selectedCustomerHistory, setSelectedCustomerHistory] = useState(null);
   const [historyVisits, setHistoryVisits] = useState([]);
 
-  // Coupon redemption code
+  // Coupon redemption code & QR scanner state
   const [redeemCode, setRedeemCode] = useState('');
+  const [isScanning, setIsScanning] = useState(false);
+  const [scannerError, setScannerError] = useState('');
+  const [redeemLoading, setRedeemLoading] = useState(false);
+  const videoRef = useRef(null);
+  const streamRef = useRef(null);
+  const scanAnimRef = useRef(null);
+  const fileInputRef = useRef(null);
 
   // CMS Form state
   const [cmsForm, setCmsForm] = useState({ ...config });
@@ -275,7 +287,7 @@ export const AdminDashboard = ({ isOpen, onClose }) => {
 
   if (!isOpen || !isAdmin) return null;
 
-  // 1. Award +1 Stamp to Customer
+  // 1. Award +1 Stamp to Customer (Fixed Position: updates in place so customer never jumps)
   const handleAwardStamp = async (customer) => {
     try {
       const serviceName = window.prompt(
@@ -295,8 +307,20 @@ export const AdminDashboard = ({ isOpen, onClose }) => {
         msg: res.data.message,
       });
 
-      // Refresh customer list
-      fetchCustomers(searchQuery);
+      // Update customer in place in local state so their position remains 100% stable!
+      setCustomers((prevCustomers) =>
+        prevCustomers.map((c) =>
+          c._id === customer._id
+            ? {
+                ...c,
+                currentStamps: res.data.currentStamps,
+                activeCouponsCount: res.data.offerUnlocked ? (c.activeCouponsCount || 0) + 1 : c.activeCouponsCount,
+                lastServiceName: serviceName || 'Salon Grooming & Haircut',
+                lastVisitDate: new Date().toISOString(),
+              }
+            : c
+        )
+      );
     } catch (err) {
       setFeedback({
         type: 'error',
@@ -316,22 +340,131 @@ export const AdminDashboard = ({ isOpen, onClose }) => {
     }
   };
 
-  // 3. Redeem Coupon Code
-  const handleRedeemCoupon = async (e) => {
-    e.preventDefault();
-    if (!redeemCode) return;
+  // 3. Redeem Coupon Code (Direct string or form submit)
+  const executeRedeem = async (codeToRedeem) => {
+    const targetCode = (codeToRedeem || redeemCode).trim().toUpperCase();
+    if (!targetCode) return;
+    setRedeemLoading(true);
     try {
-      const res = await API.post('/loyalty/redeem-coupon', { code: redeemCode });
+      const res = await API.post('/loyalty/redeem-coupon', { code: targetCode });
       setFeedback({ type: 'success', msg: res.data.message });
       setRedeemCode('');
+      // Refresh customer list to update coupon counts
       fetchCustomers(searchQuery);
     } catch (err) {
       setFeedback({
         type: 'error',
         msg: err.response?.data?.message || 'Failed to redeem coupon',
       });
+    } finally {
+      setRedeemLoading(false);
     }
   };
+
+  const handleRedeemCoupon = async (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    executeRedeem();
+  };
+
+  // Camera QR Scanner Functions
+  const stopCameraScanner = () => {
+    setIsScanning(false);
+    if (scanAnimRef.current) {
+      cancelAnimationFrame(scanAnimRef.current);
+      scanAnimRef.current = null;
+    }
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((track) => track.stop());
+      streamRef.current = null;
+    }
+    setScannerError('');
+  };
+
+  const scanQrFrame = () => {
+    if (!videoRef.current || !streamRef.current) return;
+    const video = videoRef.current;
+    if (video.readyState === video.HAVE_ENOUGH_DATA) {
+      const canvas = document.createElement('canvas');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext('2d', { willReadFrequently: true });
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const decoded = jsQR(imageData.data, imageData.width, imageData.height, {
+        inversionAttempts: 'dontInvert',
+      });
+      if (decoded && decoded.data) {
+        let code = decoded.data.trim().toUpperCase();
+        const match = code.match(/CUT-[A-Z0-9]{6}/);
+        if (match) {
+          code = match[0];
+        }
+        stopCameraScanner();
+        setRedeemCode(code);
+        executeRedeem(code);
+        return;
+      }
+    }
+    scanAnimRef.current = requestAnimationFrame(scanQrFrame);
+  };
+
+  const startCameraScanner = async () => {
+    setScannerError('');
+    setIsScanning(true);
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { ideal: 'environment' } },
+      });
+      streamRef.current = stream;
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        videoRef.current.setAttribute('playsinline', 'true');
+        await videoRef.current.play();
+        scanAnimRef.current = requestAnimationFrame(scanQrFrame);
+      }
+    } catch (err) {
+      console.error('Camera access error:', err);
+      setScannerError('Could not access camera. Please allow camera permissions or enter coupon code manually.');
+    }
+  };
+
+  // Image Upload QR Decode Fallback
+  const handleFileUploadQr = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+        const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const decoded = jsQR(imgData.data, imgData.width, imgData.height);
+        if (decoded && decoded.data) {
+          let foundCode = decoded.data.trim().toUpperCase();
+          const match = foundCode.match(/CUT-[A-Z0-9]{6}/);
+          if (match) foundCode = match[0];
+          setRedeemCode(foundCode);
+          stopCameraScanner();
+          executeRedeem(foundCode);
+        } else {
+          setScannerError('No valid salon coupon QR detected in this image. Please try another or type the code.');
+        }
+      };
+      img.src = event.target.result;
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // Auto clean-up camera on tab switch or close
+  useEffect(() => {
+    if (!isOpen || activeTab !== 'redeem') {
+      stopCameraScanner();
+    }
+  }, [isOpen, activeTab]);
 
   // 4. Save CMS Configuration
   const handleSaveCms = async (e) => {
@@ -868,30 +1001,202 @@ export const AdminDashboard = ({ isOpen, onClose }) => {
           {/* ========================================================================= */}
           {/* TAB 2: REDEEM COUPON AT COUNTER */}
           {/* ========================================================================= */}
+          {/* ========================================================================= */}
+          {/* TAB 2: REDEEM COUPON AT COUNTER */}
+          {/* ========================================================================= */}
           {activeTab === 'redeem' && (
-            <div style={{ maxWidth: '520px', margin: '1.5rem auto', textAlign: 'center' }}>
+            <div style={{ maxWidth: '560px', margin: '1rem auto 2rem', textAlign: 'center' }}>
               <div
                 style={{
-                  width: '60px',
-                  height: '60px',
+                  width: '64px',
+                  height: '64px',
                   borderRadius: '50%',
                   background: 'rgba(212, 175, 55, 0.15)',
+                  border: '1px solid rgba(212, 175, 55, 0.4)',
                   color: 'var(--gold-primary)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   margin: '0 auto 1rem',
+                  boxShadow: '0 0 20px rgba(212, 175, 55, 0.25)',
                 }}
               >
                 <QrCode size={32} />
               </div>
-              <h4 style={{ fontSize: '1.3rem', marginBottom: '0.5rem' }}>Counter Offer Coupon Redemption</h4>
-              <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '1.5rem' }}>
-                When a customer presents their 5-Stamp Reward Coupon or QR code, enter their code below to verify and redeem their free service!
+
+              <h4 style={{ fontSize: '1.35rem', marginBottom: '0.45rem', color: '#ffffff' }}>
+                Counter Offer Coupon Redemption
+              </h4>
+              <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '1.5rem', lineHeight: 1.5 }}>
+                Scan the customer's QR code using your camera or enter their 6-character coupon code below to verify and redeem their complimentary grooming reward.
               </p>
 
+              {/* QR Scanner Controls */}
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '0.85rem',
+                  background: 'rgba(255, 255, 255, 0.03)',
+                  border: '1px solid rgba(212, 175, 55, 0.25)',
+                  borderRadius: 'var(--radius-md)',
+                  padding: '1.25rem',
+                  marginBottom: '1.75rem',
+                }}
+              >
+                {!isScanning ? (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                    <button
+                      type="button"
+                      onClick={startCameraScanner}
+                      className="btn btn-primary"
+                      style={{
+                        padding: '0.85rem 1.25rem',
+                        fontSize: '0.92rem',
+                        fontWeight: 700,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '0.5rem',
+                        width: '100%',
+                      }}
+                    >
+                      <Camera size={18} />
+                      <span>📷 Open Camera & Scan QR Code</span>
+                    </button>
+
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
+                      <input
+                        type="file"
+                        ref={fileInputRef}
+                        accept="image/*"
+                        style={{ display: 'none' }}
+                        onChange={handleFileUploadQr}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        className="btn btn-secondary btn-sm"
+                        style={{
+                          padding: '0.45rem 1rem',
+                          fontSize: '0.78rem',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '0.4rem',
+                        }}
+                      >
+                        <Upload size={14} />
+                        <span>Upload QR Screenshot</span>
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    {/* Live Video Viewfinder with Gold Target Frame */}
+                    <div
+                      style={{
+                        position: 'relative',
+                        width: '100%',
+                        maxWidth: '340px',
+                        aspectRatio: '1 / 1',
+                        borderRadius: '16px',
+                        overflow: 'hidden',
+                        border: '2px solid var(--gold-primary)',
+                        boxShadow: '0 0 25px rgba(212, 175, 55, 0.4)',
+                        background: '#07090e',
+                      }}
+                    >
+                      <video
+                        ref={videoRef}
+                        autoPlay
+                        playsInline
+                        muted
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'cover',
+                        }}
+                      />
+
+                      {/* Viewfinder Target Frame Corners */}
+                      <div
+                        style={{
+                          position: 'absolute',
+                          inset: '24px',
+                          border: '2px dashed rgba(212, 175, 55, 0.8)',
+                          borderRadius: '12px',
+                          pointerEvents: 'none',
+                        }}
+                      />
+
+                      {/* Animated Laser Scanning Beam */}
+                      <div
+                        style={{
+                          position: 'absolute',
+                          left: '10%',
+                          right: '10%',
+                          height: '3px',
+                          background: 'linear-gradient(90deg, transparent, #ffd700, #ffffff, #ffd700, transparent)',
+                          boxShadow: '0 0 12px #ffd700',
+                          animation: 'laserScan 2.4s ease-in-out infinite',
+                          pointerEvents: 'none',
+                        }}
+                      />
+                    </div>
+
+                    <p style={{ fontSize: '0.78rem', color: '#cbd5e1', marginTop: '0.75rem', marginBottom: '0.75rem' }}>
+                      Point camera directly at the customer's coupon QR code...
+                    </p>
+
+                    <button
+                      type="button"
+                      onClick={stopCameraScanner}
+                      className="btn btn-secondary btn-sm"
+                      style={{
+                        padding: '0.45rem 1.25rem',
+                        fontSize: '0.8rem',
+                        borderColor: 'rgba(239, 68, 68, 0.4)',
+                        color: '#ff8080',
+                      }}
+                    >
+                      <X size={14} />
+                      <span>Close Camera Scanner</span>
+                    </button>
+                  </div>
+                )}
+
+                {scannerError && (
+                  <div
+                    style={{
+                      background: 'rgba(239, 68, 68, 0.15)',
+                      border: '1px solid rgba(239, 68, 68, 0.3)',
+                      color: '#ff8080',
+                      padding: '0.6rem 0.8rem',
+                      borderRadius: '8px',
+                      fontSize: '0.8rem',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.4rem',
+                      textAlign: 'left',
+                    }}
+                  >
+                    <AlertCircle size={15} style={{ flexShrink: 0 }} />
+                    <span>{scannerError}</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Manual Code Entry Form */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', marginBottom: '1.25rem' }}>
+                <div style={{ flex: 1, height: '1px', background: 'rgba(255, 255, 255, 0.1)' }} />
+                <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', letterSpacing: '0.08em', fontWeight: 600 }}>
+                  OR ENTER CODE MANUALLY
+                </span>
+                <div style={{ flex: 1, height: '1px', background: 'rgba(255, 255, 255, 0.1)' }} />
+              </div>
+
               <form onSubmit={handleRedeemCoupon}>
-                <div className="input-group">
+                <div className="input-group" style={{ marginBottom: '1rem' }}>
                   <input
                     type="text"
                     required
@@ -904,12 +1209,41 @@ export const AdminDashboard = ({ isOpen, onClose }) => {
                       fontFamily: 'monospace',
                       fontSize: '1.3rem',
                       letterSpacing: '0.12em',
+                      fontWeight: 700,
+                      color: 'var(--gold-primary)',
+                      border: '1.5px solid rgba(212, 175, 55, 0.5)',
+                      background: 'rgba(0, 0, 0, 0.4)',
                     }}
                   />
                 </div>
 
-                <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>
-                  Verify & Redeem Offer Coupon
+                <button
+                  type="submit"
+                  disabled={redeemLoading || !redeemCode.trim()}
+                  className="btn btn-primary"
+                  style={{
+                    width: '100%',
+                    padding: '0.85rem',
+                    fontSize: '0.92rem',
+                    fontWeight: 700,
+                    opacity: redeemLoading || !redeemCode.trim() ? 0.6 : 1,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '0.45rem',
+                  }}
+                >
+                  {redeemLoading ? (
+                    <>
+                      <RefreshCw size={16} className="spin" />
+                      <span>Verifying & Redeeming...</span>
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle size={16} />
+                      <span>Verify & Redeem Offer Coupon</span>
+                    </>
+                  )}
                 </button>
               </form>
             </div>

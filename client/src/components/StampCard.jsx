@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { useSiteConfig } from '../context/SiteConfigContext';
 import API from '../services/api';
 import confetti from 'canvas-confetti';
+import QRCode from 'qrcode';
 import {
   Scissors,
   Gift,
@@ -20,6 +21,9 @@ import {
   Calendar,
   AlertCircle,
   ExternalLink,
+  QrCode,
+  Copy,
+  Check,
 } from 'lucide-react';
 
 export const StampCard = ({
@@ -43,6 +47,36 @@ export const StampCard = ({
   const [editLoading, setEditLoading] = useState(false);
   const [editMsg, setEditMsg] = useState('');
   const [editError, setEditError] = useState('');
+
+  // Coupon Presentation & QR State
+  const [selectedCouponQr, setSelectedCouponQr] = useState(null);
+  const [qrDataUrl, setQrDataUrl] = useState('');
+  const [copiedCouponCode, setCopiedCouponCode] = useState(null);
+
+  const showQrCode = async (coupon) => {
+    try {
+      const url = await QRCode.toDataURL(coupon.code, {
+        width: 240,
+        margin: 2,
+        color: {
+          dark: '#07090e',
+          light: '#ffffff',
+        },
+      });
+      setQrDataUrl(url);
+      setSelectedCouponQr(coupon);
+    } catch (err) {
+      console.error('QR Gen Error:', err);
+    }
+  };
+
+  const handleCopyCode = (code) => {
+    if (navigator?.clipboard?.writeText) {
+      navigator.clipboard.writeText(code);
+    }
+    setCopiedCouponCode(code);
+    setTimeout(() => setCopiedCouponCode(null), 2500);
+  };
 
   // Sync tab when modal opens
   useEffect(() => {
@@ -954,25 +988,29 @@ export const StampCard = ({
                         <div
                           key={coupon._id}
                           style={{
-                            background: 'rgba(212, 175, 55, 0.08)',
-                            border: '1px solid rgba(212, 175, 55, 0.35)',
+                            background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(18, 22, 32, 0.75) 100%)',
+                            border: '1px solid rgba(212, 175, 55, 0.4)',
                             borderRadius: 'var(--radius-sm)',
-                            padding: '0.8rem',
+                            padding: '0.85rem',
                             display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
-                            flexWrap: 'wrap',
-                            gap: '0.5rem',
+                            flexDirection: 'column',
+                            gap: '0.65rem',
                           }}
                         >
-                          <div>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.2rem' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                               <span
                                 style={{
+                                  background: 'rgba(0, 0, 0, 0.6)',
+                                  border: '1px solid rgba(212, 175, 55, 0.6)',
+                                  borderRadius: '6px',
+                                  padding: '0.22rem 0.65rem',
                                   fontFamily: 'monospace',
-                                  fontWeight: 700,
-                                  fontSize: '0.92rem',
+                                  fontWeight: 800,
+                                  fontSize: '0.96rem',
+                                  letterSpacing: '0.08em',
                                   color: 'var(--gold-primary)',
+                                  boxShadow: '0 0 10px rgba(212, 175, 55, 0.25)',
                                 }}
                               >
                                 {coupon.code}
@@ -981,10 +1019,56 @@ export const StampCard = ({
                                 ACTIVE
                               </span>
                             </div>
-                            <p style={{ fontSize: '0.8rem', color: '#cbd5e1', fontWeight: 500, margin: '0.15rem 0' }}>
+
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                              <button
+                                onClick={() => handleCopyCode(coupon.code)}
+                                className="btn btn-secondary btn-sm"
+                                style={{
+                                  padding: '0.28rem 0.6rem',
+                                  fontSize: '0.72rem',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '0.3rem',
+                                }}
+                                title="Copy coupon code"
+                              >
+                                {copiedCouponCode === coupon.code ? (
+                                  <>
+                                    <Check size={12} color="#2ecc71" />
+                                    <span style={{ color: '#2ecc71', fontWeight: 700 }}>Copied!</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <Copy size={12} />
+                                    <span>Copy Code</span>
+                                  </>
+                                )}
+                              </button>
+
+                              <button
+                                onClick={() => showQrCode(coupon)}
+                                className="btn btn-primary btn-sm"
+                                style={{
+                                  padding: '0.28rem 0.65rem',
+                                  fontSize: '0.72rem',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '0.3rem',
+                                }}
+                                title="Show QR Code for Salon Counter"
+                              >
+                                <QrCode size={13} />
+                                <span>Show QR</span>
+                              </button>
+                            </div>
+                          </div>
+
+                          <div>
+                            <p style={{ fontSize: '0.84rem', color: '#f1f5f9', fontWeight: 600, margin: '0 0 0.2rem 0' }}>
                               {coupon.title || config.defaultOfferTitle}
                             </p>
-                            <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
+                            <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
                               Valid until {new Date(coupon.expiresAt).toLocaleDateString()}
                             </span>
                           </div>
@@ -1025,6 +1109,95 @@ export const StampCard = ({
                 )}
               </div>
             )}
+          </div>
+        )}
+
+        {/* QR Code Presentation Modal */}
+        {selectedCouponQr && (
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              background: 'rgba(11, 12, 16, 0.98)',
+              borderRadius: 'var(--radius-lg)',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '1.5rem',
+              zIndex: 150,
+            }}
+          >
+            <h4 style={{ fontSize: '1.15rem', marginBottom: '0.35rem', color: 'var(--gold-primary)', display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+              <QrCode size={20} />
+              <span>Counter Redemption QR</span>
+            </h4>
+            <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginBottom: '1.15rem', textAlign: 'center', maxWidth: '300px' }}>
+              Present this QR to salon admin to scan with camera, or give them your coupon code!
+            </p>
+
+            {qrDataUrl && (
+              <img
+                src={qrDataUrl}
+                alt="Coupon QR"
+                style={{
+                  width: '190px',
+                  height: '190px',
+                  borderRadius: '12px',
+                  border: '2px solid var(--gold-primary)',
+                  boxShadow: '0 0 24px rgba(212, 175, 55, 0.4)',
+                  marginBottom: '1rem',
+                  background: '#ffffff',
+                  padding: '6px',
+                }}
+              />
+            )}
+
+            <div
+              style={{
+                background: 'rgba(212, 175, 55, 0.15)',
+                border: '1px solid rgba(212, 175, 55, 0.5)',
+                borderRadius: '8px',
+                padding: '0.45rem 1rem',
+                fontFamily: 'monospace',
+                fontSize: '1.25rem',
+                fontWeight: 800,
+                color: '#ffffff',
+                letterSpacing: '0.12em',
+                marginBottom: '1.2rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.75rem',
+              }}
+            >
+              <span>{selectedCouponQr.code}</span>
+              <button
+                onClick={() => handleCopyCode(selectedCouponQr.code)}
+                className="btn btn-secondary btn-sm"
+                style={{ padding: '0.2rem 0.55rem', fontSize: '0.72rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}
+                title="Copy coupon code"
+              >
+                {copiedCouponCode === selectedCouponQr.code ? (
+                  <>
+                    <Check size={12} color="#2ecc71" />
+                    <span style={{ color: '#2ecc71' }}>Copied</span>
+                  </>
+                ) : (
+                  <>
+                    <Copy size={12} />
+                    <span>Copy</span>
+                  </>
+                )}
+              </button>
+            </div>
+
+            <button
+              onClick={() => setSelectedCouponQr(null)}
+              className="btn btn-secondary"
+              style={{ padding: '0.55rem 1.4rem', fontSize: '0.85rem' }}
+            >
+              Close & Return
+            </button>
           </div>
         )}
       </div>

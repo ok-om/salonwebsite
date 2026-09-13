@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ScrollToPlugin } from 'gsap/ScrollToPlugin';
-import { Scissors, Sparkles, MessageSquare, ArrowUpRight, ZoomIn, X, Eye, ChevronLeft, ChevronRight, ShieldCheck } from 'lucide-react';
+import { Scissors, Sparkles, MessageSquare, ArrowUpRight, ZoomIn, X, Eye, ChevronLeft, ChevronRight, ShieldCheck, Clock } from 'lucide-react';
 import { useSiteConfig } from '../context/SiteConfigContext';
 import { useAuth } from '../context/AuthContext';
 
@@ -1529,23 +1529,29 @@ export const HairCutScrollShowcase = ({ onOpenLoyalty, onOpenAdmin }) => {
                       {activeCut.badge}
                     </div>
 
-                    {/* Price pill */}
+                    {/* Duration badge (Pricing removed as requested) */}
                     <div
                       style={{
                         position: 'absolute',
                         bottom: '0.65rem',
                         left: '0.65rem',
-                        background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.95) 0%, rgba(170, 130, 10, 0.95) 100%)',
-                        color: '#07090e',
-                        padding: '0.2rem 0.65rem',
+                        background: 'rgba(7, 9, 14, 0.88)',
+                        border: '1px solid rgba(212, 175, 55, 0.6)',
+                        backdropFilter: 'blur(8px)',
+                        color: 'var(--gold-primary)',
+                        padding: '0.22rem 0.65rem',
                         borderRadius: 'var(--radius-full)',
                         fontSize: '0.74rem',
-                        fontWeight: 800,
+                        fontWeight: 700,
                         boxShadow: '0 4px 12px rgba(0,0,0,0.8)',
                         zIndex: 4,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.35rem',
                       }}
                     >
-                      {activeCut.price} • {activeCut.duration}
+                      <Clock size={12} color="var(--gold-primary)" />
+                      <span>{activeCut.duration}</span>
                     </div>
                   </div>
 
