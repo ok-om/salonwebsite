@@ -14,7 +14,62 @@ export const sendOtpEmail = async (email, otp) => {
     </div>
   `;
 
-  // 1. Support Resend HTTPS REST API (Port 443 - NEVER blocked by Render or Cloud firewalls)
+  // 1. Support Google Apps Script Relay (100% Free, NO Domain needed, sends directly from your personal Gmail over Port 443 HTTPS)
+  if (process.env.GOOGLE_SCRIPT_URL) {
+    try {
+      const gRes = await fetch(process.env.GOOGLE_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email,
+          otp,
+          subject: `Your Verification Code: ${otp} - The Classic Cut Salon`,
+          html: htmlContent,
+        }),
+      });
+      if (gRes.ok) {
+        console.log(`✉️ Real OTP email delivered via Google Apps Script to ${email}`);
+        return { success: true, mode: 'google-script-https' };
+      }
+      const errText = await gRes.text();
+      console.warn('Google Script Web App returned error:', errText);
+    } catch (err) {
+      console.warn('Google Script Web App failed:', err.message);
+    }
+  }
+
+  // 2. Support EmailJS HTTPS API (100% Free, NO Domain needed, connects directly to Gmail)
+  if (process.env.EMAILJS_SERVICE_ID && process.env.EMAILJS_TEMPLATE_ID && process.env.EMAILJS_PUBLIC_KEY) {
+    try {
+      const ejsRes = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          service_id: process.env.EMAILJS_SERVICE_ID,
+          template_id: process.env.EMAILJS_TEMPLATE_ID,
+          user_id: process.env.EMAILJS_PUBLIC_KEY,
+          accessToken: process.env.EMAILJS_PRIVATE_KEY,
+          template_params: {
+            to_email: email,
+            email: email,
+            otp: otp,
+            otp_code: otp,
+            message: `Your Classic Cut Salon verification code is ${otp}. Valid for 10 minutes.`,
+          },
+        }),
+      });
+      if (ejsRes.ok) {
+        console.log(`✉️ Real OTP email delivered via EmailJS HTTPS API to ${email}`);
+        return { success: true, mode: 'emailjs-https' };
+      }
+      const errText = await ejsRes.text();
+      console.warn('EmailJS returned error:', errText);
+    } catch (err) {
+      console.warn('EmailJS failed:', err.message);
+    }
+  }
+
+  // 3. Support Resend HTTPS REST API (Port 443 - NEVER blocked by Render or Cloud firewalls)
   if (process.env.RESEND_API_KEY) {
     try {
       const resendRes = await fetch('https://api.resend.com/emails', {
