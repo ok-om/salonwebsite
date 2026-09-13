@@ -196,7 +196,7 @@ export const login = async (req, res) => {
       user.role = 'admin';
     }
 
-    // If customer account was in deleted state, allow login but restart Coupe Stamps from 0
+    // If customer account was in deleted state, allow login but restart Coupon Stamps from 0
     if (user.isDeleted) {
       user.isDeleted = false;
       user.deletedAt = null;
@@ -276,7 +276,7 @@ export const googleAuth = async (req, res) => {
       if (name) {
         user.name = name;
       }
-      // If customer account was in deleted state, allow login but restart Coupe Stamps from 0
+      // If customer account was in deleted state, allow login but restart Coupon Stamps from 0
       if (user.isDeleted) {
         user.isDeleted = false;
         user.deletedAt = null;

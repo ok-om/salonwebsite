@@ -49,6 +49,10 @@ const userSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    lastStampDate: {
+      type: Date,
+      default: null,
+    },
     isVerified: {
       type: Boolean,
       default: false,

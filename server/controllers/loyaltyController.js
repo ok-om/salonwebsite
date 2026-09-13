@@ -13,6 +13,50 @@ const generateCouponCode = () => {
   return code;
 };
 
+// Helper: Check and apply 45-day inactivity decay to user's stamps
+// If user does not visit within 45 days of last stamp, decrement stamps by 1 (minimum 0)
+export const applyStampInactivityCheck = async (user) => {
+  if (!user) return { decayed: false, stampsDecayed: 0, daysUntilDecay: 0 };
+
+  // If user has stamps > 0 but lastStampDate wasn't set previously, initialize it
+  if (user.currentStamps > 0 && !user.lastStampDate) {
+    user.lastStampDate = user.updatedAt || new Date();
+    await user.save();
+  }
+
+  if (user.currentStamps <= 0 || !user.lastStampDate) {
+    return { decayed: false, stampsDecayed: 0, daysUntilDecay: 0 };
+  }
+
+  const now = Date.now();
+  const lastStampTime = new Date(user.lastStampDate).getTime();
+  const elapsedDays = (now - lastStampTime) / (1000 * 60 * 60 * 24);
+
+  if (elapsedDays >= 45) {
+    const periods = Math.floor(elapsedDays / 45);
+    const prevStamps = user.currentStamps;
+    user.currentStamps = Math.max(0, user.currentStamps - periods);
+    const stampsDecayed = prevStamps - user.currentStamps;
+
+    if (user.currentStamps === 0) {
+      user.lastStampDate = null;
+    } else {
+      user.lastStampDate = new Date(lastStampTime + periods * 45 * 24 * 60 * 60 * 1000);
+    }
+    await user.save();
+
+    const daysUntilDecay = user.lastStampDate
+      ? Math.max(0, Math.ceil(((new Date(user.lastStampDate).getTime() + 45 * 24 * 60 * 60 * 1000) - now) / (1000 * 60 * 60 * 24)))
+      : 0;
+
+    return { decayed: true, stampsDecayed, daysUntilDecay };
+  }
+
+  const msRemaining = (lastStampTime + 45 * 24 * 60 * 60 * 1000) - now;
+  const daysUntilDecay = Math.max(0, Math.ceil(msRemaining / (1000 * 60 * 60 * 24)));
+  return { decayed: false, stampsDecayed: 0, daysUntilDecay };
+};
+
 // 1. Admin Awards +1 Visit Stamp to Customer
 export const addVisitStamp = async (req, res) => {
   try {
@@ -39,6 +83,7 @@ export const addVisitStamp = async (req, res) => {
 
     user.currentStamps = (user.currentStamps || 0) + 1;
     user.lifetimeVisits = (user.lifetimeVisits || 0) + 1;
+    user.lastStampDate = new Date(); // Stamp awarded date set to current visit date
 
     let offerUnlocked = false;
     let newCoupon = null;
@@ -49,8 +94,8 @@ export const addVisitStamp = async (req, res) => {
 
       // Get salon default offer settings from CMS
       const siteConfig = await SiteConfig.findOne();
-      const offerTitle = siteConfig?.defaultOfferTitle || 'Complimentary Royal Haircut & Beard Sculpting';
-      const offerDiscount = siteConfig?.defaultOfferDiscount || '100% OFF / FREE SERVICE';
+      const offerTitle = siteConfig?.defaultOfferTitle || 'Exclusive 5-Stamp Reward Offer';
+      const offerDiscount = siteConfig?.defaultOfferDiscount || '30% - 40% OFF';
 
       // Generate unique coupon
       let uniqueCode = generateCouponCode();
@@ -63,20 +108,24 @@ export const addVisitStamp = async (req, res) => {
         user: user._id,
         title: offerTitle,
         discountType: offerDiscount,
+        expiresAt: new Date(Date.now() + 35 * 24 * 60 * 60 * 1000), // 35 days validity
       });
 
       // RESET active stamps to 0 for next cycle
       user.currentStamps = 0;
+      user.lastStampDate = null;
     }
 
     await user.save();
 
     res.status(200).json({
       message: offerUnlocked
-        ? '🎉 Congratulations! 5th Stamp reached! 1x Special Offer Coupon awarded and stamps reset to 0.'
-        : `Stamp awarded successfully! Customer now has ${user.currentStamps}/5 stamps.`,
+        ? '🎉 Congratulations! 5th Stamp reached! 30% to 40% OFF Special Offer Coupon awarded (valid for 35 days) and stamps reset to 0.'
+        : `Stamp awarded successfully! Customer now has ${user.currentStamps}/5 stamps. Next visit due within 45 days.`,
       currentStamps: user.currentStamps,
       lifetimeVisits: user.lifetimeVisits,
+      lastStampDate: user.lastStampDate,
+      daysUntilStampDecay: 45,
       offerUnlocked,
       coupon: newCoupon,
       visit,
@@ -87,13 +136,21 @@ export const addVisitStamp = async (req, res) => {
   }
 };
 
-// 2. Admin: Get All Customers with Stamp Counts & Filters
+// 2. Admin: Get All Customers with Stamp Counts, 45-Day Expiry & Filters
 export const getAllCustomers = async (req, res) => {
   try {
     const { search = '' } = req.query;
 
     // Clean up any accounts past their 24h restore window
     await purgeExpiredDeletedUsers();
+
+    // Auto-clean any expired coupons (>35 days) or redeemed coupons permanently from database
+    await OfferCoupon.deleteMany({
+      $or: [
+        { isRedeemed: true },
+        { expiresAt: { $lt: new Date() } },
+      ],
+    });
 
     const query = { role: 'user', isDeleted: { $ne: true } };
     if (search) {
@@ -108,13 +165,21 @@ export const getAllCustomers = async (req, res) => {
       .select('-password')
       .sort({ createdAt: -1 });
 
-    // Attach latest visit and coupon counts to each customer
+    // Attach latest visit, stamp decay countdown, and active coupons to each customer
     const customerData = await Promise.all(
       users.map(async (u) => {
+        const decayInfo = await applyStampInactivityCheck(u);
         const lastVisit = await VisitLog.findOne({ user: u._id }).sort({ visitedAt: -1 });
-        const couponsCount = await OfferCoupon.countDocuments({ user: u._id, isRedeemed: false });
+        const couponsCount = await OfferCoupon.countDocuments({
+          user: u._id,
+          isRedeemed: false,
+          expiresAt: { $gt: new Date() },
+        });
         return {
           ...u.toObject(),
+          currentStamps: u.currentStamps,
+          lastStampDate: u.lastStampDate,
+          daysUntilStampDecay: decayInfo.daysUntilDecay,
           lastVisitDate: lastVisit?.visitedAt || null,
           lastServiceName: lastVisit?.serviceName || 'N/A',
           activeCouponsCount: couponsCount,
@@ -149,20 +214,34 @@ export const getVisitHistory = async (req, res) => {
   }
 };
 
-// 4. User: Get Current User's Loyalty Profile & Coupons
+// 4. User: Get Current User's Loyalty Profile, 45-Day Stamp Inactivity Check & Coupons
 export const getMyLoyalty = async (req, res) => {
   try {
-    // Purge any previously redeemed coupons permanently from database
-    await OfferCoupon.deleteMany({ isRedeemed: true });
+    // Purge any expired coupons (>35 days) or redeemed coupons permanently from database
+    await OfferCoupon.deleteMany({
+      $or: [
+        { isRedeemed: true },
+        { expiresAt: { $lt: new Date() } },
+      ],
+    });
 
-    const user = await User.findById(req.user._id).select('name email phone currentStamps lifetimeVisits');
-    const coupons = await OfferCoupon.find({ user: req.user._id, isRedeemed: { $ne: true } }).sort({ createdAt: -1 });
+    const user = await User.findById(req.user._id).select('name email phone currentStamps lifetimeVisits lastStampDate');
+    const decayInfo = await applyStampInactivityCheck(user);
+
+    const coupons = await OfferCoupon.find({
+      user: req.user._id,
+      isRedeemed: { $ne: true },
+      expiresAt: { $gt: new Date() },
+    }).sort({ createdAt: -1 });
+
     const recentVisits = await VisitLog.find({ user: req.user._id }).sort({ visitedAt: -1 }).limit(5);
 
     res.status(200).json({
       user,
       currentStamps: user.currentStamps,
       lifetimeVisits: user.lifetimeVisits,
+      lastStampDate: user.lastStampDate,
+      daysUntilStampDecay: decayInfo.daysUntilDecay,
       stampsNeeded: 5 - user.currentStamps,
       coupons,
       recentVisits,
@@ -195,7 +274,11 @@ export const redeemCoupon = async (req, res) => {
     }
 
     if (new Date() > coupon.expiresAt) {
-      return res.status(400).json({ message: 'This coupon has expired' });
+      // Purge expired coupon from DB immediately
+      await OfferCoupon.findByIdAndDelete(coupon._id);
+      return res.status(400).json({
+        message: 'This coupon has expired (exceeded 35 days validity) and has been removed from database.',
+      });
     }
 
     const customerName = coupon.user?.name || 'Customer';
@@ -325,7 +408,7 @@ export const restoreCustomer = async (req, res) => {
     await user.save();
 
     res.status(200).json({
-      message: `Account for ${user.name} (${user.email}) has been fully restored with ${user.currentStamps}/5 Coupe Stamps!`,
+      message: `Account for ${user.name} (${user.email}) has been fully restored with ${user.currentStamps}/5 Coupon Stamps!`,
       user,
     });
   } catch (error) {

@@ -120,7 +120,7 @@ const MainContent = ({ isLoading }) => {
             style={{ color: 'var(--gold-primary)' }}
           >
             <Gift size={20} />
-            <span style={{ fontWeight: 700 }}>5-Coupe</span>
+            <span style={{ fontWeight: 700 }}>5-Coupon</span>
           </button>
         )}
 

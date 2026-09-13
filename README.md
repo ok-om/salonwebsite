@@ -1,7 +1,7 @@
 # 💈 The Classic Cut Salon (`the_classsic_cut_salon`)
 ### Luxury Gentleman Barber & Grooming Experience — Full MERN Stack
 
-A modern, responsive web application built with a **Mobile-First** approach, scaling seamlessly to laptops and desktops. Featuring handcrafted **GSAP ScrollTrigger animations** (precision scissor snips, botanical hair wash with customer character, and razor beard grooming), a **5-Coupe Stamp Loyalty System** with auto-reset & offer coupon generation, live **Admin Content Management System (CMS)**, and dual authentication with **Email OTP + Google OAuth**.
+A modern, responsive web application built with a **Mobile-First** approach, scaling seamlessly to laptops and desktops. Featuring handcrafted **GSAP ScrollTrigger animations** (precision scissor snips, botanical hair wash with customer character, and razor beard grooming), a **5-Coupon Stamp Loyalty System** with auto-reset & offer coupon generation, live **Admin Content Management System (CMS)**, and dual authentication with **Email OTP + Google OAuth**.
 
 ---
 
@@ -133,9 +133,9 @@ Jab aap pehli baar server start karenge, backend automatically ek default Admin 
 - **Admin Password**: `admin12345`
 
 ### Admin Panel Features:
-1. **Coupe Stamp Manager**:
+1. **Coupon Stamp Manager**:
    - Customer search by name, mobile or email.
-   - One-click **+1 Coupe Stamp** button per visit.
+   - One-click **+1 Coupon Stamp** button per visit.
    - 5-Stamp reaching alert: 1x Offer Coupon automatically created and active stamps reset to 0!
    - Full Visit History (kaun kab aaya tha date & time ke sath).
 2. **Counter Coupon Redemption**:

@@ -42,11 +42,15 @@ const siteConfigSchema = new mongoose.Schema(
     openingHours: {
       weekday: {
         type: String,
-        default: 'Mon - Fri: 9:00 AM - 9:30 PM',
+        default: 'Tuesday to Friday: 9:30 AM - 9:00 PM',
       },
       weekend: {
         type: String,
-        default: 'Sat - Sun: 8:30 AM - 10:00 PM',
+        default: 'Saturday & Sunday: 8:30 AM - 10:00 PM',
+      },
+      monday: {
+        type: String,
+        default: 'CLOSED (Shop is closed on every Monday)',
       },
     },
     ownerName: {
@@ -71,11 +75,11 @@ const siteConfigSchema = new mongoose.Schema(
     },
     defaultOfferTitle: {
       type: String,
-      default: 'Complimentary Royal Haircut & Beard Sculpting',
+      default: 'Exclusive 5-Stamp Reward Offer',
     },
     defaultOfferDiscount: {
       type: String,
-      default: '100% OFF / FREE SERVICE',
+      default: '30% - 40% OFF',
     },
   },
   { timestamps: true }

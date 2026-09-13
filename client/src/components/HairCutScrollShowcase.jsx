@@ -299,12 +299,12 @@ const ShowcaseHeader = React.memo(() => (
   </div>
 ));
 
-const CoupeBanner = React.memo(({ onOpenLoyalty, onOpenAdmin }) => {
+const CouponBanner = React.memo(({ onOpenLoyalty, onOpenAdmin }) => {
   const { isAdmin } = useAuth();
   if (isAdmin) return null;
   return (
     <div
-      id="coupe-banner-card"
+      id="coupon-banner-card"
       style={{
         marginTop: '4.5rem',
         background: '#07090e',
@@ -320,10 +320,10 @@ const CoupeBanner = React.memo(({ onOpenLoyalty, onOpenAdmin }) => {
     >
       <Sparkles size={26} color="var(--gold-primary)" style={{ margin: '0 auto 0.6rem', display: 'block' }} />
       <h3 style={{ fontSize: 'clamp(1.3rem, 3.8vw, 2rem)', marginBottom: '0.4rem' }}>
-        Earn Any Of These Haircuts <span className="gold-text">100% Free</span>
+        Unlock Exclusive <span className="gold-text">30% to 40% OFF</span>
       </h3>
       <p style={{ color: '#cbd5e1', maxWidth: '580px', margin: '0 auto 1.25rem', fontSize: '0.88rem' }}>
-        Collect 1 Coupe Stamp every time you visit. After 5 visits, you unlock 1 Free Royal Cut Offer and stamps reset to 0!
+        Collect 1 Coupon Stamp every time you visit. After 5 visits, you unlock a 30% to 40% OFF Luxury Grooming Offer valid for 35 days!
       </p>
       <div style={{ display: 'flex', justifyContent: 'center', gap: '0.65rem', flexWrap: 'wrap' }}>
         {isAdmin ? (
@@ -342,7 +342,7 @@ const CoupeBanner = React.memo(({ onOpenLoyalty, onOpenAdmin }) => {
         ) : (
           <button onClick={onOpenLoyalty} className="btn btn-primary btn-sm" style={{ padding: '0.6rem 1.4rem' }}>
             <Scissors size={15} />
-            <span>Open My 5-Coupe Card</span>
+            <span>Open My 5-Coupon Card</span>
           </button>
         )}
         <a href="#contact" className="btn btn-outline btn-sm" style={{ padding: '0.6rem 1.2rem' }}>
@@ -442,7 +442,7 @@ export const HairCutScrollShowcase = ({ onOpenLoyalty, onOpenAdmin }) => {
             }
           }
         }
-        // If already at Card 7: allow native scroll down into CoupeBanner & rest of page
+        // If already at Card 7: allow native scroll down into CouponBanner & rest of page
       }
       // Swiping DOWN (finger moves down -> scroll up intent -> Prev Card)
       else if (deltaY > 0) {
@@ -1700,8 +1700,8 @@ export const HairCutScrollShowcase = ({ onOpenLoyalty, onOpenAdmin }) => {
         </div>
       </div>
 
-      {/* Bottom Banner: 5-Coupe Card & Location (Solid Deep Luxury Dark) */}
-      <CoupeBanner onOpenLoyalty={onOpenLoyalty} onOpenAdmin={onOpenAdmin} />
+      {/* Bottom Banner: 5-Coupon Card & Location (Solid Deep Luxury Dark) */}
+      <CouponBanner onOpenLoyalty={onOpenLoyalty} onOpenAdmin={onOpenAdmin} />
 
       {/* Responsive Styles Injection */}
       <style>{`

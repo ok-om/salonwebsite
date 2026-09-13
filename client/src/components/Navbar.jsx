@@ -146,7 +146,7 @@ export const Navbar = ({ onOpenAuth, onOpenAdmin, onOpenLoyalty, onOpenProfile }
             </button>
             {!isAdmin && (
               <button onClick={onOpenLoyalty} style={desktopLinkStyle}>
-                5-Coupe Card
+                5-Coupon Card
               </button>
             )}
             <button onClick={() => scrollToSection('contact')} style={desktopLinkStyle}>
@@ -195,7 +195,7 @@ export const Navbar = ({ onOpenAuth, onOpenAdmin, onOpenLoyalty, onOpenProfile }
                     boxShadow: '0 0 14px rgba(212, 175, 55, 0.15)',
                     cursor: 'pointer',
                   }}
-                  title="Click to view your Profile & 5-Coupe Card"
+                  title="Click to view your Profile & 5-Coupon Card"
                 >
                   <div
                     style={{
@@ -264,7 +264,7 @@ export const Navbar = ({ onOpenAuth, onOpenAdmin, onOpenLoyalty, onOpenProfile }
               <button
                 onClick={() => (onOpenProfile ? onOpenProfile('profile') : onOpenLoyalty())}
                 className="mobile-stamp-badge"
-                title="View Profile & 5-Coupe Card"
+                title="View Profile & 5-Coupon Card"
                 style={{
                   background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.22) 0%, rgba(18, 21, 30, 0.95) 100%)',
                   border: '1.5px solid var(--gold-primary)',
@@ -498,7 +498,7 @@ export const Navbar = ({ onOpenAuth, onOpenAdmin, onOpenLoyalty, onOpenProfile }
                         style={{ flex: 1, padding: '0.45rem', fontSize: '0.78rem' }}
                       >
                         <Scissors size={14} />
-                        <span>5-Coupe Card</span>
+                        <span>5-Coupon Card</span>
                       </button>
                     )}
                   </div>
@@ -559,7 +559,7 @@ export const Navbar = ({ onOpenAuth, onOpenAdmin, onOpenLoyalty, onOpenProfile }
                       color: 'var(--gold-primary)',
                     }}
                   >
-                    <span>🎟️</span> 5-Coupe Stamp Card
+                    <span>🎟️</span> 5-Coupon Stamp Card
                   </button>
                 )}
                 <button onClick={() => scrollToSection('contact')} style={mobileMenuItemStyle}>

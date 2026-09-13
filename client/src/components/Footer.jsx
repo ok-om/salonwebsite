@@ -81,11 +81,14 @@ export const Footer = ({ onOpenAdminLogin }) => {
             <h4 style={{ color: '#ffffff', fontSize: '1rem', marginBottom: '1rem', fontFamily: 'var(--font-serif)' }}>
               Salon Hours & Contact
             </h4>
-            <p style={{ fontSize: '0.85rem', color: '#cbd5e1', marginBottom: '0.3rem' }}>
-              {config.openingHours?.weekday || 'Mon - Fri: 9:00 AM - 9:30 PM'}
+            <p style={{ fontSize: '0.85rem', color: '#cbd5e1', marginBottom: '0.25rem' }}>
+              <strong style={{ color: 'var(--gold-primary)' }}>Tue – Fri:</strong> 9:30 AM – 9:00 PM
             </p>
-            <p style={{ fontSize: '0.85rem', color: '#cbd5e1', marginBottom: '0.5rem' }}>
-              {config.openingHours?.weekend || 'Sat - Sun: 8:30 AM - 10:00 PM'}
+            <p style={{ fontSize: '0.85rem', color: '#cbd5e1', marginBottom: '0.35rem' }}>
+              <strong style={{ color: 'var(--gold-primary)' }}>Sat – Sun:</strong> 8:30 AM – 10:00 PM
+            </p>
+            <p style={{ fontSize: '0.8rem', color: '#fca5a5', fontWeight: 600, marginBottom: '0.6rem' }}>
+              🔴 Monday: CLOSED (Shop is closed on every Monday)
             </p>
             <p style={{ fontSize: '0.82rem', color: '#94a3b8', marginBottom: '0.8rem' }}>
               📧 <a href={`mailto:${config.email || 'sraut7285@gmail.com'}`} style={{ color: 'inherit', textDecoration: 'none' }}>{config.email || 'sraut7285@gmail.com'}</a>
@@ -105,7 +108,7 @@ export const Footer = ({ onOpenAdminLogin }) => {
               Staff & Salon Admin
             </h4>
             <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '1rem' }}>
-              Salon operators can access the Coupe Stamp registry, visit audit logs, and live CMS editor.
+              Salon operators can access the Coupon Stamp registry, visit audit logs, and live CMS editor.
             </p>
             <button
               onClick={onOpenAdminLogin}

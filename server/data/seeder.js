@@ -43,18 +43,38 @@ export const seedInitialData = async () => {
         mapDirectionsUrl: 'https://www.google.com/maps/dir/?api=1&destination=19.2528181,75.8555902',
         mapEmbedUrl: 'https://maps.google.com/maps?q=19.2528181,75.8555902&hl=en&z=15&output=embed',
         openingHours: {
-          weekday: 'Mon - Fri: 9:00 AM - 9:30 PM',
-          weekend: 'Sat - Sun: 8:30 AM - 10:00 PM',
+          weekday: 'Tuesday to Friday: 9:30 AM - 9:00 PM',
+          weekend: 'Saturday & Sunday: 8:30 AM - 10:00 PM',
+          monday: 'CLOSED (Shop is closed on every Monday)',
         },
         ownerName: 'Master Barber Alex Thorne',
         ownerTitle: 'Founder & Chief Barber',
         ownerBio: 'With over 15 years mastering British and Italian scissor sculpting and straight-razor artistry, Alex founded The Classic Cut Salon to bring authentic gentleman luxury and personalized grooming back to the modern man.',
         ownerImage: '',
         heroVideoUrl: '/video/backgroundvideo.mp4',
-        defaultOfferTitle: 'Complimentary Royal Haircut & Beard Sculpting',
-        defaultOfferDiscount: '100% OFF / FREE SERVICE',
+        defaultOfferTitle: 'Exclusive 5-Stamp Reward Offer',
+        defaultOfferDiscount: '30% - 40% OFF',
       });
       console.log('✅ Default Site CMS config seeded');
+    } else {
+      // Sync opening hours and default discount in existing config if still set to old defaults
+      let updated = false;
+      if (!configExists.openingHours?.weekday?.includes('Tuesday')) {
+        configExists.openingHours = {
+          weekday: 'Tuesday to Friday: 9:30 AM - 9:00 PM',
+          weekend: 'Saturday & Sunday: 8:30 AM - 10:00 PM',
+          monday: 'CLOSED (Shop is closed on every Monday)',
+        };
+        updated = true;
+      }
+      if (configExists.defaultOfferDiscount?.includes('100%')) {
+        configExists.defaultOfferDiscount = '30% - 40% OFF';
+        updated = true;
+      }
+      if (updated) {
+        await configExists.save();
+        console.log('✅ Synchronized Site CMS config with updated hours and 30%-40% offer');
+      }
     }
 
     // 3. Seed Services if empty

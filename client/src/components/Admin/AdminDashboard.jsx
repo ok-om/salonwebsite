@@ -765,7 +765,7 @@ export const AdminDashboard = ({ isOpen, onClose }) => {
                     <tr style={{ background: 'rgba(255, 255, 255, 0.04)', color: 'var(--text-secondary)' }}>
                       <th style={{ padding: '0.75rem 1rem' }}>Customer</th>
                       <th style={{ padding: '0.75rem 1rem' }}>Contact</th>
-                      <th style={{ padding: '0.75rem 1rem' }}>Coupe Stamps</th>
+                      <th style={{ padding: '0.75rem 1rem' }}>Coupon Stamps</th>
                       <th style={{ padding: '0.75rem 1rem' }}>Last Visit Date</th>
                       <th style={{ padding: '0.75rem 1rem' }}>Active Rewards</th>
                       <th style={{ padding: '0.75rem 1rem', textAlign: 'right' }}>Actions</th>
@@ -808,7 +808,12 @@ export const AdminDashboard = ({ isOpen, onClose }) => {
                           >
                             ✂️ {c.currentStamps}/5 Stamps
                           </span>
-                          <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>
+                          {c.currentStamps > 0 && c.daysUntilStampDecay !== undefined && (
+                            <div style={{ fontSize: '0.68rem', color: '#fca5a5', marginTop: '0.2rem', fontWeight: 600 }}>
+                              ⏳ Due in {c.daysUntilStampDecay}d
+                            </div>
+                          )}
+                          <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '0.15rem' }}>
                             Lifetime: {c.lifetimeVisits}
                           </div>
                         </td>
@@ -838,10 +843,10 @@ export const AdminDashboard = ({ isOpen, onClose }) => {
                             <button
                               onClick={() => handleAwardStamp(c)}
                               className="btn btn-primary btn-sm"
-                              title="Award 1 Coupe Stamp for this visit"
+                              title="Award 1 Coupon Stamp for this visit"
                               style={{ padding: '0.35rem 0.75rem', fontSize: '0.75rem' }}
                             >
-                              +1 Coupe Stamp
+                              +1 Coupon Stamp
                             </button>
                             <button
                               onClick={() => handleViewHistory(c)}
@@ -947,7 +952,7 @@ export const AdminDashboard = ({ isOpen, onClose }) => {
                           className="btn btn-primary btn-sm"
                           style={{ flex: 1, padding: '0.45rem', fontSize: '0.75rem', justifyContent: 'center' }}
                         >
-                          +1 Coupe Stamp
+                          +1 Coupon Stamp
                         </button>
                         <button
                           onClick={() => handleViewHistory(c)}
@@ -1417,7 +1422,7 @@ export const AdminDashboard = ({ isOpen, onClose }) => {
                   <span>24-Hour Account Recovery Policy</span>
                 </div>
                 <p style={{ fontSize: '0.85rem', color: '#cbd5e1', lineHeight: '1.5', margin: 0 }}>
-                  Deleted accounts remain in this temporary recycle bin for <strong>24 hours</strong>. During this window, you can restore the user and recover their Coupe Stamps. If not restored within 24 hours, MongoDB automatically erases the account and all related visit history permanently.
+                  Deleted accounts remain in this temporary recycle bin for <strong>24 hours</strong>. During this window, you can restore the user and recover their Coupon Stamps. If not restored within 24 hours, MongoDB automatically erases the account and all related visit history permanently.
                 </p>
               </div>
 

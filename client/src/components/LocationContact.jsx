@@ -142,14 +142,36 @@ export const LocationContact = () => {
                 <div style={iconBoxStyle}>
                   <Clock size={18} color="var(--gold-primary)" />
                 </div>
-                <div>
-                  <span style={infoLabelStyle}>Working Hours</span>
-                  <p style={{ color: '#cbd5e1', fontSize: '0.82rem', margin: '0.1rem 0' }}>
-                    {config.openingHours?.weekday || 'Mon - Fri: 9:00 AM - 9:30 PM'}
-                  </p>
-                  <p style={{ color: '#cbd5e1', fontSize: '0.82rem' }}>
-                    {config.openingHours?.weekend || 'Sat - Sun: 8:30 AM - 10:00 PM'}
-                  </p>
+                <div style={{ flex: 1 }}>
+                  <span style={infoLabelStyle}>Working Hours & Schedule</span>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', marginTop: '0.2rem' }}>
+                    <p style={{ color: '#e2e8f0', fontSize: '0.84rem', margin: 0, fontWeight: 500 }}>
+                      <strong style={{ color: 'var(--gold-primary)' }}>Tue – Fri:</strong> 9:30 AM – 9:00 PM
+                    </p>
+                    <p style={{ color: '#e2e8f0', fontSize: '0.84rem', margin: 0, fontWeight: 500 }}>
+                      <strong style={{ color: 'var(--gold-primary)' }}>Sat – Sun:</strong> 8:30 AM – 10:00 PM
+                    </p>
+                    <div
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.4rem',
+                        marginTop: '0.35rem',
+                        background: 'rgba(239, 68, 68, 0.14)',
+                        border: '1px solid rgba(239, 68, 68, 0.35)',
+                        padding: '0.3rem 0.65rem',
+                        borderRadius: '6px',
+                        color: '#fca5a5',
+                        fontSize: '0.78rem',
+                        fontWeight: 700,
+                        letterSpacing: '0.02em',
+                        width: 'fit-content',
+                      }}
+                    >
+                      <span>🔴</span>
+                      <span>Shop is closed on every Monday</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

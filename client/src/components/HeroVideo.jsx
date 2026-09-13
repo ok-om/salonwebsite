@@ -267,7 +267,7 @@ export const HeroVideo = ({ onOpenLoyalty, onOpenAdmin, onScrollToExperience, is
                   }}
                 >
                   <Scissors size={17} />
-                  <span>Check My 5-Coupe Card</span>
+                  <span>Check My 5-Coupon Card</span>
                 </button>
               )}
 

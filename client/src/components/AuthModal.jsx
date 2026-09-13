@@ -351,7 +351,7 @@ export const AuthModal = ({ isOpen, onClose, onAuthSuccess }) => {
             {step === 3
               ? 'Link your phone number to receive appointment confirmations & loyalty stamps'
               : mode === 'login'
-              ? 'Access your 5-Coupe Card, appointment history & rewards'
+              ? 'Access your 5-Coupon Card, appointment history & 30% to 40% OFF rewards'
               : 'Register to unlock automated visit stamps & complimentary offers'}
           </p>
         </div>
@@ -432,7 +432,7 @@ export const AuthModal = ({ isOpen, onClose, onAuthSuccess }) => {
                 />
               </div>
               <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginTop: '0.4rem' }}>
-                Your phone number is used for appointment reminders & 5-Coupe loyalty stamps.
+                Your phone number is used for appointment reminders & 5-Coupon loyalty stamps.
               </span>
             </div>
 

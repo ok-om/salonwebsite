@@ -262,7 +262,7 @@ export const StampCard = ({
                 Gentleman's <span className="gold-text">VIP Lounge</span>
               </h3>
               <p style={{ color: '#cbd5e1', marginBottom: '1.5rem', fontSize: '0.88rem', maxWidth: '380px', margin: '0 auto 1.5rem' }}>
-                Sign in with Google or Email to view your personal profile, track your 5-Coupe visit stamps, and redeem complimentary grooming rewards!
+                Sign in with Google or Email to view your personal profile, track your 5-Coupon visit stamps, and redeem 30% to 40% OFF grooming rewards!
               </p>
               <button
                 onClick={() => {
@@ -344,7 +344,7 @@ export const StampCard = ({
                     }}
                   >
                     <Gift size={15} />
-                    <span>5-Coupe Card ({currentStamps}/5)</span>
+                    <span>5-Coupon Card ({currentStamps}/5)</span>
                   </button>
                 )}
               </div>
@@ -798,7 +798,7 @@ export const StampCard = ({
                       style={{ width: '100%', padding: '0.75rem', fontSize: '0.85rem', justifyContent: 'center' }}
                     >
                       <Gift size={16} />
-                      <span>View 5-Coupe Card & Rewards</span>
+                      <span>View 5-Coupon Card & Rewards</span>
                     </button>
                   )}
 
@@ -826,10 +826,48 @@ export const StampCard = ({
             )}
 
             {/* ===================================================================== */}
-            {/* TAB 2: 5-COUPE STAMP CARD & REWARDS (Customers Only) */}
+            {/* TAB 2: 5-COUPON STAMP CARD & REWARDS (Customers Only) */}
             {/* ===================================================================== */}
             {!isAdmin && activeTab === 'stamps' && (
               <div>
+                {/* 45-Day Stamp Inactivity Policy Banner (Only visible when user has stamps) */}
+                {currentStamps > 0 && (
+                  <div
+                    style={{
+                      marginBottom: '1rem',
+                      background: 'rgba(212, 175, 55, 0.08)',
+                      border: '1px solid rgba(212, 175, 55, 0.38)',
+                      borderRadius: 'var(--radius-sm)',
+                      padding: '0.65rem 0.85rem',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.65rem',
+                      fontSize: '0.78rem',
+                      color: '#fef08a',
+                    }}
+                  >
+                    <Clock size={16} color="var(--gold-primary)" style={{ flexShrink: 0 }} />
+                    <div style={{ lineHeight: 1.45 }}>
+                      <span style={{ fontWeight: 700, color: 'var(--gold-primary)' }}>
+                        ⏳ 45-Day Visit Policy:
+                      </span>{' '}
+                      {loyaltyData?.daysUntilStampDecay !== undefined ? (
+                        <span>
+                          Next visit due within{' '}
+                          <strong style={{ color: '#ffffff', textDecoration: 'underline' }}>
+                            {loyaltyData.daysUntilStampDecay} day{loyaltyData.daysUntilStampDecay !== 1 ? 's' : ''}
+                          </strong>{' '}
+                          to keep current stamps and earn your next one! If 45 days pass without a visit, 1 stamp will expire.
+                        </span>
+                      ) : (
+                        <span>
+                          Collect your next stamp within 45 days of your previous visit to preserve your stamp progress.
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                )}
+
                 {/* Stamp Card Presentation */}
                 <div
                   style={{
@@ -915,7 +953,7 @@ export const StampCard = ({
                             <span style={{ fontSize: '0.8rem', fontWeight: 700 }}>#{slotNumber}</span>
                           )}
                           <span style={{ fontSize: '0.55rem', fontWeight: 700, marginTop: '0.1rem' }}>
-                            {isStamped ? 'DONE' : isFifthSlot ? 'FREE' : `#${slotNumber}`}
+                            {isStamped ? 'DONE' : isFifthSlot ? '30-40%' : `#${slotNumber}`}
                           </span>
                         </div>
                       );
@@ -938,11 +976,11 @@ export const StampCard = ({
                     <span style={{ color: '#e2e8f0' }}>
                       {stampsNeeded > 0 ? (
                         <>
-                          Just <strong style={{ color: 'var(--gold-primary)' }}>{stampsNeeded} visit{stampsNeeded > 1 ? 's' : ''}</strong> to unlock your next complimentary coupon!
+                          Just <strong style={{ color: 'var(--gold-primary)' }}>{stampsNeeded} visit{stampsNeeded > 1 ? 's' : ''}</strong> to unlock your 30% to 40% OFF reward coupon!
                         </>
                       ) : (
                         <strong style={{ color: '#2ecc71' }}>
-                          🎉 5 Stamps Achieved! Free Offer Coupon generated & stamps reset!
+                          🎉 5 Stamps Achieved! 30% to 40% OFF Offer Coupon generated & stamps reset!
                         </strong>
                       )}
                     </span>
@@ -968,7 +1006,7 @@ export const StampCard = ({
                         fontSize: '0.82rem',
                       }}
                     >
-                      No active offers yet. Reach 5 salon visits to earn your complimentary grooming reward!
+                      No active offers yet. Reach 5 salon visits to earn your 30% to 40% OFF grooming reward!
                     </div>
                   ) : (
                     <div
@@ -1065,11 +1103,26 @@ export const StampCard = ({
                           </div>
 
                           <div>
-                            <p style={{ fontSize: '0.84rem', color: '#f1f5f9', fontWeight: 600, margin: '0 0 0.2rem 0' }}>
-                              {coupon.title || config.defaultOfferTitle}
-                            </p>
-                            <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-                              Valid until {new Date(coupon.expiresAt).toLocaleDateString()}
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', marginBottom: '0.25rem', flexWrap: 'wrap' }}>
+                              <p style={{ fontSize: '0.84rem', color: '#f1f5f9', fontWeight: 600, margin: 0 }}>
+                                {coupon.title || config.defaultOfferTitle}
+                              </p>
+                              <span
+                                style={{
+                                  background: 'linear-gradient(135deg, #d4af37 0%, #b8860b 100%)',
+                                  color: '#07090e',
+                                  fontWeight: 800,
+                                  fontSize: '0.68rem',
+                                  padding: '0.12rem 0.45rem',
+                                  borderRadius: '4px',
+                                  letterSpacing: '0.02em',
+                                }}
+                              >
+                                {coupon.discountType || '30% to 40% OFF'}
+                              </span>
+                            </div>
+                            <span style={{ fontSize: '0.72rem', color: '#94a3b8' }}>
+                              ⏱️ 35 Days Validity (Expires {new Date(coupon.expiresAt).toLocaleDateString()})
                             </span>
                           </div>
                         </div>
