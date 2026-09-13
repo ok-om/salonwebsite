@@ -92,7 +92,7 @@ export const Navbar = ({ onOpenAuth, onOpenAdmin, onOpenLoyalty, onOpenProfile }
             }}
           >
             <img
-              src="/logo/logo.jpg"
+              src="/logo/logo.webp"
               alt="Logo"
               width="38"
               height="38"
@@ -399,7 +399,7 @@ export const Navbar = ({ onOpenAuth, onOpenAdmin, onOpenLoyalty, onOpenProfile }
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
                 <img
-                  src="/logo/logo.jpg"
+                  src="/logo/logo.webp"
                   alt="Logo"
                   width="34"
                   height="34"

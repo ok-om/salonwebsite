@@ -15,7 +15,7 @@ const HAIRCUTS = [
     title: 'Signature Precision Scissor Fade',
     category: 'Master Scissor Styling',
     description: 'Surgical sectioning with bespoke taper fade, scissor-textured crown, and clean beard blend.',
-    image: '/hair-cut/imgi_214_1000_F_327372387_nDiUJ8UxnzYVwUsT3fHmUImZOL7jDZ9r.jpg',
+    image: '/hair-cut/imgi_214_1000_F_327372387_nDiUJ8UxnzYVwUsT3fHmUImZOL7jDZ9r.webp',
     badge: 'Trending Cut',
     price: '₹499',
     duration: '35 mins',
@@ -29,7 +29,7 @@ const HAIRCUTS = [
     title: 'Royal Parted Executive Pompadour',
     category: 'Gentleman Classic',
     description: 'Crisp side part with natural graduation, high-gloss artisan styling paste, and temple line taper.',
-    image: '/hair-cut/imgi_218_1000_F_469681744_FZWt6LKXLoCU4XVv8Cjx6ZFmwNlNLm7x.jpg',
+    image: '/hair-cut/imgi_218_1000_F_469681744_FZWt6LKXLoCU4XVv8Cjx6ZFmwNlNLm7x.webp',
     badge: 'Executive',
     price: '₹549',
     duration: '40 mins',
@@ -43,7 +43,7 @@ const HAIRCUTS = [
     title: 'Textured Crop & Low Skin Taper',
     category: 'Modern Urban',
     description: 'Choppy top texture designed for low maintenance, paired with velvety skin-tapered sideburns.',
-    image: '/hair-cut/imgi_240_1000_F_288480491_sSOxyfSGfwPlMrHCvpNEQZHTbEiEgkIO.jpg',
+    image: '/hair-cut/imgi_240_1000_F_288480491_sSOxyfSGfwPlMrHCvpNEQZHTbEiEgkIO.webp',
     badge: 'Low Maintenance',
     price: '₹499',
     duration: '30 mins',
@@ -57,7 +57,7 @@ const HAIRCUTS = [
     title: 'The Classic Gentleman Contour',
     category: 'Vintage Craft',
     description: 'Traditional shear work balanced to natural hair swirl, conditioned with cedarwood tonic.',
-    image: '/hair-cut/imgi_252_1000_F_434370728_kHa2nwVqDX1oxH2hJfwYh3J323knuVWV.jpg',
+    image: '/hair-cut/imgi_252_1000_F_434370728_kHa2nwVqDX1oxH2hJfwYh3J323knuVWV.webp',
     badge: 'Timeless',
     price: '₹449',
     duration: '35 mins',
@@ -71,7 +71,7 @@ const HAIRCUTS = [
     title: 'Sculpted Quiff & Razor Perimeter',
     category: 'High Volume',
     description: 'Blowout volume with root-lifting texture, finished with high-precision straight razor edges.',
-    image: '/hair-cut/imgi_272_1000_F_1136144072_OPmo46myEzyxZlp1IwUwwGQS2zkpy1Dk.jpg',
+    image: '/hair-cut/imgi_272_1000_F_1136144072_OPmo46myEzyxZlp1IwUwwGQS2zkpy1Dk.webp',
     badge: 'Statement Look',
     price: '₹599',
     duration: '45 mins',
@@ -85,7 +85,7 @@ const HAIRCUTS = [
     title: 'Textured Waves & Tapered Neckline',
     category: 'Natural Texture',
     description: 'Sculpted for natural wavy hair flow, weightless feathering, and razor-cleaned neck taper.',
-    image: '/hair-cut/imgi_313_1000_F_292538620_17sS0WLcHCDk3ChhkoTyCh5HDm2zBV53.jpg',
+    image: '/hair-cut/imgi_313_1000_F_292538620_17sS0WLcHCDk3ChhkoTyCh5HDm2zBV53.webp',
     badge: 'Popular',
     price: '₹499',
     duration: '35 mins',
@@ -99,7 +99,7 @@ const HAIRCUTS = [
     title: 'Imperial Beard & Haircut Ensemble',
     category: 'Royal Full Grooming',
     description: 'Complete head-to-beard transformation: precision fade, hot towel straight-razor shave, and finish.',
-    image: '/hair-cut/imgi_414_1000_F_612963026_EgapnuI2p4b7ef9R7w8wRr5oHwEKU6Ts.jpg',
+    image: '/hair-cut/imgi_414_1000_F_612963026_EgapnuI2p4b7ef9R7w8wRr5oHwEKU6Ts.webp',
     badge: 'Master Combo',
     price: '₹899',
     duration: '60 mins',
@@ -112,115 +112,115 @@ const HAIRCUTS = [
 
 // Receding Salon Background Images (from public/backgrounds - only active & high-res)
 const BACKGROUND_IMAGES = [
-  { url: '/backgrounds/imgi_394_1000_F_675403262_HTWy014WRCcGlggsScfGJP0fYNZHbOYr.jpg', title: 'Precision Matte Black Barber Suite' },
-  { url: '/backgrounds/imgi_392_1000_F_297675193_tGrmFGFl6v8tnaGdn9EHYM56BYY4sQjc.jpg', title: 'Classic Barber Mirrors & Stations' },
-  { url: '/backgrounds/imgi_208_ff4f544d81725dd38d2d2bb5b295fa5b.jpg', title: 'Artisan Wood Barber Tools Flatlay' },
-  { url: '/backgrounds/imgi_356_1000_F_326566143_kFyzo5JoXJmUPDry91VXdezgCKj948mf.jpg', title: 'Warm Ambient Salon Atmosphere' },
-  { url: '/backgrounds/imgi_374_1000_F_128681251_GLw0Pn01yBNv2bWLpO9yKVSv23PUuLW1.jpg', title: 'Gentleman Grooming Lounge & Mirrors' },
-  { url: '/backgrounds/imgi_210_38241661916192b49e48f59bc83cd714.jpg', title: 'Vintage Leather Barber Station' },
-  { url: '/backgrounds/imgi_420_1000_F_524917351_fwbPdxikeeV0apegDZZvRCpn4Tk2e9wl.jpg', title: 'Bespoke Wooden Salon Suite' },
-  { url: '/backgrounds/imgi_444_1000_F_329640738_E1pDlWorkUJI2cKc4sAyVMAUcPfSHUtL.jpg', title: 'Luxury Barber Chair Ensemble' },
+  { url: '/backgrounds/imgi_394_1000_F_675403262_HTWy014WRCcGlggsScfGJP0fYNZHbOYr.webp', title: 'Precision Matte Black Barber Suite' },
+  { url: '/backgrounds/imgi_392_1000_F_297675193_tGrmFGFl6v8tnaGdn9EHYM56BYY4sQjc.webp', title: 'Classic Barber Mirrors & Stations' },
+  { url: '/backgrounds/imgi_208_ff4f544d81725dd38d2d2bb5b295fa5b.webp', title: 'Artisan Wood Barber Tools Flatlay' },
+  { url: '/backgrounds/imgi_356_1000_F_326566143_kFyzo5JoXJmUPDry91VXdezgCKj948mf.webp', title: 'Warm Ambient Salon Atmosphere' },
+  { url: '/backgrounds/imgi_374_1000_F_128681251_GLw0Pn01yBNv2bWLpO9yKVSv23PUuLW1.webp', title: 'Gentleman Grooming Lounge & Mirrors' },
+  { url: '/backgrounds/imgi_210_38241661916192b49e48f59bc83cd714.webp', title: 'Vintage Leather Barber Station' },
+  { url: '/backgrounds/imgi_420_1000_F_524917351_fwbPdxikeeV0apegDZZvRCpn4Tk2e9wl.webp', title: 'Bespoke Wooden Salon Suite' },
+  { url: '/backgrounds/imgi_444_1000_F_329640738_E1pDlWorkUJI2cKc4sAyVMAUcPfSHUtL.webp', title: 'Luxury Barber Chair Ensemble' },
 ];
 
 // Grooming Journey Stages (Animated figures + 2026 Blueprints & Extra art on Left & Right)
 const JOURNEY_STAGES = [
   {
     cardId: 1,
-    leftFigure: '/figures/client_reveal.jpg',
+    leftFigure: '/figures/client_reveal.webp',
     leftTitle: 'Step 1: Consultation',
     leftText: 'Welcome! Ready for your signature royal fade?',
-    rightFigure: '/figures/barber_welcome.jpg',
+    rightFigure: '/figures/barber_welcome.webp',
     rightTitle: 'Master Barber Welcome',
     rightText: 'Take a seat in the luxury throne! ✂️',
     emoji: '👋',
-    blueprintImg: '/extra/imgi_226_95737f71322201e513ecb65bedf6941a.jpg',
+    blueprintImg: '/extra/imgi_226_95737f71322201e513ecb65bedf6941a.webp',
     blueprintTitle: '2026 Trend: Textured Slick Back Fade',
     blueprintSubtitle: 'Side · Back · Top Profiles',
-    rightExtraArt: '/extra/imgi_52_d6ddac91d026c61c2305c0b775385c7d.jpg',
+    rightExtraArt: '/extra/imgi_52_d6ddac91d026c61c2305c0b775385c7d.webp',
   },
   {
     cardId: 2,
-    leftFigure: '/figures/client_wash.jpg',
+    leftFigure: '/figures/client_wash.webp',
     leftTitle: 'Step 2: Herbal Hair Wash',
     leftText: 'Soothing scalp massage & eucalyptus lather! 🫧',
-    rightFigure: '/figures/barber_welcome.jpg',
+    rightFigure: '/figures/barber_welcome.webp',
     rightTitle: 'Deep Scalp Therapy',
     rightText: 'Relaxing hot water wash & hair prep! 💆‍♂️',
     emoji: '🫧',
-    blueprintImg: '/extra/imgi_227_ce2377fe792f2f57106aafdd105a5091.jpg',
+    blueprintImg: '/extra/imgi_227_ce2377fe792f2f57106aafdd105a5091.webp',
     blueprintTitle: '2026 Trend: Medium Bro Flow Fade',
     blueprintSubtitle: 'Natural Flow & Clean Fade',
-    rightExtraArt: '/extra/imgi_115_52a6a37771836805aa53b59bf731dda2.jpg',
+    rightExtraArt: '/extra/imgi_115_52a6a37771836805aa53b59bf731dda2.webp',
   },
   {
     cardId: 3,
-    leftFigure: '/figures/client_wash.jpg',
+    leftFigure: '/figures/client_wash.webp',
     leftTitle: 'Step 3: Texture Prep',
     leftText: 'Nourishing botanical mask for silky hair swirl.',
-    rightFigure: '/figures/client_beard.jpg',
+    rightFigure: '/figures/client_beard.webp',
     rightTitle: 'Artisan Shears',
     rightText: 'Sectioning every angle with surgical precision.',
     emoji: '✂️',
-    blueprintImg: '/extra/imgi_225_0ef0297acf52413490517a5b4a3a2c99.jpg',
+    blueprintImg: '/extra/imgi_225_0ef0297acf52413490517a5b4a3a2c99.webp',
     blueprintTitle: "Trending: Handsome Men's Hairstyle Ideas",
     blueprintSubtitle: 'French Crop, Taper Fade & Skin Fade',
-    rightExtraArt: '/extra/imgi_52_d6ddac91d026c61c2305c0b775385c7d.jpg',
+    rightExtraArt: '/extra/imgi_52_d6ddac91d026c61c2305c0b775385c7d.webp',
   },
   {
     cardId: 4,
-    leftFigure: '/figures/client_beard.jpg',
+    leftFigure: '/figures/client_beard.webp',
     leftTitle: 'Step 4: Beard Sculpt & Shave',
     leftText: 'Crisp beard alignment & cedarwood balm massage! 🪒',
-    rightFigure: '/figures/barber_welcome.jpg',
+    rightFigure: '/figures/barber_welcome.webp',
     rightTitle: 'Hot Towel Wrap',
     rightText: 'Traditional straight-razor cheek perimeter shave.',
     emoji: '🪒',
-    blueprintImg: '/extra/imgi_228_f8ea540a0037934a6f1067810f762791.jpg',
+    blueprintImg: '/extra/imgi_228_f8ea540a0037934a6f1067810f762791.webp',
     blueprintTitle: '2026 Trend: Wavy Flow Fade',
     blueprintSubtitle: 'Multi-Profile Fade Spec & Wave Styling',
-    rightExtraArt: '/extra/imgi_115_52a6a37771836805aa53b59bf731dda2.jpg',
+    rightExtraArt: '/extra/imgi_115_52a6a37771836805aa53b59bf731dda2.webp',
   },
   {
     cardId: 5,
-    leftFigure: '/figures/client_beard.jpg',
+    leftFigure: '/figures/client_beard.webp',
     leftTitle: 'Step 5: High Volume Quiff',
     leftText: 'Root-lifting blowout with artisan styling clay.',
-    rightFigure: '/figures/client_reveal.jpg',
+    rightFigure: '/figures/client_reveal.webp',
     rightTitle: 'Crown Volume & Flow',
     rightText: 'Sculpting high volume with razor perimeter.',
     emoji: '💈',
-    blueprintImg: '/extra/imgi_229_3c134ab9e2e433f4775fcc3525c85efe.jpg',
+    blueprintImg: '/extra/imgi_229_3c134ab9e2e433f4775fcc3525c85efe.webp',
     blueprintTitle: '2026 Trend: Medium Wavy Fade',
     blueprintSubtitle: 'Natural Waves & Clean Tapered Neck',
-    rightExtraArt: '/extra/imgi_52_d6ddac91d026c61c2305c0b775385c7d.jpg',
+    rightExtraArt: '/extra/imgi_52_d6ddac91d026c61c2305c0b775385c7d.webp',
   },
   {
     cardId: 6,
-    leftFigure: '/figures/client_reveal.jpg',
+    leftFigure: '/figures/client_reveal.webp',
     leftTitle: 'Step 6: Symmetry Check',
     leftText: 'Every taper line clean, sharp, and balanced! 🪞',
-    rightFigure: '/figures/barber_welcome.jpg',
+    rightFigure: '/figures/barber_welcome.webp',
     rightTitle: 'Master Barber Polish',
     rightText: 'Conditioned with botanical beard tonic.',
     emoji: '✨',
-    blueprintImg: '/extra/imgi_224_b8810b36410cbeb7a0b42bdf227129dc.jpg',
+    blueprintImg: '/extra/imgi_224_b8810b36410cbeb7a0b42bdf227129dc.webp',
     blueprintTitle: 'Find Your Look: 9 Trending Hair Styles',
     blueprintSubtitle: 'Quiff, Pompadour, Buzz Cut & Taper',
-    rightExtraArt: '/extra/imgi_115_52a6a37771836805aa53b59bf731dda2.jpg',
+    rightExtraArt: '/extra/imgi_115_52a6a37771836805aa53b59bf731dda2.webp',
   },
   {
     cardId: 7,
-    leftFigure: '/figures/client_reveal.jpg',
+    leftFigure: '/figures/client_reveal.webp',
     leftTitle: 'Step 7: Royal Reveal',
     leftText: '100% transformed! Looking handsome & royal. ⭐⭐⭐⭐⭐',
-    rightFigure: '/figures/barber_welcome.jpg',
+    rightFigure: '/figures/barber_welcome.webp',
     rightTitle: 'Stamp Added to Card',
     rightText: 'Collect 5 stamps for a 100% Free Cut! 🎁',
     emoji: '👑',
-    blueprintImg: '/extra/imgi_115_52a6a37771836805aa53b59bf731dda2.jpg',
+    blueprintImg: '/extra/imgi_115_52a6a37771836805aa53b59bf731dda2.webp',
     blueprintTitle: 'Barber Shop: Try A Different Style',
     blueprintSubtitle: 'Master Haircut & Shave Experience',
-    rightExtraArt: '/extra/imgi_52_d6ddac91d026c61c2305c0b775385c7d.jpg',
+    rightExtraArt: '/extra/imgi_52_d6ddac91d026c61c2305c0b775385c7d.webp',
   },
 ];
 
@@ -863,7 +863,7 @@ export const HairCutScrollShowcase = ({ onOpenLoyalty, onOpenAdmin }) => {
           }}
         >
           <img
-            src="/extra/imgi_147_12dbea6ae79b491f523d75fb82e11c0a.jpg"
+            src="/extra/imgi_147_12dbea6ae79b491f523d75fb82e11c0a.webp"
             alt="Gold Barber Crest"
             width="38"
             height="38"
@@ -1026,7 +1026,7 @@ export const HairCutScrollShowcase = ({ onOpenLoyalty, onOpenAdmin }) => {
         {/* Artisan Barber Art Banner (imgi_115 or watercolor) */}
         <div
           onClick={() => setLightboxImage({
-            url: '/extra/imgi_115_52a6a37771836805aa53b59bf731dda2.jpg',
+            url: '/extra/imgi_115_52a6a37771836805aa53b59bf731dda2.webp',
             title: 'Barber Shop: Try A Different Style',
             subtitle: 'Artisan shears, vintage clippers, and gentleman grooming aesthetics',
           })}
@@ -1046,7 +1046,7 @@ export const HairCutScrollShowcase = ({ onOpenLoyalty, onOpenAdmin }) => {
           title="Click to view vintage barber art"
         >
           <img
-            src="/extra/imgi_115_52a6a37771836805aa53b59bf731dda2.jpg"
+            src="/extra/imgi_115_52a6a37771836805aa53b59bf731dda2.webp"
             alt="Barber Shop Art"
             width="38"
             height="38"
@@ -1117,7 +1117,7 @@ export const HairCutScrollShowcase = ({ onOpenLoyalty, onOpenAdmin }) => {
         {/* 2026 Trend Spotlight Button (Opens full 9-cut boys & men poster) */}
         <div
           onClick={() => setLightboxImage({
-            url: '/extra/imgi_224_b8810b36410cbeb7a0b42bdf227129dc.jpg',
+            url: '/extra/imgi_224_b8810b36410cbeb7a0b42bdf227129dc.webp',
             title: 'Find Your Look: 2026 Hair Styles Guide',
             subtitle: 'Explore 9 trending styles: Quiff, Fade, Pompadour, Buzz, Crop & Waves',
           })}
@@ -1138,7 +1138,7 @@ export const HairCutScrollShowcase = ({ onOpenLoyalty, onOpenAdmin }) => {
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
             <img
-              src="/extra/imgi_224_b8810b36410cbeb7a0b42bdf227129dc.jpg"
+              src="/extra/imgi_224_b8810b36410cbeb7a0b42bdf227129dc.webp"
               alt="2026 Lookbook"
               width="32"
               height="32"
@@ -1272,27 +1272,30 @@ export const HairCutScrollShowcase = ({ onOpenLoyalty, onOpenAdmin }) => {
               overflow: 'hidden',
             }}
           >
-            {BACKGROUND_IMAGES.map((bg, idx) => (
-              <img
-                key={idx}
-                src={bg.url}
-                alt={bg.title}
-                loading={idx === 0 ? 'eager' : 'lazy'}
-                decoding="async"
-                className="salon-bg-slide"
-                style={{
-                  position: 'absolute',
-                  inset: 0,
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover',
-                  opacity: idx === activeBgIndex ? 0.92 : 0,
-                  filter: 'contrast(1.08) brightness(0.92) saturate(1.15)',
-                  transition: 'opacity 0.6s ease-in-out',
-                  zIndex: idx === activeBgIndex ? 2 : 1,
-                }}
-              />
-            ))}
+            {BACKGROUND_IMAGES.map((bg, idx) => {
+              if (Math.abs(idx - activeBgIndex) > 1) return null;
+              return (
+                <img
+                  key={idx}
+                  src={bg.url}
+                  alt={bg.title}
+                  loading={idx === 0 ? 'eager' : 'lazy'}
+                  decoding="async"
+                  className="salon-bg-slide"
+                  style={{
+                    position: 'absolute',
+                    inset: 0,
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    opacity: idx === activeBgIndex ? 0.92 : 0,
+                    filter: 'contrast(1.08) brightness(0.92) saturate(1.15)',
+                    transition: 'opacity 0.6s ease-in-out',
+                    zIndex: idx === activeBgIndex ? 2 : 1,
+                  }}
+                />
+              );
+            })}
 
             {/* Vignette Gradient for Luxury Depth and Visual Focus */}
             <div
@@ -1483,29 +1486,32 @@ export const HairCutScrollShowcase = ({ onOpenLoyalty, onOpenAdmin }) => {
                         zIndex: 2,
                       }}
                     />
-                    {/* All 7 Signature Haircut Photos pre-mounted for 0ms instantaneous cross-fade & zero skip/flash */}
-                    {HAIRCUTS.map((cut, cIdx) => (
-                      <img
-                        key={cut.id}
-                        src={cut.image}
-                        alt={cut.title}
-                        loading={cIdx === 0 ? "eager" : "lazy"}
-                        decoding="async"
-                        className="haircut-img"
-                        style={{
-                          gridArea: '1 / 1',
-                          zIndex: cIdx === activeCardIndex ? 3 : 2,
-                          width: '100%',
-                          height: '290px',
-                          objectFit: 'cover',
-                          display: 'block',
-                          opacity: cIdx === activeCardIndex ? 1 : 0,
-                          transition: 'opacity 0.28s ease, transform 0.28s ease',
-                          transform: cIdx === activeCardIndex ? 'scale(1)' : 'scale(0.97)',
-                          pointerEvents: cIdx === activeCardIndex ? 'auto' : 'none',
-                        }}
-                      />
-                    ))}
+                    {/* Only mount active and adjacent haircut photos to save mobile network and RAM */}
+                    {HAIRCUTS.map((cut, cIdx) => {
+                      if (Math.abs(cIdx - activeCardIndex) > 1) return null;
+                      return (
+                        <img
+                          key={cut.id}
+                          src={cut.image}
+                          alt={cut.title}
+                          loading={cIdx === 0 ? "eager" : "lazy"}
+                          decoding="async"
+                          className="haircut-img"
+                          style={{
+                            gridArea: '1 / 1',
+                            zIndex: cIdx === activeCardIndex ? 3 : 2,
+                            width: '100%',
+                            height: '290px',
+                            objectFit: 'cover',
+                            display: 'block',
+                            opacity: cIdx === activeCardIndex ? 1 : 0,
+                            transition: 'opacity 0.28s ease, transform 0.28s ease',
+                            transform: cIdx === activeCardIndex ? 'scale(1)' : 'scale(0.97)',
+                            pointerEvents: cIdx === activeCardIndex ? 'auto' : 'none',
+                          }}
+                        />
+                      );
+                    })}
 
                     {/* Badge */}
                     <div

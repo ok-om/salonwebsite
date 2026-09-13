@@ -30,7 +30,7 @@ export const Footer = ({ onOpenAdminLogin }) => {
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
               <img
-                src="/logo/logo.jpg"
+                src="/logo/logo.webp"
                 alt="Logo"
                 width="44"
                 height="44"

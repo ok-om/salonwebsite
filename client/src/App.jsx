@@ -8,7 +8,6 @@ import { HairCutScrollShowcase } from './components/HairCutScrollShowcase';
 import { ModernServicesExperience } from './components/ModernServicesExperience';
 import { LocationContact } from './components/LocationContact';
 import { Footer } from './components/Footer';
-import { LoadingScreen } from './components/LoadingScreen';
 import { Home, Scissors, Gift, Phone, User, ShieldCheck } from 'lucide-react';
 
 // Code-split interactive modals on-demand to reduce initial JS payload
@@ -194,14 +193,11 @@ const MainContent = ({ isLoading }) => {
 };
 
 export default function App() {
-  const [isLoading, setIsLoading] = useState(true);
-
   return (
     <AuthProvider>
       <SiteConfigProvider>
         <SmoothScrollProvider>
-          {isLoading && <LoadingScreen onComplete={() => setIsLoading(false)} />}
-          <MainContent isLoading={isLoading} />
+          <MainContent isLoading={false} />
         </SmoothScrollProvider>
       </SiteConfigProvider>
     </AuthProvider>

@@ -34,7 +34,7 @@ export const ModernServicesExperience = () => {
         'Personalized consultation tailored to your head shape and hair growth pattern. Includes precision shear sectioning, clipper graduation taper fade, refreshing scalp wash, botanical conditioning, and artisan styling paste finish.',
       price: '₹499',
       duration: '35 Mins',
-      image: '/hair-cut/imgi_214_1000_F_327372387_nDiUJ8UxnzYVwUsT3fHmUImZOL7jDZ9r.jpg',
+      image: '/hair-cut/imgi_214_1000_F_327372387_nDiUJ8UxnzYVwUsT3fHmUImZOL7jDZ9r.webp',
       shapeType: 'double-circle', // Eyeglasses/double circle shape
       inclusions: [
         'One-on-one Face Profile Consultation',
@@ -56,7 +56,7 @@ export const ModernServicesExperience = () => {
         'Master trimmer sculpt matching your jawline aesthetics. Cheek and neck line defined with feather razor precision, steam towel softening, and nourished with organic cedarwood beard oil.',
       price: '₹299',
       duration: '25 Mins',
-      image: '/hair-cut/imgi_414_1000_F_612963026_EgapnuI2p4b7ef9R7w8wRr5oHwEKU6Ts.jpg',
+      image: '/hair-cut/imgi_414_1000_F_612963026_EgapnuI2p4b7ef9R7w8wRr5oHwEKU6Ts.webp',
       shapeType: 'bowtie', // Bowtie/butterfly shape
       inclusions: [
         'Jawline & Stubble Symmetry Alignment',
@@ -78,7 +78,7 @@ export const ModernServicesExperience = () => {
         'Traditional imperial wet shave experience. Begins with pre-shave essential oils, warm herbal lather applied with badger-hair brush, precision feather razor stroke, and double hot eucalyptus towel wrap with cold balm finish.',
       price: '₹399',
       duration: '30 Mins',
-      image: '/figures/client_wash.jpg',
+      image: '/figures/client_wash.webp',
       shapeType: 'triple-arch', // Triple arch/cloud shape
       inclusions: [
         'Essential Pre-Shave Oil Treatment',
@@ -96,7 +96,7 @@ export const ModernServicesExperience = () => {
       name: 'Textured Crop Fade',
       bgColor: '#eab308', // Yellow
       shapeClass: 'shape-rounded-rect',
-      image: '/hair-cut/imgi_240_1000_F_288480491_sSOxyfSGfwPlMrHCvpNEQZHTbEiEgkIO.jpg',
+      image: '/hair-cut/imgi_240_1000_F_288480491_sSOxyfSGfwPlMrHCvpNEQZHTbEiEgkIO.webp',
       tag: 'Trending 2026',
     },
     {
@@ -104,7 +104,7 @@ export const ModernServicesExperience = () => {
       name: 'Mid Taper Fade',
       bgColor: '#84cc16', // Lime
       shapeClass: 'shape-m-arch',
-      image: '/hair-cut/imgi_214_1000_F_327372387_nDiUJ8UxnzYVwUsT3fHmUImZOL7jDZ9r.jpg',
+      image: '/hair-cut/imgi_214_1000_F_327372387_nDiUJ8UxnzYVwUsT3fHmUImZOL7jDZ9r.webp',
       tag: 'Clean Precision',
     },
     {
@@ -112,7 +112,7 @@ export const ModernServicesExperience = () => {
       name: 'Modern Executive Quiff',
       bgColor: '#f472b6', // Pastel Pink
       shapeClass: 'shape-flower-four',
-      image: '/hair-cut/imgi_218_1000_F_469681744_FZWt6LKXLoCU4XVv8Cjx6ZFmwNlNLm7x.jpg',
+      image: '/hair-cut/imgi_218_1000_F_469681744_FZWt6LKXLoCU4XVv8Cjx6ZFmwNlNLm7x.webp',
       tag: 'Gentleman Classic',
     },
     {
@@ -120,7 +120,7 @@ export const ModernServicesExperience = () => {
       name: 'Slick Back Fade',
       bgColor: '#fb923c', // Orange
       shapeClass: 'shape-u-cup',
-      image: '/hair-cut/imgi_272_1000_F_1136144072_OPmo46myEzyxZlp1IwUwwGQS2zkpy1Dk.jpg',
+      image: '/hair-cut/imgi_272_1000_F_1136144072_OPmo46myEzyxZlp1IwUwwGQS2zkpy1Dk.webp',
       tag: 'High Volume',
     },
     {
@@ -128,7 +128,7 @@ export const ModernServicesExperience = () => {
       name: 'Beard Fade Blend',
       bgColor: '#22c55e', // Emerald
       shapeClass: 'shape-triple-bubble',
-      image: '/hair-cut/imgi_414_1000_F_612963026_EgapnuI2p4b7ef9R7w8wRr5oHwEKU6Ts.jpg',
+      image: '/hair-cut/imgi_414_1000_F_612963026_EgapnuI2p4b7ef9R7w8wRr5oHwEKU6Ts.webp',
       tag: 'Master Combo',
     },
     {
@@ -136,7 +136,7 @@ export const ModernServicesExperience = () => {
       name: 'Natural Wavy Flow',
       bgColor: '#fda4af', // Rose Dome
       shapeClass: 'shape-dome-arch',
-      image: '/hair-cut/imgi_313_1000_F_292538620_17sS0WLcHCDk3ChhkoTyCh5HDm2zBV53.jpg',
+      image: '/hair-cut/imgi_313_1000_F_292538620_17sS0WLcHCDk3ChhkoTyCh5HDm2zBV53.webp',
       tag: 'Effortless Flow',
     },
     {
@@ -144,7 +144,7 @@ export const ModernServicesExperience = () => {
       name: 'Gentleman Contour',
       bgColor: '#facc15', // Yellow Sun
       shapeClass: 'shape-circle-oval',
-      image: '/hair-cut/imgi_252_1000_F_434370728_kHa2nwVqDX1oxH2hJfwYh3J323knuVWV.jpg',
+      image: '/hair-cut/imgi_252_1000_F_434370728_kHa2nwVqDX1oxH2hJfwYh3J323knuVWV.webp',
       tag: 'Timeless Cut',
     },
     {
@@ -152,7 +152,7 @@ export const ModernServicesExperience = () => {
       name: 'French Crop Taper',
       bgColor: '#e7e5e4', // Almond Sand
       shapeClass: 'shape-soft-squarcle',
-      image: '/figures/client_reveal.jpg',
+      image: '/figures/client_reveal.webp',
       tag: 'Sharp Edges',
     },
   ];
@@ -355,7 +355,7 @@ export const ModernServicesExperience = () => {
 
             <button
               onClick={() => setSelectedPoster({
-                url: '/extra/imgi_224_b8810b36410cbeb7a0b42bdf227129dc.jpg',
+                url: '/extra/imgi_224_b8810b36410cbeb7a0b42bdf227129dc.webp',
                 title: '2026 Hair Styles Guide',
                 subtitle: 'Explore 9 Signature Men Haircuts'
               })}
@@ -774,13 +774,13 @@ export const ModernServicesExperience = () => {
             <div
               className="extra-art-card"
               onClick={() => setSelectedPoster({
-                url: '/extra/imgi_115_52a6a37771836805aa53b59bf731dda2.jpg',
+                url: '/extra/imgi_115_52a6a37771836805aa53b59bf731dda2.webp',
                 title: 'Barber Shop: Try A Different Style',
                 subtitle: 'Authentic vintage barbershop artistry with razor, clippers, and gentleman grooming aesthetics',
               })}
             >
               <img
-                src="/extra/imgi_115_52a6a37771836805aa53b59bf731dda2.jpg"
+                src="/extra/imgi_115_52a6a37771836805aa53b59bf731dda2.webp"
                 alt="Vintage Barber Shop Art"
                 className="extra-art-img"
                 loading="lazy"
@@ -798,13 +798,13 @@ export const ModernServicesExperience = () => {
             <div
               className="extra-art-card"
               onClick={() => setSelectedPoster({
-                url: '/extra/imgi_224_b8810b36410cbeb7a0b42bdf227129dc.jpg',
+                url: '/extra/imgi_224_b8810b36410cbeb7a0b42bdf227129dc.webp',
                 title: 'Boys Hair Styles 2026 Trend Chart',
                 subtitle: 'Messy, Curtain, Taper Fade, Quiff, Side Part, Pompadour, Buzz Cut, and Textured Crop',
               })}
             >
               <img
-                src="/extra/imgi_224_b8810b36410cbeb7a0b42bdf227129dc.jpg"
+                src="/extra/imgi_224_b8810b36410cbeb7a0b42bdf227129dc.webp"
                 alt="Boys Hair Styles 2026"
                 className="extra-art-img"
                 loading="lazy"
@@ -822,13 +822,13 @@ export const ModernServicesExperience = () => {
             <div
               className="extra-art-card"
               onClick={() => setSelectedPoster({
-                url: '/extra/imgi_225_0ef0297acf52413490517a5b4a3a2c99.jpg',
+                url: '/extra/imgi_225_0ef0297acf52413490517a5b4a3a2c99.webp',
                 title: "Handsome Men's Hairstyle Ideas",
                 subtitle: 'Low Taper Fade, Textured Crop, Classic Side Part, French Crop, and Skin Fade',
               })}
             >
               <img
-                src="/extra/imgi_225_0ef0297acf52413490517a5b4a3a2c99.jpg"
+                src="/extra/imgi_225_0ef0297acf52413490517a5b4a3a2c99.webp"
                 alt="Handsome Men Hairstyle Ideas"
                 className="extra-art-img"
                 loading="lazy"
@@ -846,13 +846,13 @@ export const ModernServicesExperience = () => {
             <div
               className="extra-art-card"
               onClick={() => setSelectedPoster({
-                url: '/extra/imgi_226_95737f71322201e513ecb65bedf6941a.jpg',
+                url: '/extra/imgi_226_95737f71322201e513ecb65bedf6941a.webp',
                 title: 'Textured Slick Back Fade 2026 Spec',
                 subtitle: 'Side, back, and top profile fade guide with professional barber styling tips',
               })}
             >
               <img
-                src="/extra/imgi_226_95737f71322201e513ecb65bedf6941a.jpg"
+                src="/extra/imgi_226_95737f71322201e513ecb65bedf6941a.webp"
                 alt="Textured Slick Back Fade 2026"
                 className="extra-art-img"
                 loading="lazy"

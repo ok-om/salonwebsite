@@ -240,6 +240,17 @@ export const AuthModal = ({ isOpen, onClose, onAuthSuccess }) => {
       }
     };
 
+    // Dynamically inject script if not yet loaded
+    if (!window.google?.accounts?.id && !document.getElementById('google-gsi-script')) {
+      const script = document.createElement('script');
+      script.id = 'google-gsi-script';
+      script.src = 'https://accounts.google.com/gsi/client';
+      script.async = true;
+      script.defer = true;
+      script.onload = () => initGoogleGSI();
+      document.head.appendChild(script);
+    }
+
     if (!initGoogleGSI()) {
       checkTimer = setInterval(() => {
         if (initGoogleGSI()) {
@@ -318,7 +329,7 @@ export const AuthModal = ({ isOpen, onClose, onAuthSuccess }) => {
         {/* Modal Header */}
         <div style={{ textAlign: 'center', marginBottom: '1.75rem' }}>
           <img
-            src="/logo/logo.jpg"
+            src="/logo/logo.webp"
             alt="Logo"
             style={{
               width: '56px',

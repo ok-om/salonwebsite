@@ -18,15 +18,32 @@ export const HeroVideo = ({ onOpenLoyalty, onOpenAdmin, onScrollToExperience, is
   const videoRef = useRef(null);
   const audioRef = useRef(null);
   const [isPlayingMusic, setIsPlayingMusic] = useState(false);
+  const [isMobileDevice, setIsMobileDevice] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.innerWidth < 860 || ('ontouchstart' in window);
+    }
+    return false;
+  });
 
-  // 1. Video Auto-Play and Auto-Pause on Offscreen
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobileDevice(window.innerWidth < 860 || ('ontouchstart' in window));
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // 1. Video Playback optimization (defer playback by 800ms to prevent initial main thread contention)
   useEffect(() => {
     const videoEl = videoRef.current;
     if (!videoEl) return;
 
     videoEl.defaultMuted = true;
     videoEl.muted = true;
-    videoEl.play().catch(() => {});
+
+    const startTimer = setTimeout(() => {
+      videoEl.play().catch(() => {});
+    }, 800);
 
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -43,7 +60,10 @@ export const HeroVideo = ({ onOpenLoyalty, onOpenAdmin, onScrollToExperience, is
       observer.observe(heroSectionRef.current);
     }
 
-    return () => observer.disconnect();
+    return () => {
+      clearTimeout(startTimer);
+      observer.disconnect();
+    };
   }, []);
 
 
@@ -95,8 +115,8 @@ export const HeroVideo = ({ onOpenLoyalty, onOpenAdmin, onScrollToExperience, is
         loop
         muted
         playsInline
-        preload="metadata"
-        poster="/backgrounds/imgi_394_1000_F_675403262_HTWy014WRCcGlggsScfGJP0fYNZHbOYr.jpg"
+        preload="none"
+        poster="/backgrounds/imgi_394_1000_F_675403262_HTWy014WRCcGlggsScfGJP0fYNZHbOYr.webp"
         style={{
           position: 'absolute',
           top: 0,
@@ -271,11 +291,111 @@ export const HeroVideo = ({ onOpenLoyalty, onOpenAdmin, onScrollToExperience, is
             </div>
           </div>
 
-          {/* Column B: Interactive Three.js 3D Showcase (Code-split on demand) */}
+          {/* Column B: Interactive 3D Showcase (Mobile gets ultra-fast GPU CSS emblem, Desktop gets Three.js) */}
           <div className="hero-3d-col">
-            <Suspense fallback={<div style={{ minHeight: '260px' }} />}>
-              <Hero3DCanvas isReady={isReady} />
-            </Suspense>
+            {isMobileDevice ? (
+              <div
+                style={{
+                  position: 'relative',
+                  width: '210px',
+                  height: '210px',
+                  margin: '0 auto',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                {/* Outer Rotating Dash Ring */}
+                <svg
+                  style={{
+                    position: 'absolute',
+                    inset: 0,
+                    width: '100%',
+                    height: '100%',
+                    animation: 'spin 14s linear infinite',
+                    pointerEvents: 'none',
+                  }}
+                  viewBox="0 0 100 100"
+                >
+                  <circle
+                    cx="50"
+                    cy="50"
+                    r="46"
+                    fill="none"
+                    stroke="rgba(212, 175, 55, 0.45)"
+                    strokeWidth="1.5"
+                    strokeDasharray="5 7"
+                  />
+                </svg>
+
+                {/* Counter-Rotating Inner Accent Ring */}
+                <svg
+                  style={{
+                    position: 'absolute',
+                    inset: '14px',
+                    width: 'calc(100% - 28px)',
+                    height: 'calc(100% - 28px)',
+                    animation: 'spin 22s linear infinite reverse',
+                    pointerEvents: 'none',
+                  }}
+                  viewBox="0 0 100 100"
+                >
+                  <circle
+                    cx="50"
+                    cy="50"
+                    r="45"
+                    fill="none"
+                    stroke="rgba(212, 175, 55, 0.25)"
+                    strokeWidth="1"
+                    strokeDasharray="2 6"
+                  />
+                </svg>
+
+                {/* Inner Glowing Luxury Disc */}
+                <div
+                  style={{
+                    position: 'relative',
+                    width: '135px',
+                    height: '135px',
+                    borderRadius: '50%',
+                    border: '2px solid rgba(212, 175, 55, 0.75)',
+                    boxShadow: '0 0 35px rgba(212, 175, 55, 0.4), inset 0 0 20px rgba(212, 175, 55, 0.25)',
+                    background: 'radial-gradient(circle at 35% 35%, rgba(35, 42, 58, 0.95) 0%, rgba(11, 14, 22, 0.95) 100%)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    transform: 'translateZ(0)',
+                  }}
+                >
+                  <Scissors
+                    size={46}
+                    color="var(--gold-primary, #d4af37)"
+                    style={{
+                      filter: 'drop-shadow(0 0 10px rgba(212, 175, 55, 0.7))',
+                      transform: 'rotate(-45deg)',
+                    }}
+                  />
+                  <span
+                    style={{
+                      marginTop: '0.35rem',
+                      fontFamily: 'var(--font-serif, "Cinzel", serif)',
+                      fontSize: '0.62rem',
+                      fontWeight: 700,
+                      letterSpacing: '0.12em',
+                      color: 'var(--gold-primary)',
+                      textTransform: 'uppercase',
+                    }}
+                  >
+                    Est. 2026
+                  </span>
+                </div>
+              </div>
+            ) : (
+              <Suspense fallback={<div style={{ minHeight: '260px' }} />}>
+                <Hero3DCanvas isReady={isReady} />
+              </Suspense>
+            )}
           </div>
         </div>
 
