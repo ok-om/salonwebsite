@@ -43,15 +43,16 @@ export const Hero3DCanvas = ({ isReady = true }) => {
     // Adaptive quality: low-end constrained devices use antialias: false, standard/high-end keep antialias: true
     const renderer = new THREE.WebGLRenderer({
       alpha: true,
-      antialias: capabilities.isConstrained ? false : true,
+      antialias: isMobile ? false : (capabilities.isConstrained ? false : true),
       powerPreference: 'high-performance',
+      precision: isMobile ? 'mediump' : 'highp',
     });
 
     renderer.setSize(width, height);
-    // Safe DPR defaults: preserved exact quality for standard devices, capped at 1.0 only for verified constrained devices
-    const targetDpr = capabilities.isConstrained
+    // Safe DPR defaults: preserved exact quality for standard devices, capped at 1.0 on mobile to avoid 9x retina over-rendering
+    const targetDpr = isMobile
       ? 1.0
-      : Math.min(window.devicePixelRatio, isMobile ? 1.25 : 1.5);
+      : (capabilities.isConstrained ? 1.0 : Math.min(window.devicePixelRatio, 1.5));
     renderer.setPixelRatio(targetDpr);
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.35;
