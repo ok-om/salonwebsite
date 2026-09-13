@@ -15,6 +15,7 @@ import { LoadingScreen } from './components/LoadingScreen';
 const StampCard = React.lazy(() => import('./components/StampCard').then(m => ({ default: m.StampCard })));
 const AuthModal = React.lazy(() => import('./components/AuthModal').then(m => ({ default: m.AuthModal })));
 const AdminDashboard = React.lazy(() => import('./components/Admin/AdminDashboard').then(m => ({ default: m.AdminDashboard })));
+const SetAdminPasswordModal = React.lazy(() => import('./components/SetAdminPasswordModal').then(m => ({ default: m.SetAdminPasswordModal })));
 
 const MainContent = ({ isLoading }) => {
   const { user, isAdmin, isAuthenticated } = useAuth();
@@ -186,6 +187,12 @@ const MainContent = ({ isLoading }) => {
           <AdminDashboard
             isOpen={adminDashboardOpen}
             onClose={() => setAdminDashboardOpen(false)}
+          />
+        )}
+
+        {user?.needsAdminPassword && (
+          <SetAdminPasswordModal
+            isOpen={true}
           />
         )}
       </React.Suspense>

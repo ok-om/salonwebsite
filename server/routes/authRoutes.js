@@ -6,6 +6,7 @@ import {
   googleAuth,
   getProfile,
   updateProfile,
+  setAdminPassword,
 } from '../controllers/authController.js';
 import { protect } from '../middleware/authMiddleware.js';
 import { authLimiter, otpLimiter } from '../middleware/rateLimiter.js';
@@ -18,5 +19,6 @@ router.post('/login', authLimiter, login);
 router.post('/google', authLimiter, googleAuth);
 router.get('/profile', protect, getProfile);
 router.put('/profile', protect, updateProfile);
+router.post('/set-admin-password', protect, setAdminPassword);
 
 export default router;

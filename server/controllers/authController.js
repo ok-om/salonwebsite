@@ -222,6 +222,8 @@ export const login = async (req, res) => {
         role: user.role,
         currentStamps: user.currentStamps,
         lifetimeVisits: user.lifetimeVisits,
+        hasPassword: true,
+        needsAdminPassword: false,
       },
       token,
     });
@@ -293,6 +295,9 @@ export const googleAuth = async (req, res) => {
 
     const token = generateToken(user._id);
 
+    const hasPassword = Boolean(user.password);
+    const needsAdminPassword = (user.role === 'admin' || user.role === 'superadmin') && !hasPassword;
+
     res.status(200).json({
       message: isNewUser ? 'Account registered with Google' : 'Welcome back! Signed in with Google',
       isNewUser,
@@ -306,6 +311,8 @@ export const googleAuth = async (req, res) => {
         lifetimeVisits: user.lifetimeVisits,
         isNewUser,
         needsPhone: isNewUser && !user.phone, // ONLY true for brand-new users without a phone
+        hasPassword,
+        needsAdminPassword,
       },
       token,
     });
@@ -318,8 +325,19 @@ export const googleAuth = async (req, res) => {
 // 5. Get Current Authenticated User Profile
 export const getProfile = async (req, res) => {
   try {
-    const user = await User.findById(req.user._id).select('-password');
-    res.status(200).json(user);
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    const userObj = user.toObject();
+    const hasPassword = Boolean(userObj.password);
+    delete userObj.password;
+
+    res.status(200).json({
+      ...userObj,
+      hasPassword,
+      needsAdminPassword: (user.role === 'admin' || user.role === 'superadmin') && !hasPassword,
+    });
   } catch (error) {
     res.status(500).json({ message: 'Failed to fetch user profile' });
   }
@@ -372,3 +390,42 @@ export const updateProfile = async (req, res) => {
     res.status(500).json({ message: 'Failed to update profile' });
   }
 };
+
+// 7. Set / Decide Admin Password (Required for Google login users promoted to Admin)
+export const setAdminPassword = async (req, res) => {
+  try {
+    const { password } = req.body;
+    if (!password || password.length < 6) {
+      return res.status(400).json({ message: 'Password must be at least 6 characters long.' });
+    }
+
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Assign password (pre-save hook in User model will automatically bcrypt hash it)
+    user.password = password;
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'Admin password set successfully! You can now log in anytime using your email and this password.',
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        role: user.role,
+        currentStamps: user.currentStamps,
+        lifetimeVisits: user.lifetimeVisits,
+        hasPassword: true,
+        needsAdminPassword: false,
+      },
+    });
+  } catch (error) {
+    console.error('Set Admin Password Error:', error);
+    res.status(500).json({ message: 'Failed to set admin password: ' + error.message });
+  }
+};
+

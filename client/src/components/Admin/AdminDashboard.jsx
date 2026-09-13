@@ -650,16 +650,16 @@ export const AdminDashboard = ({ isOpen, onClose }) => {
     }
   };
 
-  // 10. Super Admin: Create new staff admin
+  // 10. Super Admin: Promote existing user to staff admin
   const handleCreateAdmin = async (e) => {
     e.preventDefault();
-    if (!newAdminForm.name.trim() || !newAdminForm.email.trim() || !newAdminForm.password.trim()) {
-      setFeedback({ type: 'error', msg: 'Name, Email and Password are required.' });
+    if (!newAdminForm.email.trim()) {
+      setFeedback({ type: 'error', msg: 'Registered customer email is required.' });
       return;
     }
     setAddAdminLoading(true);
     try {
-      const res = await API.post('/admin/staff', newAdminForm);
+      const res = await API.post('/admin/staff', { email: newAdminForm.email.trim() });
       setFeedback({ type: 'success', msg: res.data.message });
       setShowAddAdminModal(false);
       setNewAdminForm({ name: '', email: '', phone: '', password: '' });
@@ -667,7 +667,7 @@ export const AdminDashboard = ({ isOpen, onClose }) => {
     } catch (err) {
       setFeedback({
         type: 'error',
-        msg: err.response?.data?.message || 'Failed to create staff admin',
+        msg: err.response?.data?.message || 'Failed to promote user to admin',
       });
     } finally {
       setAddAdminLoading(false);
@@ -1830,7 +1830,7 @@ export const AdminDashboard = ({ isOpen, onClose }) => {
                   }}
                 >
                   <UserPlus size={16} />
-                  <span>Add New Staff Admin</span>
+                  <span>Promote Existing User</span>
                 </button>
               </div>
 
@@ -2427,9 +2427,9 @@ export const AdminDashboard = ({ isOpen, onClose }) => {
                     <UserPlus size={20} />
                   </div>
                   <div>
-                    <h3 style={{ fontSize: '1.2rem', color: '#ffffff', margin: 0 }}>Add Staff Admin</h3>
+                    <h3 style={{ fontSize: '1.2rem', color: '#ffffff', margin: 0 }}>Promote User to Admin</h3>
                     <p style={{ fontSize: '0.75rem', color: 'var(--gold-primary)', margin: '0.2rem 0 0 0' }}>
-                      Grant Salon Admin Privileges
+                      Grant Salon Admin Privileges to an Existing User
                     </p>
                   </div>
                 </div>
@@ -2443,73 +2443,49 @@ export const AdminDashboard = ({ isOpen, onClose }) => {
                 </button>
               </div>
 
+              {/* Requirement Notice */}
+              <div
+                style={{
+                  background: 'rgba(212, 175, 55, 0.08)',
+                  border: '1px solid rgba(212, 175, 55, 0.3)',
+                  padding: '0.75rem 0.9rem',
+                  borderRadius: '8px',
+                  marginBottom: '1rem',
+                  fontSize: '0.78rem',
+                  color: '#cbd5e1',
+                  lineHeight: 1.5,
+                }}
+              >
+                <strong style={{ color: 'var(--gold-primary)', display: 'block', marginBottom: '0.2rem' }}>
+                  👑 Super Admin Security Rule:
+                </strong>
+                The person must be an <strong>existing registered user</strong>. You do not set their password — <strong>the user decides their own password</strong>. If they registered using Google, they will receive a prompt on their screen to choose their password.
+              </div>
+
               <form onSubmit={handleCreateAdmin} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                 <div className="input-group">
-                  <label className="input-label">Full Name *</label>
-                  <input
-                    type="text"
-                    required
-                    value={newAdminForm.name}
-                    onChange={(e) => setNewAdminForm({ ...newAdminForm, name: e.target.value })}
-                    className="input-field"
-                    placeholder="e.g. Salon Manager"
-                  />
-                </div>
-
-                <div className="input-group">
-                  <label className="input-label">Email Address *</label>
+                  <label className="input-label">Select or Enter Registered User Email *</label>
                   <input
                     type="email"
                     required
+                    list="registered-customers-list"
                     value={newAdminForm.email}
                     onChange={(e) => setNewAdminForm({ ...newAdminForm, email: e.target.value })}
                     className="input-field"
-                    placeholder="e.g. manager@classiccut.com"
+                    placeholder="Search customer email (e.g. user@gmail.com)"
                   />
-                </div>
-
-                <div className="input-group">
-                  <label className="input-label">Mobile Number (Optional)</label>
-                  <div style={{ position: 'relative' }}>
-                    <span
-                      style={{
-                        position: 'absolute',
-                        left: '0.85rem',
-                        top: '50%',
-                        transform: 'translateY(-50%)',
-                        color: 'var(--gold-primary)',
-                        fontWeight: 600,
-                        fontSize: '0.85rem',
-                      }}
-                    >
-                      +91
-                    </span>
-                    <input
-                      type="tel"
-                      maxLength="10"
-                      value={newAdminForm.phone}
-                      onChange={(e) => {
-                        const val = e.target.value.replace(/[^0-9]/g, '');
-                        setNewAdminForm({ ...newAdminForm, phone: val });
-                      }}
-                      className="input-field"
-                      style={{ paddingLeft: '3.2rem' }}
-                      placeholder="9876543210"
-                    />
-                  </div>
-                </div>
-
-                <div className="input-group">
-                  <label className="input-label">Password * (Min 6 Characters)</label>
-                  <input
-                    type="password"
-                    required
-                    minLength={6}
-                    value={newAdminForm.password}
-                    onChange={(e) => setNewAdminForm({ ...newAdminForm, password: e.target.value })}
-                    className="input-field"
-                    placeholder="Set temporary or permanent password"
-                  />
+                  <datalist id="registered-customers-list">
+                    {customers
+                      ?.filter((c) => c.role !== 'admin' && c.role !== 'superadmin' && !c.isDeleted)
+                      ?.map((c) => (
+                        <option key={c._id} value={c.email}>
+                          {c.name} {c.phone ? `(${c.phone})` : ''}
+                        </option>
+                      ))}
+                  </datalist>
+                  <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', display: 'block', marginTop: '0.35rem' }}>
+                    Type or pick from registered customers. Only existing users can be promoted.
+                  </span>
                 </div>
 
                 <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.5rem', justifyContent: 'flex-end' }}>
@@ -2528,7 +2504,7 @@ export const AdminDashboard = ({ isOpen, onClose }) => {
                     className="btn btn-primary"
                     style={{ flex: 1.3 }}
                   >
-                    {addAdminLoading ? 'Creating Admin...' : 'Create Admin'}
+                    {addAdminLoading ? 'Promoting...' : 'Promote to Admin'}
                   </button>
                 </div>
               </form>
