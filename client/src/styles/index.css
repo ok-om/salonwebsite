@@ -776,3 +776,19 @@ html.lenis body {
     gap: 0.75rem;
   }
 }
+
+/* ==========================================================================
+   PERFORMANCE & CONTENT-VISIBILITY OPTIMIZATIONS (CWV LCP / INP)
+   ========================================================================== */
+#services,
+#contact {
+  content-visibility: auto;
+  contain-intrinsic-size: 800px;
+}
+
+/* GPU Accelerated Composited Rendering */
+.haircut-reveal-card,
+.service-glass-card {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}

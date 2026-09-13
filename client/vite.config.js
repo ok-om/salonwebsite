@@ -120,11 +120,16 @@ export default defineConfig({
     port: 5173,
   },
   build: {
+    target: 'esnext',
+    minify: 'esbuild',
+    cssCodeSplit: true,
     rollupOptions: {
       output: {
         manualChunks: {
-          three: ['three'],
-          motion: ['gsap', 'lenis'],
+          'vendor-react': ['react', 'react-dom'],
+          'vendor-icons': ['lucide-react'],
+          'vendor-motion': ['gsap', 'lenis'],
+          'vendor-three': ['three'],
         },
       },
     },

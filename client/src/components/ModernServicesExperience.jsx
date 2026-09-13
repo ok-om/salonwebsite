@@ -466,6 +466,8 @@ export const ModernServicesExperience = () => {
                   <img
                     src={item.image}
                     alt={item.name}
+                    loading="lazy"
+                    decoding="async"
                     style={{
                       width: '100%',
                       height: '100%',
@@ -632,6 +634,8 @@ export const ModernServicesExperience = () => {
                       <img
                         src={srv.image}
                         alt={srv.title}
+                        loading="lazy"
+                        decoding="async"
                         style={{
                           width: '100%',
                           height: '100%',

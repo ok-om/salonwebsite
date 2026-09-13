@@ -94,6 +94,9 @@ export const Navbar = ({ onOpenAuth, onOpenAdmin, onOpenLoyalty, onOpenProfile }
             <img
               src="/logo/logo.jpg"
               alt="Logo"
+              width="38"
+              height="38"
+              decoding="async"
               style={{
                 width: '38px',
                 height: '38px',
@@ -398,6 +401,10 @@ export const Navbar = ({ onOpenAuth, onOpenAdmin, onOpenLoyalty, onOpenProfile }
                 <img
                   src="/logo/logo.jpg"
                   alt="Logo"
+                  width="34"
+                  height="34"
+                  loading="lazy"
+                  decoding="async"
                   style={{ width: '34px', height: '34px', borderRadius: '50%', border: '1.5px solid var(--gold-primary)' }}
                 />
                 <span style={{ fontFamily: 'var(--font-serif)', fontSize: '0.95rem', fontWeight: 700, color: '#ffffff' }}>

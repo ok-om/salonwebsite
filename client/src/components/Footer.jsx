@@ -32,6 +32,10 @@ export const Footer = ({ onOpenAdminLogin }) => {
               <img
                 src="/logo/logo.jpg"
                 alt="Logo"
+                width="44"
+                height="44"
+                loading="lazy"
+                decoding="async"
                 style={{
                   width: '44px',
                   height: '44px',

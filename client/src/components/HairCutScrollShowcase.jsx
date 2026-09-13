@@ -865,6 +865,10 @@ export const HairCutScrollShowcase = ({ onOpenLoyalty, onOpenAdmin }) => {
           <img
             src="/extra/imgi_147_12dbea6ae79b491f523d75fb82e11c0a.jpg"
             alt="Gold Barber Crest"
+            width="38"
+            height="38"
+            loading="lazy"
+            decoding="async"
             style={{
               width: '38px',
               height: '38px',
@@ -909,6 +913,8 @@ export const HairCutScrollShowcase = ({ onOpenLoyalty, onOpenAdmin }) => {
               <img
                 src={currentStage.blueprintImg}
                 alt={currentStage.blueprintTitle}
+                loading="lazy"
+                decoding="async"
                 style={{
                   width: '100%',
                   height: '100%',
@@ -973,6 +979,10 @@ export const HairCutScrollShowcase = ({ onOpenLoyalty, onOpenAdmin }) => {
           <img
             src={currentStage.leftFigure}
             alt={currentStage.leftTitle}
+            width="38"
+            height="38"
+            loading="lazy"
+            decoding="async"
             style={{
               width: '38px',
               height: '38px',
@@ -1038,6 +1048,10 @@ export const HairCutScrollShowcase = ({ onOpenLoyalty, onOpenAdmin }) => {
           <img
             src="/extra/imgi_115_52a6a37771836805aa53b59bf731dda2.jpg"
             alt="Barber Shop Art"
+            width="38"
+            height="38"
+            loading="lazy"
+            decoding="async"
             style={{
               width: '38px',
               height: '38px',
@@ -1073,6 +1087,10 @@ export const HairCutScrollShowcase = ({ onOpenLoyalty, onOpenAdmin }) => {
             <img
               src={currentStage.rightFigure}
               alt={currentStage.rightTitle}
+              width="42"
+              height="42"
+              loading="lazy"
+              decoding="async"
               style={{
                 width: '42px',
                 height: '42px',
@@ -1122,6 +1140,10 @@ export const HairCutScrollShowcase = ({ onOpenLoyalty, onOpenAdmin }) => {
             <img
               src="/extra/imgi_224_b8810b36410cbeb7a0b42bdf227129dc.jpg"
               alt="2026 Lookbook"
+              width="32"
+              height="32"
+              loading="lazy"
+              decoding="async"
               style={{
                 width: '32px',
                 height: '32px',
@@ -1197,6 +1219,10 @@ export const HairCutScrollShowcase = ({ onOpenLoyalty, onOpenAdmin }) => {
           <img
             src={currentStage.leftFigure}
             alt="Salon Companion"
+            width="52"
+            height="52"
+            loading="lazy"
+            decoding="async"
             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
           />
         </div>
@@ -1251,6 +1277,8 @@ export const HairCutScrollShowcase = ({ onOpenLoyalty, onOpenAdmin }) => {
                 key={idx}
                 src={bg.url}
                 alt={bg.title}
+                loading={idx === 0 ? 'eager' : 'lazy'}
+                decoding="async"
                 className="salon-bg-slide"
                 style={{
                   position: 'absolute',
@@ -1461,7 +1489,7 @@ export const HairCutScrollShowcase = ({ onOpenLoyalty, onOpenAdmin }) => {
                         key={cut.id}
                         src={cut.image}
                         alt={cut.title}
-                        loading="eager"
+                        loading={cIdx === 0 ? "eager" : "lazy"}
                         decoding="async"
                         className="haircut-img"
                         style={{

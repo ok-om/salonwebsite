@@ -1,10 +1,13 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, Suspense } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useSiteConfig } from '../context/SiteConfigContext';
-import { Hero3DCanvas } from './Three/Hero3DCanvas';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Volume2, VolumeX, Sparkles, ChevronDown, Scissors, ShieldCheck } from 'lucide-react';
+
+const Hero3DCanvas = React.lazy(() =>
+  import('./Three/Hero3DCanvas').then((m) => ({ default: m.Hero3DCanvas }))
+);
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -92,7 +95,7 @@ export const HeroVideo = ({ onOpenLoyalty, onOpenAdmin, onScrollToExperience, is
         loop
         muted
         playsInline
-        preload="auto"
+        preload="metadata"
         poster="/backgrounds/imgi_394_1000_F_675403262_HTWy014WRCcGlggsScfGJP0fYNZHbOYr.jpg"
         style={{
           position: 'absolute',
@@ -268,9 +271,11 @@ export const HeroVideo = ({ onOpenLoyalty, onOpenAdmin, onScrollToExperience, is
             </div>
           </div>
 
-          {/* Column B: Interactive Three.js 3D Showcase */}
+          {/* Column B: Interactive Three.js 3D Showcase (Code-split on demand) */}
           <div className="hero-3d-col">
-            <Hero3DCanvas isReady={isReady} />
+            <Suspense fallback={<div style={{ minHeight: '260px' }} />}>
+              <Hero3DCanvas isReady={isReady} />
+            </Suspense>
           </div>
         </div>
 
