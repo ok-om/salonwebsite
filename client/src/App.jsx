@@ -26,6 +26,7 @@ const MainContent = ({ isLoading }) => {
   const [stampCardOpen, setStampCardOpen] = useState(false);
   const [stampCardTab, setStampCardTab] = useState('profile');
   const [adminDashboardOpen, setAdminDashboardOpen] = useState(false);
+  const [skipPasswordModal, setSkipPasswordModal] = useState(false);
 
   const handleOpenLoyalty = (tab = 'stamps') => {
     setStampCardTab(tab);
@@ -190,9 +191,10 @@ const MainContent = ({ isLoading }) => {
           />
         )}
 
-        {user?.needsAdminPassword && (
+        {user && (user.needsPasswordSetup || user.needsAdminPassword) && !skipPasswordModal && (
           <SetAdminPasswordModal
             isOpen={true}
+            onClose={() => setSkipPasswordModal(true)}
           />
         )}
       </React.Suspense>

@@ -86,14 +86,15 @@ export const AuthProvider = ({ children }) => {
     return res.data;
   };
 
-  // 6. Set Admin Password (for Google users promoted to Admin)
-  const setAdminPassword = async (newPassword) => {
-    const res = await API.post('/auth/set-admin-password', { password: newPassword });
+  // 6. Set User/Admin Password (for Google users)
+  const setPassword = async (newPassword) => {
+    const res = await API.post('/auth/set-password', { password: newPassword });
     if (res.data.user) {
       setUser(res.data.user);
     }
     return res.data;
   };
+  const setAdminPassword = setPassword;
 
   // 7. Logout
   const logout = () => {
@@ -179,6 +180,7 @@ export const AuthProvider = ({ children }) => {
         login,
         googleLogin,
         updateProfile,
+        setPassword,
         setAdminPassword,
         logout,
         refreshUser: loadUser,

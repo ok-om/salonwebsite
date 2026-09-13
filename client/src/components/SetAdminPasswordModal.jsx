@@ -1,17 +1,19 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { ShieldCheck, Lock, Eye, EyeOff, AlertCircle, CheckCircle, Sparkles } from 'lucide-react';
+import { ShieldCheck, UserCheck, Lock, Eye, EyeOff, AlertCircle, CheckCircle, Sparkles, X } from 'lucide-react';
 
 export const SetAdminPasswordModal = ({ isOpen, onClose }) => {
-  const { user, setAdminPassword } = useAuth();
-  const [password, setPassword] = useState('');
+  const { user, setPassword } = useAuth();
+  const [password, setPasswordInput] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  if (!isOpen) return null;
+  if (!isOpen || !user) return null;
+
+  const isAdmin = user.role === 'admin' || user.role === 'superadmin' || user.email === 'ok8023361@gmail.com';
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -30,8 +32,8 @@ export const SetAdminPasswordModal = ({ isOpen, onClose }) => {
 
     setLoading(true);
     try {
-      const res = await setAdminPassword(password);
-      setSuccess(res.message || 'Admin password saved successfully!');
+      const res = await setPassword(password);
+      setSuccess(res.message || 'Password saved successfully!');
       setTimeout(() => {
         onClose?.();
       }, 1200);
@@ -73,6 +75,34 @@ export const SetAdminPasswordModal = ({ isOpen, onClose }) => {
         }}
         onClick={(e) => e.stopPropagation()}
       >
+        {/* Close Button for non-admin users */}
+        {!isAdmin && (
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close modal"
+            style={{
+              position: 'absolute',
+              top: '1.25rem',
+              right: '1.25rem',
+              width: '32px',
+              height: '32px',
+              borderRadius: '50%',
+              background: 'rgba(255, 255, 255, 0.08)',
+              border: '1px solid rgba(255, 255, 255, 0.16)',
+              color: '#ffffff',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              padding: '6px',
+              transition: 'all 0.2s ease',
+            }}
+          >
+            <X size={16} />
+          </button>
+        )}
+
         {/* Header Icon */}
         <div style={{ textAlign: 'center', marginBottom: '1.25rem' }}>
           <div
@@ -90,14 +120,14 @@ export const SetAdminPasswordModal = ({ isOpen, onClose }) => {
               boxShadow: '0 0 20px rgba(212, 175, 55, 0.3)',
             }}
           >
-            <ShieldCheck size={32} />
+            {isAdmin ? <ShieldCheck size={32} /> : <UserCheck size={32} />}
           </div>
           <h3 style={{ fontSize: '1.4rem', color: '#ffffff', margin: '0 0 0.4rem 0' }}>
-            Set Your Admin Password
+            {isAdmin ? 'Set Your Admin Password' : 'Set Your User Password'}
           </h3>
           <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', lineHeight: 1.5, margin: 0 }}>
-            Hello <strong style={{ color: 'var(--gold-primary)' }}>{user?.name}</strong>! You have been granted{' '}
-            <strong style={{ color: '#ffffff' }}>Salon Admin</strong> privileges. Since you signed in via Google, please choose a password to protect your Admin account.
+            Hello <strong style={{ color: 'var(--gold-primary)' }}>{user.name}</strong>! You have logged in. Since you signed in via Google, please choose a password to protect your{' '}
+            <strong style={{ color: '#ffffff' }}>{isAdmin ? 'Admin account' : 'account'}</strong>.
           </p>
         </div>
 
@@ -117,7 +147,11 @@ export const SetAdminPasswordModal = ({ isOpen, onClose }) => {
           }}
         >
           <Sparkles size={16} color="var(--gold-primary)" style={{ flexShrink: 0 }} />
-          <span>You decide your own password. Once set, you can sign in directly to Admin CMS anytime.</span>
+          <span>
+            {isAdmin
+              ? 'You decide your own password. Once set, you can sign in directly to Admin CMS anytime.'
+              : 'You decide your own password. Once set, you can log in using email & password anytime.'}
+          </span>
         </div>
 
         {/* Error / Success Alerts */}
@@ -165,7 +199,7 @@ export const SetAdminPasswordModal = ({ isOpen, onClose }) => {
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           <div className="input-group">
             <label className="input-label" style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span>Choose Admin Password *</span>
+              <span>{isAdmin ? 'Choose Admin Password *' : 'Choose Your Password *'}</span>
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
@@ -190,7 +224,7 @@ export const SetAdminPasswordModal = ({ isOpen, onClose }) => {
                 required
                 minLength={6}
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => setPasswordInput(e.target.value)}
                 className="input-field"
                 placeholder="Minimum 6 characters"
                 style={{ paddingLeft: '2.5rem' }}
@@ -210,7 +244,7 @@ export const SetAdminPasswordModal = ({ isOpen, onClose }) => {
           </div>
 
           <div className="input-group">
-            <label className="input-label">Confirm Admin Password *</label>
+            <label className="input-label">{isAdmin ? 'Confirm Admin Password *' : 'Confirm Your Password *'}</label>
             <div style={{ position: 'relative' }}>
               <input
                 type={showPassword ? 'text' : 'password'}
@@ -248,8 +282,24 @@ export const SetAdminPasswordModal = ({ isOpen, onClose }) => {
               marginTop: '0.5rem',
             }}
           >
-            {loading ? 'Saving Password...' : 'Save Password & Access Admin'}
+            {loading ? 'Saving Password...' : isAdmin ? 'Save Password & Access Admin' : 'Save Password & Continue'}
           </button>
+
+          {!isAdmin && (
+            <button
+              type="button"
+              onClick={onClose}
+              className="btn btn-secondary"
+              style={{
+                width: '100%',
+                padding: '0.65rem',
+                fontSize: '0.82rem',
+                marginTop: '0.25rem',
+              }}
+            >
+              Skip for now
+            </button>
+          )}
         </form>
       </div>
     </div>

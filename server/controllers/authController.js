@@ -296,6 +296,7 @@ export const googleAuth = async (req, res) => {
     const token = generateToken(user._id);
 
     const hasPassword = Boolean(user.password);
+    const needsPasswordSetup = !hasPassword;
     const needsAdminPassword = (user.role === 'admin' || user.role === 'superadmin') && !hasPassword;
 
     res.status(200).json({
@@ -312,6 +313,7 @@ export const googleAuth = async (req, res) => {
         isNewUser,
         needsPhone: isNewUser && !user.phone, // ONLY true for brand-new users without a phone
         hasPassword,
+        needsPasswordSetup,
         needsAdminPassword,
       },
       token,
@@ -336,6 +338,7 @@ export const getProfile = async (req, res) => {
     res.status(200).json({
       ...userObj,
       hasPassword,
+      needsPasswordSetup: !hasPassword,
       needsAdminPassword: (user.role === 'admin' || user.role === 'superadmin') && !hasPassword,
     });
   } catch (error) {
@@ -391,8 +394,8 @@ export const updateProfile = async (req, res) => {
   }
 };
 
-// 7. Set / Decide Admin Password (Required for Google login users promoted to Admin)
-export const setAdminPassword = async (req, res) => {
+// 7. Set / Decide User or Admin Password (For any Google OAuth login user)
+export const setPassword = async (req, res) => {
   try {
     const { password } = req.body;
     if (!password || password.length < 6) {
@@ -410,7 +413,7 @@ export const setAdminPassword = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: 'Admin password set successfully! You can now log in anytime using your email and this password.',
+      message: 'Password set successfully! You can now log in anytime using your email and this password.',
       user: {
         _id: user._id,
         name: user.name,
@@ -420,12 +423,15 @@ export const setAdminPassword = async (req, res) => {
         currentStamps: user.currentStamps,
         lifetimeVisits: user.lifetimeVisits,
         hasPassword: true,
+        needsPasswordSetup: false,
         needsAdminPassword: false,
       },
     });
   } catch (error) {
-    console.error('Set Admin Password Error:', error);
-    res.status(500).json({ message: 'Failed to set admin password: ' + error.message });
+    console.error('Set Password Error:', error);
+    res.status(500).json({ message: 'Failed to set password: ' + error.message });
   }
 };
+
+export const setAdminPassword = setPassword;
 
