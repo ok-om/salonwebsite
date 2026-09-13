@@ -719,5 +719,60 @@ html.lenis body {
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.7), 0 0 12px rgba(212, 175, 55, 0.2);
 }
 
+/* ==========================================================================
+   ADMIN DASHBOARD RESPONSIVE MOBILE OPTIMIZATION
+   ========================================================================== */
+.admin-modal-content {
+  padding: clamp(0.9rem, 3vw, 1.75rem) !important;
+  width: min(920px, 98%) !important;
+}
 
+.admin-nav-tabs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 0.45rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 0.75rem;
+  margin-bottom: 1.25rem;
+}
 
+.cms-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+
+.cms-form-grid .grid-span-full {
+  grid-column: span 2;
+}
+
+@media (max-width: 640px) {
+  .cms-form-grid {
+    grid-template-columns: 1fr !important;
+    gap: 0.85rem !important;
+  }
+  .cms-form-grid .grid-span-full {
+    grid-column: span 1 !important;
+  }
+}
+
+/* Responsive Table vs Cards (Zero Side-Scroll on Mobile) */
+.admin-desktop-table {
+  display: block;
+  overflow-x: auto;
+}
+
+.admin-mobile-cards {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .admin-desktop-table {
+    display: none !important;
+  }
+  .admin-mobile-cards {
+    display: flex !important;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+}

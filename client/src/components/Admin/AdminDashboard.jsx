@@ -447,29 +447,29 @@ export const AdminDashboard = ({ isOpen, onClose }) => {
       }}
     >
       <div
-        className="modal-content"
+        className="modal-content admin-modal-content"
         data-lenis-prevent="true"
         onClick={(e) => e.stopPropagation()}
         onWheel={(e) => e.stopPropagation()}
         style={{
           maxWidth: '920px',
-          width: '95%',
+          width: '96%',
           maxHeight: '90vh',
           display: 'flex',
           flexDirection: 'column',
-          padding: '2rem',
+          padding: 'clamp(0.85rem, 3vw, 1.75rem)',
           background: '#11131a',
           border: '1px solid var(--border-glow)',
           overscrollBehavior: 'contain',
         }}
       >
         {/* Header */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', gap: '0.75rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
             <div
               style={{
-                width: '40px',
-                height: '40px',
+                width: '38px',
+                height: '38px',
                 borderRadius: '8px',
                 background: 'rgba(197, 34, 34, 0.2)',
                 color: 'var(--crimson-light)',
@@ -477,13 +477,16 @@ export const AdminDashboard = ({ isOpen, onClose }) => {
                 alignItems: 'center',
                 justifyContent: 'center',
                 border: '1px solid rgba(197, 34, 34, 0.4)',
+                flexShrink: 0,
               }}
             >
-              <ShieldCheck size={24} />
+              <ShieldCheck size={22} />
             </div>
             <div>
-              <h3 style={{ fontSize: '1.4rem', color: '#ffffff' }}>Admin Central Command</h3>
-              <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+              <h3 style={{ fontSize: 'clamp(1.05rem, 3.5vw, 1.35rem)', color: '#ffffff', lineHeight: 1.25, margin: 0 }}>
+                Admin Central Command
+              </h3>
+              <p style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', margin: '0.2rem 0 0 0' }}>
                 Full control over Customer Accounts, Visits & Live Website CMS
               </p>
             </div>
@@ -496,6 +499,7 @@ export const AdminDashboard = ({ isOpen, onClose }) => {
               border: 'none',
               color: 'var(--text-secondary)',
               cursor: 'pointer',
+              padding: '0.35rem',
             }}
           >
             <X size={22} />
@@ -528,48 +532,49 @@ export const AdminDashboard = ({ isOpen, onClose }) => {
           </div>
         )}
 
-        {/* Nav Tabs */}
-        <div
-          style={{
-            display: 'flex',
-            gap: '0.5rem',
-            borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
-            paddingBottom: '0.75rem',
-            marginBottom: '1.5rem',
-            overflowX: 'auto',
-          }}
-        >
+        {/* Nav Tabs (Responsive 2x2 Grid on Mobile, No Horizontal Scrollbar) */}
+        <div className="admin-nav-tabs">
           <button
             onClick={() => setActiveTab('stamps')}
             className={`btn btn-sm ${activeTab === 'stamps' ? 'btn-primary' : 'btn-secondary'}`}
+            style={{ justifyContent: 'center', textAlign: 'center', whiteSpace: 'normal', height: 'auto', padding: '0.5rem 0.5rem' }}
           >
-            <Users size={15} />
-            <span>Customer Management ({customers.length})</span>
+            <Users size={14} />
+            <span style={{ fontSize: '0.78rem' }}>Customers ({customers.length})</span>
           </button>
 
           <button
             onClick={() => setActiveTab('redeem')}
             className={`btn btn-sm ${activeTab === 'redeem' ? 'btn-primary' : 'btn-secondary'}`}
+            style={{ justifyContent: 'center', textAlign: 'center', whiteSpace: 'normal', height: 'auto', padding: '0.5rem 0.5rem' }}
           >
-            <QrCode size={15} />
-            <span>Redeem Counter Coupon</span>
+            <QrCode size={14} />
+            <span style={{ fontSize: '0.78rem' }}>Redeem Coupon</span>
           </button>
 
           <button
             onClick={() => setActiveTab('cms')}
             className={`btn btn-sm ${activeTab === 'cms' ? 'btn-primary' : 'btn-secondary'}`}
+            style={{ justifyContent: 'center', textAlign: 'center', whiteSpace: 'normal', height: 'auto', padding: '0.5rem 0.5rem' }}
           >
-            <Settings size={15} />
-            <span>Live Website CMS</span>
+            <Settings size={14} />
+            <span style={{ fontSize: '0.78rem' }}>Website CMS</span>
           </button>
 
           <button
             onClick={() => setActiveTab('recovery')}
             className={`btn btn-sm ${activeTab === 'recovery' ? 'btn-primary' : 'btn-secondary'}`}
-            style={activeTab === 'recovery' ? { background: '#c52222', borderColor: '#ff4d4d' } : {}}
+            style={{
+              justifyContent: 'center',
+              textAlign: 'center',
+              whiteSpace: 'normal',
+              height: 'auto',
+              padding: '0.5rem 0.5rem',
+              ...(activeTab === 'recovery' ? { background: '#c52222', borderColor: '#ff4d4d' } : {}),
+            }}
           >
-            <RotateCcw size={15} />
-            <span>Deleted Accounts ({deletedCustomers.length})</span>
+            <RotateCcw size={14} />
+            <span style={{ fontSize: '0.78rem' }}>Deleted ({deletedCustomers.length})</span>
           </button>
         </div>
 
@@ -613,8 +618,8 @@ export const AdminDashboard = ({ isOpen, onClose }) => {
                 </div>
               </div>
 
-              {/* Customers Table */}
-              <div style={{ overflowX: 'auto' }}>
+              {/* Desktop Customers Table */}
+              <div className="admin-desktop-table">
                 <table
                   style={{
                     width: '100%',
@@ -746,6 +751,108 @@ export const AdminDashboard = ({ isOpen, onClose }) => {
                 </table>
               </div>
 
+              {/* Mobile Customer Cards (Zero Horizontal Scroll) */}
+              <div className="admin-mobile-cards">
+                {customers.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '2rem 1rem', color: 'var(--text-muted)' }}>
+                    {searchQuery ? `No customers found matching "${searchQuery}".` : 'No customers registered yet.'}
+                  </div>
+                ) : (
+                  paginatedCustomers.map((c) => (
+                    <div
+                      key={`mob-${c._id}`}
+                      style={{
+                        background: 'rgba(255, 255, 255, 0.03)',
+                        border: '1px solid rgba(255, 255, 255, 0.08)',
+                        borderRadius: 'var(--radius-sm)',
+                        padding: '0.85rem',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '0.6rem',
+                      }}
+                    >
+                      {/* Name & Stamp Badge */}
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                        <div style={{ fontWeight: 700, fontSize: '0.95rem', color: '#ffffff' }}>{c.name}</div>
+                        <span
+                          style={{
+                            padding: '0.2rem 0.6rem',
+                            borderRadius: 'var(--radius-full)',
+                            fontSize: '0.75rem',
+                            fontWeight: 700,
+                            background: c.currentStamps === 4 ? 'rgba(197, 34, 34, 0.25)' : 'rgba(212, 175, 55, 0.15)',
+                            color: c.currentStamps === 4 ? '#ff8080' : 'var(--gold-primary)',
+                            border: '1px solid currentColor',
+                          }}
+                        >
+                          ✂️ {c.currentStamps}/5 Stamps
+                        </span>
+                      </div>
+
+                      {/* Contact & Visit Meta */}
+                      <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
+                        {c.phone && <div>📞 {c.phone}</div>}
+                        <div style={{ color: 'var(--text-muted)' }}>✉️ {c.email}</div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.25rem', fontSize: '0.72rem', flexWrap: 'wrap', gap: '0.25rem' }}>
+                          <span style={{ color: '#cbd5e1' }}>
+                            Last Visit: {c.lastVisitDate ? new Date(c.lastVisitDate).toLocaleDateString() : 'First visit pending'}
+                          </span>
+                          {c.activeCouponsCount > 0 ? (
+                            <span className="badge badge-green" style={{ fontSize: '0.65rem' }}>
+                              🎁 {c.activeCouponsCount} Active
+                            </span>
+                          ) : (
+                            <span style={{ color: 'var(--text-muted)' }}>Lifetime: {c.lifetimeVisits}</span>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Actions */}
+                      <div style={{ display: 'flex', gap: '0.4rem', marginTop: '0.2rem' }}>
+                        <button
+                          onClick={() => handleAwardStamp(c)}
+                          className="btn btn-primary btn-sm"
+                          style={{ flex: 1, padding: '0.45rem', fontSize: '0.75rem', justifyContent: 'center' }}
+                        >
+                          +1 Coupe Stamp
+                        </button>
+                        <button
+                          onClick={() => handleViewHistory(c)}
+                          className="btn btn-secondary btn-sm"
+                          title="View Visit History"
+                          style={{ padding: '0.45rem 0.65rem' }}
+                        >
+                          <Clock size={14} />
+                        </button>
+                        <button
+                          onClick={() => handleOpenEditCustomer(c)}
+                          className="btn btn-secondary btn-sm"
+                          title="Edit Customer"
+                          style={{ padding: '0.45rem 0.65rem', color: 'var(--gold-primary)' }}
+                        >
+                          <Edit2 size={14} />
+                        </button>
+                        {c.email !== 'ok8023361@gmail.com' && c.role !== 'admin' && (
+                          <button
+                            onClick={() => setCustomerToDelete(c)}
+                            className="btn btn-sm"
+                            title="Delete Customer"
+                            style={{
+                              padding: '0.45rem 0.65rem',
+                              background: 'rgba(239, 68, 68, 0.15)',
+                              border: '1px solid rgba(239, 68, 68, 0.3)',
+                              color: '#ff6b6b',
+                            }}
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+
               {/* Customer Pagination Controls */}
               <PaginationControl
                 currentPage={validCustomerPage}
@@ -813,7 +920,7 @@ export const AdminDashboard = ({ isOpen, onClose }) => {
           {/* ========================================================================= */}
           {activeTab === 'cms' && (
             <form onSubmit={handleSaveCms}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }}>
+              <div className="cms-form-grid">
                 {/* Salon Name */}
                 <div className="input-group">
                   <label className="input-label">Salon Name</label>
@@ -860,7 +967,7 @@ export const AdminDashboard = ({ isOpen, onClose }) => {
                 </div>
 
                 {/* Address */}
-                <div className="input-group" style={{ gridColumn: 'span 2' }}>
+                <div className="input-group grid-span-full">
                   <label className="input-label">Salon Physical Address</label>
                   <input
                     type="text"
@@ -1014,7 +1121,8 @@ export const AdminDashboard = ({ isOpen, onClose }) => {
                 </div>
               ) : (
                 <>
-                  <div style={{ overflowX: 'auto' }}>
+                  {/* Desktop Table for Deleted Accounts */}
+                  <div className="admin-desktop-table">
                     <table
                       style={{
                         width: '100%',
@@ -1108,6 +1216,80 @@ export const AdminDashboard = ({ isOpen, onClose }) => {
                         ))}
                       </tbody>
                     </table>
+                  </div>
+
+                  {/* Mobile Cards for Deleted Accounts (Zero Side-Scroll) */}
+                  <div className="admin-mobile-cards">
+                    {paginatedDeleted.map((u) => (
+                      <div
+                        key={`mob-del-${u._id}`}
+                        style={{
+                          background: 'rgba(255, 255, 255, 0.03)',
+                          border: '1px solid rgba(239, 68, 68, 0.2)',
+                          borderRadius: 'var(--radius-sm)',
+                          padding: '0.85rem',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: '0.55rem',
+                        }}
+                      >
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '0.5rem' }}>
+                          <div>
+                            <div style={{ fontWeight: 700, fontSize: '0.95rem', color: '#ffffff' }}>{u.name}</div>
+                            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{u.email}</div>
+                            {u.phone && <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>{u.phone}</div>}
+                          </div>
+                          <span
+                            style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '0.3rem',
+                              padding: '0.2rem 0.55rem',
+                              borderRadius: 'var(--radius-full)',
+                              fontSize: '0.72rem',
+                              fontWeight: 600,
+                              background: 'rgba(239, 68, 68, 0.15)',
+                              color: '#ff8080',
+                              border: '1px solid rgba(239, 68, 68, 0.4)',
+                            }}
+                          >
+                            <Clock size={11} />
+                            {u.timeLeftFormatted || 'Less than 24h'}
+                          </span>
+                        </div>
+
+                        <div style={{ fontSize: '0.75rem', color: 'var(--gold-primary)', display: 'flex', justifyContent: 'space-between' }}>
+                          <span>Preserved: {u.archivedStamps || 0}/5 Stamps</span>
+                          <span style={{ color: 'var(--text-muted)' }}>Lifetime: {u.archivedVisits || u.lifetimeVisits || 0}</span>
+                        </div>
+
+                        <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.2rem' }}>
+                          <button
+                            onClick={() => handleRestoreCustomer(u._id)}
+                            className="btn btn-primary btn-sm"
+                            style={{ flex: 1, padding: '0.45rem', fontSize: '0.75rem', justifyContent: 'center' }}
+                          >
+                            <RotateCcw size={13} />
+                            <span>Restore Account</span>
+                          </button>
+                          <button
+                            onClick={() => handlePermanentDelete(u._id, u.name)}
+                            className="btn btn-sm"
+                            style={{
+                              padding: '0.45rem 0.75rem',
+                              fontSize: '0.75rem',
+                              background: 'rgba(255, 255, 255, 0.05)',
+                              border: '1px solid rgba(255, 255, 255, 0.15)',
+                              color: '#ff6b6b',
+                              justifyContent: 'center',
+                            }}
+                          >
+                            <Trash2 size={13} />
+                            <span>Purge</span>
+                          </button>
+                        </div>
+                      </div>
+                    ))}
                   </div>
 
                   {/* Deleted Accounts Pagination Controls */}

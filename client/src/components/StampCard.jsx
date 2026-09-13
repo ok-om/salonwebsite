@@ -3,13 +3,11 @@ import { useAuth } from '../context/AuthContext';
 import { useSiteConfig } from '../context/SiteConfigContext';
 import API from '../services/api';
 import confetti from 'canvas-confetti';
-import QRCode from 'qrcode';
 import {
   Scissors,
   Gift,
   Clock,
   Sparkles,
-  QrCode as QrIcon,
   X,
   User,
   Mail,
@@ -37,9 +35,6 @@ export const StampCard = ({
   const [activeTab, setActiveTab] = useState(initialTab);
   const [loyaltyData, setLoyaltyData] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [selectedCouponQr, setSelectedCouponQr] = useState(null);
-  const [qrDataUrl, setQrDataUrl] = useState('');
-
   // Profile Edit State
   const [isEditingPhone, setIsEditingPhone] = useState(false);
   const [phoneInput, setPhoneInput] = useState('');
@@ -88,22 +83,6 @@ export const StampCard = ({
     }
   }, [isOpen, isAuthenticated]);
 
-  const showQrCode = async (coupon) => {
-    try {
-      const qr = await QRCode.toDataURL(coupon.code, {
-        width: 220,
-        margin: 2,
-        color: {
-          dark: '#0b0c10',
-          light: '#f4f5f8',
-        },
-      });
-      setQrDataUrl(qr);
-      setSelectedCouponQr(coupon);
-    } catch (err) {
-      console.error('QR Error:', err);
-    }
-  };
 
   // Handle Save Mobile Phone
   const handleSavePhone = async (e) => {
@@ -765,7 +744,7 @@ export const StampCard = ({
                 )}
 
                 {/* Profile Tab Action Buttons */}
-                <div style={{ display: 'flex', gap: '0.65rem' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem', width: '100%', marginTop: '0.5rem' }}>
                   {isAdmin ? (
                     <button
                       onClick={() => {
@@ -773,7 +752,7 @@ export const StampCard = ({
                         if (onOpenAdmin) onOpenAdmin();
                       }}
                       className="btn btn-primary"
-                      style={{ flex: 1, padding: '0.65rem', fontSize: '0.85rem' }}
+                      style={{ width: '100%', padding: '0.75rem', fontSize: '0.85rem', justifyContent: 'center' }}
                     >
                       <ShieldCheck size={16} />
                       <span>Open Admin Central Command</span>
@@ -782,7 +761,7 @@ export const StampCard = ({
                     <button
                       onClick={() => setActiveTab('stamps')}
                       className="btn btn-primary"
-                      style={{ flex: 1, padding: '0.65rem', fontSize: '0.85rem' }}
+                      style={{ width: '100%', padding: '0.75rem', fontSize: '0.85rem', justifyContent: 'center' }}
                     >
                       <Gift size={16} />
                       <span>View 5-Coupe Card & Rewards</span>
@@ -796,10 +775,12 @@ export const StampCard = ({
                     }}
                     className="btn btn-secondary"
                     style={{
-                      padding: '0.65rem 1rem',
+                      width: '100%',
+                      padding: '0.75rem',
                       fontSize: '0.85rem',
                       color: '#ff8080',
-                      borderColor: 'rgba(229, 62, 62, 0.3)',
+                      borderColor: 'rgba(229, 62, 62, 0.35)',
+                      justifyContent: 'center',
                     }}
                     title="Log Out of Account"
                   >
@@ -938,10 +919,10 @@ export const StampCard = ({
                 <div style={{ marginBottom: '1.25rem' }}>
                   <h4 style={{ fontSize: '0.95rem', marginBottom: '0.6rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                     <Gift size={16} color="var(--gold-primary)" />
-                    <span>Unlocked Offer Coupons ({loyaltyData?.coupons?.length || 0})</span>
+                    <span>Unlocked Offer Coupons ({activeCoupons.length})</span>
                   </h4>
 
-                  {loyaltyData?.coupons?.length === 0 ? (
+                  {activeCoupons.length === 0 ? (
                     <div
                       style={{
                         padding: '1.2rem',
@@ -953,16 +934,28 @@ export const StampCard = ({
                         fontSize: '0.82rem',
                       }}
                     >
-                      No offers yet. Reach 5 salon visits to earn your complimentary grooming reward!
+                      No active offers yet. Reach 5 salon visits to earn your complimentary grooming reward!
                     </div>
                   ) : (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
-                      {loyaltyData?.coupons?.map((coupon) => (
+                    <div
+                      data-lenis-prevent="true"
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '0.6rem',
+                        maxHeight: '260px',
+                        overflowY: 'auto',
+                        paddingRight: '0.35rem',
+                        overscrollBehavior: 'contain',
+                        WebkitOverflowScrolling: 'touch',
+                      }}
+                    >
+                      {activeCoupons.map((coupon) => (
                         <div
                           key={coupon._id}
                           style={{
-                            background: coupon.isRedeemed ? 'rgba(255,255,255,0.03)' : 'rgba(212, 175, 55, 0.08)',
-                            border: coupon.isRedeemed ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(212, 175, 55, 0.35)',
+                            background: 'rgba(212, 175, 55, 0.08)',
+                            border: '1px solid rgba(212, 175, 55, 0.35)',
                             borderRadius: 'var(--radius-sm)',
                             padding: '0.8rem',
                             display: 'flex',
@@ -979,33 +972,22 @@ export const StampCard = ({
                                   fontFamily: 'monospace',
                                   fontWeight: 700,
                                   fontSize: '0.92rem',
-                                  color: coupon.isRedeemed ? 'var(--text-muted)' : 'var(--gold-primary)',
+                                  color: 'var(--gold-primary)',
                                 }}
                               >
                                 {coupon.code}
                               </span>
-                              <span className={coupon.isRedeemed ? 'badge badge-crimson' : 'badge badge-green'} style={{ fontSize: '0.65rem' }}>
-                                {coupon.isRedeemed ? 'REDEEMED' : 'ACTIVE'}
+                              <span className="badge badge-green" style={{ fontSize: '0.65rem' }}>
+                                ACTIVE
                               </span>
                             </div>
-                            <p style={{ fontSize: '0.8rem', color: '#cbd5e1', fontWeight: 500 }}>
+                            <p style={{ fontSize: '0.8rem', color: '#cbd5e1', fontWeight: 500, margin: '0.15rem 0' }}>
                               {coupon.title || config.defaultOfferTitle}
                             </p>
                             <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
                               Valid until {new Date(coupon.expiresAt).toLocaleDateString()}
                             </span>
                           </div>
-
-                          {!coupon.isRedeemed && (
-                            <button
-                              onClick={() => showQrCode(coupon)}
-                              className="btn btn-primary btn-sm"
-                              style={{ padding: '0.35rem 0.75rem', fontSize: '0.75rem' }}
-                            >
-                              <QrIcon size={13} />
-                              <span>Show QR</span>
-                            </button>
-                          )}
                         </div>
                       ))}
                     </div>
@@ -1043,65 +1025,6 @@ export const StampCard = ({
                 )}
               </div>
             )}
-          </div>
-        )}
-
-        {/* QR Code Presentation Modal */}
-        {selectedCouponQr && (
-          <div
-            style={{
-              position: 'absolute',
-              inset: 0,
-              background: 'rgba(11, 12, 16, 0.97)',
-              borderRadius: 'var(--radius-lg)',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: '1.5rem',
-              zIndex: 100,
-            }}
-          >
-            <h4 style={{ fontSize: '1.1rem', marginBottom: '0.4rem', color: 'var(--gold-primary)' }}>
-              Counter Redemption QR
-            </h4>
-            <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '1rem', textAlign: 'center' }}>
-              Present this QR to the salon receptionist or admin to claim your free reward!
-            </p>
-
-            {qrDataUrl && (
-              <img
-                src={qrDataUrl}
-                alt="Coupon QR"
-                style={{
-                  width: '180px',
-                  height: '180px',
-                  borderRadius: '10px',
-                  border: '2px solid var(--gold-primary)',
-                  marginBottom: '0.75rem',
-                }}
-              />
-            )}
-
-            <div
-              style={{
-                fontFamily: 'monospace',
-                fontSize: '1.1rem',
-                fontWeight: 700,
-                color: '#ffffff',
-                letterSpacing: '0.1em',
-                marginBottom: '1.25rem',
-              }}
-            >
-              {selectedCouponQr.code}
-            </div>
-
-            <button
-              onClick={() => setSelectedCouponQr(null)}
-              className="btn btn-secondary btn-sm"
-            >
-              Back to Stamp Card
-            </button>
           </div>
         )}
       </div>

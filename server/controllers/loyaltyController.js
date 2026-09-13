@@ -152,8 +152,11 @@ export const getVisitHistory = async (req, res) => {
 // 4. User: Get Current User's Loyalty Profile & Coupons
 export const getMyLoyalty = async (req, res) => {
   try {
+    // Purge any previously redeemed coupons permanently from database
+    await OfferCoupon.deleteMany({ isRedeemed: true });
+
     const user = await User.findById(req.user._id).select('name email phone currentStamps lifetimeVisits');
-    const coupons = await OfferCoupon.find({ user: req.user._id }).sort({ createdAt: -1 });
+    const coupons = await OfferCoupon.find({ user: req.user._id, isRedeemed: { $ne: true } }).sort({ createdAt: -1 });
     const recentVisits = await VisitLog.find({ user: req.user._id }).sort({ visitedAt: -1 }).limit(5);
 
     res.status(200).json({
@@ -180,13 +183,14 @@ export const redeemCoupon = async (req, res) => {
     const coupon = await OfferCoupon.findOne({ code: code.toUpperCase().trim() }).populate('user', 'name phone email');
 
     if (!coupon) {
-      return res.status(404).json({ message: 'Invalid coupon code' });
+      return res.status(404).json({ message: 'Invalid coupon code or already used & cleared' });
     }
 
     if (coupon.isRedeemed) {
+      // Remove it from DB if it wasn't purged
+      await OfferCoupon.findByIdAndDelete(coupon._id);
       return res.status(400).json({
-        message: `This coupon was already redeemed on ${new Date(coupon.redeemedAt).toLocaleDateString()}`,
-        coupon,
+        message: 'This coupon was already redeemed and has now been removed.',
       });
     }
 
@@ -194,14 +198,15 @@ export const redeemCoupon = async (req, res) => {
       return res.status(400).json({ message: 'This coupon has expired' });
     }
 
-    coupon.isRedeemed = true;
-    coupon.redeemedAt = new Date();
-    coupon.redeemedBy = req.user._id;
-    await coupon.save();
+    const customerName = coupon.user?.name || 'Customer';
+    const couponCode = coupon.code;
+
+    // Permanently remove redeemed coupon from DB as requested
+    await OfferCoupon.findByIdAndDelete(coupon._id);
 
     res.status(200).json({
-      message: `✅ Coupon ${coupon.code} redeemed successfully for ${coupon.user.name}!`,
-      coupon,
+      message: `✅ Coupon ${couponCode} redeemed successfully for ${customerName} and cleared from system!`,
+      coupon: { ...coupon.toObject(), isRedeemed: true },
     });
   } catch (error) {
     console.error('Redeem Coupon Error:', error);
