@@ -93,6 +93,69 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
+  // Connect to Live Real-Time Event Stream (SSE) for instant, zero-reload updates
+  useEffect(() => {
+    if (!token) return;
+
+    const streamUrl = `${API.defaults.baseURL}/loyalty/live-stream?token=${encodeURIComponent(token)}`;
+    let eventSource = null;
+
+    try {
+      eventSource = new EventSource(streamUrl);
+
+      eventSource.onmessage = (e) => {
+        try {
+          const data = JSON.parse(e.data);
+          if (data.type === 'STAMP_AWARDED') {
+            if (user && data.userId === user._id) {
+              setUser((prev) =>
+                prev
+                  ? {
+                      ...prev,
+                      currentStamps: data.currentStamps,
+                      lifetimeVisits: data.lifetimeVisits,
+                      lastStampDate: data.lastStampDate,
+                    }
+                  : prev
+              );
+            }
+          } else if (data.type === 'CUSTOMER_UPDATED') {
+            if (user && data.userId === user._id) {
+              setUser((prev) =>
+                prev
+                  ? {
+                      ...prev,
+                      name: data.name || prev.name,
+                      phone: data.phone || prev.phone,
+                    }
+                  : prev
+              );
+            }
+          }
+          // Dispatch global window event for components (StampCard, AdminDashboard)
+          window.dispatchEvent(new CustomEvent('classic_cut_realtime', { detail: data }));
+        } catch (err) {
+          // heartbeat or non-json message
+        }
+      };
+
+      eventSource.onerror = () => {
+        // SSE auto-reconnects automatically
+      };
+    } catch (err) {
+      console.warn('Realtime SSE init failed:', err);
+    }
+
+    return () => {
+      if (eventSource) {
+        eventSource.close();
+      }
+    };
+  }, [token, user?._id]);
+
+  const isAdmin = user?.role === 'admin' || user?.role === 'superadmin' || user?.email === 'ok8023361@gmail.com';
+  const isSuperAdmin = user?.role === 'superadmin' || user?.email === 'ok8023361@gmail.com';
+
   return (
     <AuthContext.Provider
       value={{
@@ -100,7 +163,8 @@ export const AuthProvider = ({ children }) => {
         token,
         loading,
         isAuthenticated: !!user,
-        isAdmin: user?.role === 'admin',
+        isAdmin,
+        isSuperAdmin,
         requestOtp,
         registerWithOtp,
         login,

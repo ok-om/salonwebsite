@@ -38,7 +38,6 @@ const offerCouponSchema = new mongoose.Schema(
     expiresAt: {
       type: Date,
       default: () => new Date(Date.now() + 35 * 24 * 60 * 60 * 1000), // 35 days validity
-      index: true,
     },
   },
   { timestamps: true }

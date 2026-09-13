@@ -323,7 +323,7 @@ const CouponBanner = React.memo(({ onOpenLoyalty, onOpenAdmin }) => {
         Unlock Exclusive <span className="gold-text">30% to 40% OFF</span>
       </h3>
       <p style={{ color: '#cbd5e1', maxWidth: '580px', margin: '0 auto 1.25rem', fontSize: '0.88rem' }}>
-        Collect 1 Coupon Stamp every time you visit. After 5 visits, you unlock a 30% to 40% OFF Luxury Grooming Offer valid for 35 days!
+        Collect 1 Coupon Stamp every time you visit. After 5 visits, you unlock a 30% to 40% OFF Luxury Grooming Offer!
       </p>
       <div style={{ display: 'flex', justifyContent: 'center', gap: '0.65rem', flexWrap: 'wrap' }}>
         {isAdmin ? (

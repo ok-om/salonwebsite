@@ -27,6 +27,9 @@ import {
   Upload,
   Sparkles,
   RefreshCw,
+  Crown,
+  UserPlus,
+  Shield,
 } from 'lucide-react';
 
 const PaginationControl = ({
@@ -189,14 +192,21 @@ const PaginationControl = ({
 };
 
 export const AdminDashboard = ({ isOpen, onClose }) => {
-  const { user, isAdmin } = useAuth();
+  const { user, isAdmin, isSuperAdmin } = useAuth();
   const { config, updateConfig, refreshConfig } = useSiteConfig();
 
-  const [activeTab, setActiveTab] = useState('stamps'); // 'stamps' | 'cms' | 'recovery' | 'redeem'
+  const [activeTab, setActiveTab] = useState('stamps'); // 'stamps' | 'cms' | 'recovery' | 'redeem' | 'staff'
   const [customers, setCustomers] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(false);
   const [feedback, setFeedback] = useState({ type: '', msg: '' });
+
+  // Staff Admins State (Super Admin Only)
+  const [staffList, setStaffList] = useState([]);
+  const [staffLoading, setStaffLoading] = useState(false);
+  const [showAddAdminModal, setShowAddAdminModal] = useState(false);
+  const [newAdminForm, setNewAdminForm] = useState({ name: '', email: '', phone: '', password: '' });
+  const [addAdminLoading, setAddAdminLoading] = useState(false);
 
   // Visit history modal
   const [selectedCustomerHistory, setSelectedCustomerHistory] = useState(null);
@@ -278,12 +288,84 @@ export const AdminDashboard = ({ isOpen, onClose }) => {
     }
   };
 
+  // Load Staff Admins (Super Admin Only)
+  const fetchStaffList = async () => {
+    if (!isSuperAdmin) return;
+    setStaffLoading(true);
+    try {
+      const res = await API.get('/admin/staff');
+      setStaffList(res.data);
+    } catch (err) {
+      console.error('Failed to load staff list:', err);
+    } finally {
+      setStaffLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (isOpen && isAdmin) {
       fetchCustomers(searchQuery);
       fetchDeletedCustomers();
+      if (isSuperAdmin) {
+        fetchStaffList();
+      }
     }
-  }, [isOpen, isAdmin]);
+  }, [isOpen, isAdmin, isSuperAdmin]);
+
+  // Zero-Reload Real-time Updates Listener
+  useEffect(() => {
+    const handleRealtime = (e) => {
+      const data = e.detail;
+      if (!data) return;
+
+      if (data.type === 'STAMP_AWARDED') {
+        setCustomers((prevCustomers) =>
+          prevCustomers.map((c) =>
+            c._id === data.userId
+              ? {
+                  ...c,
+                  currentStamps: data.currentStamps,
+                  lifetimeVisits: data.lifetimeVisits || (c.lifetimeVisits || 0) + 1,
+                  activeCouponsCount: data.offerUnlocked ? (c.activeCouponsCount || 0) + 1 : c.activeCouponsCount,
+                  lastServiceName: data.serviceName || c.lastServiceName,
+                  lastVisitDate: data.lastStampDate || new Date().toISOString(),
+                }
+              : c
+          )
+        );
+      } else if (data.type === 'COUPON_REDEEMED') {
+        setCustomers((prevCustomers) =>
+          prevCustomers.map((c) =>
+            c._id === data.userId
+              ? {
+                  ...c,
+                  activeCouponsCount: Math.max(0, (c.activeCouponsCount || 1) - 1),
+                }
+              : c
+          )
+        );
+      } else if (data.type === 'CUSTOMER_UPDATED') {
+        setCustomers((prevCustomers) =>
+          prevCustomers.map((c) =>
+            c._id === data.userId
+              ? {
+                  ...c,
+                  name: data.name || c.name,
+                  phone: data.phone || c.phone,
+                }
+              : c
+          )
+        );
+      } else if (data.type === 'ADMIN_LIST_CHANGED') {
+        if (isSuperAdmin) {
+          fetchStaffList();
+        }
+      }
+    };
+
+    window.addEventListener('classic_cut_realtime', handleRealtime);
+    return () => window.removeEventListener('classic_cut_realtime', handleRealtime);
+  }, [isSuperAdmin]);
 
   if (!isOpen || !isAdmin) return null;
 
@@ -568,6 +650,47 @@ export const AdminDashboard = ({ isOpen, onClose }) => {
     }
   };
 
+  // 10. Super Admin: Create new staff admin
+  const handleCreateAdmin = async (e) => {
+    e.preventDefault();
+    if (!newAdminForm.name.trim() || !newAdminForm.email.trim() || !newAdminForm.password.trim()) {
+      setFeedback({ type: 'error', msg: 'Name, Email and Password are required.' });
+      return;
+    }
+    setAddAdminLoading(true);
+    try {
+      const res = await API.post('/admin/staff', newAdminForm);
+      setFeedback({ type: 'success', msg: res.data.message });
+      setShowAddAdminModal(false);
+      setNewAdminForm({ name: '', email: '', phone: '', password: '' });
+      fetchStaffList();
+    } catch (err) {
+      setFeedback({
+        type: 'error',
+        msg: err.response?.data?.message || 'Failed to create staff admin',
+      });
+    } finally {
+      setAddAdminLoading(false);
+    }
+  };
+
+  // 11. Super Admin: Delete staff admin
+  const handleDeleteAdmin = async (adminId, adminName) => {
+    if (!window.confirm(`Are you sure you want to remove ${adminName} from Admin Staff? This action cannot be undone.`)) {
+      return;
+    }
+    try {
+      const res = await API.delete(`/admin/staff/${adminId}`);
+      setFeedback({ type: 'success', msg: res.data.message });
+      fetchStaffList();
+    } catch (err) {
+      setFeedback({
+        type: 'error',
+        msg: err.response?.data?.message || 'Failed to remove staff admin',
+      });
+    }
+  };
+
   return (
     <div
       className="modal-overlay"
@@ -709,6 +832,29 @@ export const AdminDashboard = ({ isOpen, onClose }) => {
             <RotateCcw size={14} />
             <span style={{ fontSize: '0.78rem' }}>Deleted ({deletedCustomers.length})</span>
           </button>
+
+          {isSuperAdmin && (
+            <button
+              onClick={() => {
+                setActiveTab('staff');
+                fetchStaffList();
+              }}
+              className={`btn btn-sm ${activeTab === 'staff' ? 'btn-primary' : 'btn-secondary'}`}
+              style={{
+                justifyContent: 'center',
+                textAlign: 'center',
+                whiteSpace: 'normal',
+                height: 'auto',
+                padding: '0.5rem 0.5rem',
+                ...(activeTab === 'staff'
+                  ? { background: 'linear-gradient(135deg, #d4af37 0%, #aa820a 100%)', color: '#0b0c10', fontWeight: 700 }
+                  : {}),
+              }}
+            >
+              <Crown size={14} />
+              <span style={{ fontSize: '0.78rem' }}>👑 Staff Admins ({staffList.length})</span>
+            </button>
+          )}
         </div>
 
         {/* Tab Content Container */}
@@ -1644,6 +1790,238 @@ export const AdminDashboard = ({ isOpen, onClose }) => {
               )}
             </div>
           )}
+
+          {/* ========================================================================= */}
+          {/* TAB 5: STAFF & ADMINS (SUPER ADMIN EXCLUSIVE) */}
+          {/* ========================================================================= */}
+          {isSuperAdmin && activeTab === 'staff' && (
+            <div>
+              {/* Tab Header & Add Staff Admin Button */}
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginBottom: '1.25rem',
+                  gap: '0.75rem',
+                  flexWrap: 'wrap',
+                }}
+              >
+                <div>
+                  <h4 style={{ fontSize: '1.1rem', color: '#ffffff', margin: '0 0 0.25rem 0', display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+                    <Crown size={18} color="var(--gold-primary)" />
+                    <span>Staff Admins Management</span>
+                  </h4>
+                  <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', margin: 0 }}>
+                    As Super Admin, you can add new salon admins or remove existing staff. Standard admins cannot access this area.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowAddAdminModal(true)}
+                  className="btn btn-primary btn-sm"
+                  style={{
+                    padding: '0.55rem 1.1rem',
+                    fontSize: '0.82rem',
+                    fontWeight: 700,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.4rem',
+                  }}
+                >
+                  <UserPlus size={16} />
+                  <span>Add New Staff Admin</span>
+                </button>
+              </div>
+
+              {/* Staff List Table */}
+              {staffLoading ? (
+                <div style={{ textAlign: 'center', padding: '3rem 1rem', color: 'var(--text-muted)' }}>
+                  <RefreshCw size={24} className="spin" style={{ margin: '0 auto 0.5rem', display: 'block' }} />
+                  <span>Loading salon staff admins...</span>
+                </div>
+              ) : staffList.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '3rem 1rem', color: 'var(--text-muted)' }}>
+                  No other admins registered yet.
+                </div>
+              ) : (
+                <>
+                  {/* Desktop Table */}
+                  <div className="admin-desktop-table" style={{ border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: 'var(--radius-md)', overflow: 'hidden' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.85rem' }}>
+                      <thead>
+                        <tr style={{ background: 'rgba(255, 255, 255, 0.04)', color: 'var(--text-secondary)', borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>
+                          <th style={{ padding: '0.85rem 1rem' }}>Staff Member</th>
+                          <th style={{ padding: '0.85rem 1rem' }}>Email Address</th>
+                          <th style={{ padding: '0.85rem 1rem' }}>Phone</th>
+                          <th style={{ padding: '0.85rem 1rem' }}>Access Role</th>
+                          <th style={{ padding: '0.85rem 1rem', textAlign: 'right' }}>Action</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {staffList.map((st) => {
+                          const isTargetSuper = st.role === 'superadmin' || st.email === 'ok8023361@gmail.com';
+                          const isSelf = user?._id === st._id;
+                          return (
+                            <tr
+                              key={st._id}
+                              style={{
+                                borderBottom: '1px solid rgba(255, 255, 255, 0.04)',
+                                background: isTargetSuper ? 'rgba(212, 175, 55, 0.04)' : 'transparent',
+                              }}
+                            >
+                              <td style={{ padding: '0.85rem 1rem' }}>
+                                <div style={{ fontWeight: 600, color: '#ffffff' }}>{st.name}</div>
+                                <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                                  Added {new Date(st.createdAt || Date.now()).toLocaleDateString()}
+                                </div>
+                              </td>
+                              <td style={{ padding: '0.85rem 1rem', color: '#cbd5e1' }}>{st.email}</td>
+                              <td style={{ padding: '0.85rem 1rem', color: 'var(--text-muted)' }}>
+                                {st.phone ? `+91 ${st.phone.replace(/[^0-9]/g, '').slice(-10)}` : '—'}
+                              </td>
+                              <td style={{ padding: '0.85rem 1rem' }}>
+                                {isTargetSuper ? (
+                                  <span
+                                    style={{
+                                      display: 'inline-flex',
+                                      alignItems: 'center',
+                                      gap: '0.3rem',
+                                      background: 'rgba(212, 175, 55, 0.2)',
+                                      color: 'var(--gold-primary)',
+                                      border: '1px solid rgba(212, 175, 55, 0.4)',
+                                      padding: '0.2rem 0.6rem',
+                                      borderRadius: '999px',
+                                      fontSize: '0.72rem',
+                                      fontWeight: 700,
+                                    }}
+                                  >
+                                    <Crown size={12} /> Super Admin
+                                  </span>
+                                ) : (
+                                  <span
+                                    style={{
+                                      display: 'inline-flex',
+                                      alignItems: 'center',
+                                      gap: '0.3rem',
+                                      background: 'rgba(59, 130, 246, 0.15)',
+                                      color: '#93c5fd',
+                                      border: '1px solid rgba(59, 130, 246, 0.3)',
+                                      padding: '0.2rem 0.6rem',
+                                      borderRadius: '999px',
+                                      fontSize: '0.72rem',
+                                      fontWeight: 600,
+                                    }}
+                                  >
+                                    <Shield size={12} /> Staff Admin
+                                  </span>
+                                )}
+                              </td>
+                              <td style={{ padding: '0.85rem 1rem', textAlign: 'right' }}>
+                                {isTargetSuper ? (
+                                  <span style={{ fontSize: '0.74rem', color: 'var(--gold-primary)', fontStyle: 'italic', display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
+                                    <Lock size={12} /> Protected Owner
+                                  </span>
+                                ) : isSelf ? (
+                                  <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>
+                                    Current Session
+                                  </span>
+                                ) : (
+                                  <button
+                                    type="button"
+                                    onClick={() => handleDeleteAdmin(st._id, st.name)}
+                                    className="btn btn-sm"
+                                    style={{
+                                      padding: '0.35rem 0.75rem',
+                                      fontSize: '0.75rem',
+                                      background: 'rgba(239, 68, 68, 0.15)',
+                                      border: '1px solid rgba(239, 68, 68, 0.35)',
+                                      color: '#ff8080',
+                                      display: 'inline-flex',
+                                      alignItems: 'center',
+                                      gap: '0.3rem',
+                                    }}
+                                  >
+                                    <Trash2 size={13} />
+                                    <span>Remove</span>
+                                  </button>
+                                )}
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  {/* Mobile Cards for Staff Admins */}
+                  <div className="admin-mobile-cards">
+                    {staffList.map((st) => {
+                      const isTargetSuper = st.role === 'superadmin' || st.email === 'ok8023361@gmail.com';
+                      const isSelf = user?._id === st._id;
+                      return (
+                        <div
+                          key={st._id}
+                          style={{
+                            background: isTargetSuper ? 'rgba(212, 175, 55, 0.05)' : 'rgba(255, 255, 255, 0.04)',
+                            border: isTargetSuper ? '1px solid rgba(212, 175, 55, 0.3)' : '1px solid rgba(255, 255, 255, 0.08)',
+                            borderRadius: 'var(--radius-md)',
+                            padding: '0.85rem',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '0.45rem',
+                          }}
+                        >
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                            <div>
+                              <div style={{ fontWeight: 700, color: '#ffffff', fontSize: '0.95rem' }}>{st.name}</div>
+                              <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>{st.email}</div>
+                              {st.phone && (
+                                <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '0.15rem' }}>
+                                  +91 {st.phone.replace(/[^0-9]/g, '').slice(-10)}
+                                </div>
+                              )}
+                            </div>
+                            {isTargetSuper ? (
+                              <span style={{ fontSize: '0.68rem', background: 'rgba(212, 175, 55, 0.2)', color: 'var(--gold-primary)', padding: '0.15rem 0.5rem', borderRadius: '999px', fontWeight: 700 }}>
+                                👑 Super Admin
+                              </span>
+                            ) : (
+                              <span style={{ fontSize: '0.68rem', background: 'rgba(59, 130, 246, 0.15)', color: '#93c5fd', padding: '0.15rem 0.5rem', borderRadius: '999px', fontWeight: 600 }}>
+                                🛡️ Staff Admin
+                              </span>
+                            )}
+                          </div>
+                          {!isTargetSuper && !isSelf && (
+                            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '0.35rem' }}>
+                              <button
+                                type="button"
+                                onClick={() => handleDeleteAdmin(st._id, st.name)}
+                                className="btn btn-sm"
+                                style={{
+                                  padding: '0.35rem 0.75rem',
+                                  fontSize: '0.74rem',
+                                  background: 'rgba(239, 68, 68, 0.15)',
+                                  border: '1px solid rgba(239, 68, 68, 0.35)',
+                                  color: '#ff8080',
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: '0.3rem',
+                                }}
+                              >
+                                <Trash2 size={13} />
+                                <span>Remove Admin</span>
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Customer Delete Confirmation Modal */}
@@ -1996,6 +2374,164 @@ export const AdminDashboard = ({ isOpen, onClose }) => {
                   ))}
                 </div>
               )}
+            </div>
+          </div>
+        )}
+
+        {/* Super Admin: Add New Staff Admin Modal */}
+        {showAddAdminModal && (
+          <div
+            style={{
+              position: 'fixed',
+              inset: 0,
+              background: 'rgba(0, 0, 0, 0.85)',
+              backdropFilter: 'blur(8px)',
+              WebkitBackdropFilter: 'blur(8px)',
+              zIndex: 99999,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '1.25rem',
+            }}
+            onClick={() => !addAdminLoading && setShowAddAdminModal(false)}
+          >
+            <div
+              style={{
+                background: '#14171f',
+                border: '1px solid rgba(212, 175, 55, 0.4)',
+                boxShadow: '0 25px 60px rgba(0, 0, 0, 0.9), 0 0 35px rgba(212, 175, 55, 0.2)',
+                borderRadius: 'var(--radius-lg)',
+                maxWidth: '480px',
+                width: '100%',
+                padding: '2rem',
+                color: '#ffffff',
+                position: 'relative',
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                  <div
+                    style={{
+                      width: '40px',
+                      height: '40px',
+                      borderRadius: '8px',
+                      background: 'rgba(212, 175, 55, 0.15)',
+                      border: '1px solid rgba(212, 175, 55, 0.3)',
+                      color: 'var(--gold-primary)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <UserPlus size={20} />
+                  </div>
+                  <div>
+                    <h3 style={{ fontSize: '1.2rem', color: '#ffffff', margin: 0 }}>Add Staff Admin</h3>
+                    <p style={{ fontSize: '0.75rem', color: 'var(--gold-primary)', margin: '0.2rem 0 0 0' }}>
+                      Grant Salon Admin Privileges
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  disabled={addAdminLoading}
+                  onClick={() => setShowAddAdminModal(false)}
+                  style={{ background: 'none', border: 'none', color: '#ffffff', cursor: 'pointer' }}
+                >
+                  <X size={20} />
+                </button>
+              </div>
+
+              <form onSubmit={handleCreateAdmin} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <div className="input-group">
+                  <label className="input-label">Full Name *</label>
+                  <input
+                    type="text"
+                    required
+                    value={newAdminForm.name}
+                    onChange={(e) => setNewAdminForm({ ...newAdminForm, name: e.target.value })}
+                    className="input-field"
+                    placeholder="e.g. Salon Manager"
+                  />
+                </div>
+
+                <div className="input-group">
+                  <label className="input-label">Email Address *</label>
+                  <input
+                    type="email"
+                    required
+                    value={newAdminForm.email}
+                    onChange={(e) => setNewAdminForm({ ...newAdminForm, email: e.target.value })}
+                    className="input-field"
+                    placeholder="e.g. manager@classiccut.com"
+                  />
+                </div>
+
+                <div className="input-group">
+                  <label className="input-label">Mobile Number (Optional)</label>
+                  <div style={{ position: 'relative' }}>
+                    <span
+                      style={{
+                        position: 'absolute',
+                        left: '0.85rem',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        color: 'var(--gold-primary)',
+                        fontWeight: 600,
+                        fontSize: '0.85rem',
+                      }}
+                    >
+                      +91
+                    </span>
+                    <input
+                      type="tel"
+                      maxLength="10"
+                      value={newAdminForm.phone}
+                      onChange={(e) => {
+                        const val = e.target.value.replace(/[^0-9]/g, '');
+                        setNewAdminForm({ ...newAdminForm, phone: val });
+                      }}
+                      className="input-field"
+                      style={{ paddingLeft: '3.2rem' }}
+                      placeholder="9876543210"
+                    />
+                  </div>
+                </div>
+
+                <div className="input-group">
+                  <label className="input-label">Password * (Min 6 Characters)</label>
+                  <input
+                    type="password"
+                    required
+                    minLength={6}
+                    value={newAdminForm.password}
+                    onChange={(e) => setNewAdminForm({ ...newAdminForm, password: e.target.value })}
+                    className="input-field"
+                    placeholder="Set temporary or permanent password"
+                  />
+                </div>
+
+                <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.5rem', justifyContent: 'flex-end' }}>
+                  <button
+                    type="button"
+                    disabled={addAdminLoading}
+                    onClick={() => setShowAddAdminModal(false)}
+                    className="btn btn-secondary"
+                    style={{ flex: 1 }}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={addAdminLoading}
+                    className="btn btn-primary"
+                    style={{ flex: 1.3 }}
+                  >
+                    {addAdminLoading ? 'Creating Admin...' : 'Create Admin'}
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         )}

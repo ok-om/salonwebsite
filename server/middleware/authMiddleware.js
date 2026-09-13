@@ -25,9 +25,25 @@ export const protect = async (req, res, next) => {
 };
 
 export const adminOnly = (req, res, next) => {
-  if (req.user && req.user.role === 'admin') {
+  if (
+    req.user &&
+    (req.user.role === 'admin' ||
+      req.user.role === 'superadmin' ||
+      req.user.email === 'ok8023361@gmail.com')
+  ) {
     next();
   } else {
     res.status(403).json({ message: 'Access denied: Admin privileges required' });
+  }
+};
+
+export const superAdminOnly = (req, res, next) => {
+  if (
+    req.user &&
+    (req.user.role === 'superadmin' || req.user.email === 'ok8023361@gmail.com')
+  ) {
+    next();
+  } else {
+    res.status(403).json({ message: 'Access denied: Super Admin privileges required to manage admins' });
   }
 };

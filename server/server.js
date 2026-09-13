@@ -9,6 +9,7 @@ import authRoutes from './routes/authRoutes.js';
 import loyaltyRoutes from './routes/loyaltyRoutes.js';
 import cmsRoutes from './routes/cmsRoutes.js';
 import serviceRoutes from './routes/serviceRoutes.js';
+import adminRoutes from './routes/adminRoutes.js';
 
 dotenv.config();
 
@@ -33,6 +34,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/loyalty', loyaltyRoutes);
 app.use('/api/cms', cmsRoutes);
 app.use('/api/services', serviceRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Root & Health check endpoints
 app.get('/', (req, res) => {

@@ -13,7 +13,26 @@ import {
 } from '../controllers/loyaltyController.js';
 import { protect, adminOnly } from '../middleware/authMiddleware.js';
 
+import jwt from 'jsonwebtoken';
+import { User } from '../models/User.js';
+import { registerRealtimeClient } from '../services/realtimeService.js';
+
 const router = express.Router();
+
+// Real-time Live-Stream endpoint (SSE for zero-reload updates)
+router.get('/live-stream', async (req, res) => {
+  let user = null;
+  const token = req.query.token || (req.headers.authorization && req.headers.authorization.split(' ')[1]);
+  if (token) {
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'classic_cut_super_secure_secret_2026');
+      user = await User.findById(decoded.id).select('-password');
+    } catch (err) {
+      // Proceed as guest
+    }
+  }
+  registerRealtimeClient(req, res, user);
+});
 
 // User endpoints
 router.get('/my-stamps', protect, getMyLoyalty);

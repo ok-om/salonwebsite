@@ -8,24 +8,24 @@ export const seedInitialData = async () => {
       console.log('ℹ️ MongoDB not connected yet. Seeder will run when database connection is established.');
       return;
     }
-    // 1. Seed or promote Admin User
+    // 1. Seed or promote Super Admin User
     const targetAdminEmail = (process.env.ADMIN_EMAIL || 'ok8023361@gmail.com').toLowerCase().trim();
     let adminUser = await User.findOne({ email: targetAdminEmail });
     if (!adminUser) {
-      console.log(`⚡ Seeding Admin account: ${targetAdminEmail}...`);
+      console.log(`⚡ Seeding Super Admin account: ${targetAdminEmail}...`);
       await User.create({
-        name: 'Master Barber (Salon Admin)',
+        name: 'Master Barber (Super Admin)',
         email: targetAdminEmail,
         phone: '+919322188848',
         password: process.env.ADMIN_PASSWORD || 'admin12345',
-        role: 'admin',
+        role: 'superadmin',
         isVerified: true,
       });
-      console.log(`✅ Admin account created: ${targetAdminEmail}`);
-    } else if (adminUser.role !== 'admin') {
-      adminUser.role = 'admin';
+      console.log(`✅ Super Admin account created: ${targetAdminEmail}`);
+    } else if (adminUser.role !== 'superadmin') {
+      adminUser.role = 'superadmin';
       await adminUser.save();
-      console.log(`✅ Admin role granted to: ${targetAdminEmail}`);
+      console.log(`✅ Super Admin role granted to: ${targetAdminEmail}`);
     }
 
     // 2. Seed Site Config if none exists

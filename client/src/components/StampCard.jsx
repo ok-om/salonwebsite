@@ -117,6 +117,54 @@ export const StampCard = ({
     }
   }, [isOpen, isAuthenticated]);
 
+  // Real-time live updates without reload for stamps, coupons, and redemptions
+  useEffect(() => {
+    const handleRealtime = (e) => {
+      const data = e.detail;
+      if (!data) return;
+
+      if (data.type === 'STAMP_AWARDED') {
+        if (user && data.userId === user._id) {
+          setLoyaltyData((prev) => {
+            if (!prev) return prev;
+            const updatedCoupons = data.coupon
+              ? [data.coupon, ...(prev.coupons || [])]
+              : prev.coupons || [];
+            return {
+              ...prev,
+              currentStamps: data.currentStamps,
+              lifetimeVisits: data.lifetimeVisits,
+              lastStampDate: data.lastStampDate,
+              daysUntilStampDecay: data.daysUntilStampDecay || 45,
+              stampsNeeded: 5 - data.currentStamps,
+              coupons: updatedCoupons,
+            };
+          });
+
+          // Celebration confetti
+          confetti({
+            particleCount: 60,
+            spread: 70,
+            origin: { y: 0.6 },
+          });
+        }
+      } else if (data.type === 'COUPON_REDEEMED') {
+        if (user && (data.userId === user._id || data.targetUserId === user._id)) {
+          setLoyaltyData((prev) => {
+            if (!prev) return prev;
+            return {
+              ...prev,
+              coupons: (prev.coupons || []).filter((c) => c.code !== data.code),
+            };
+          });
+        }
+      }
+    };
+
+    window.addEventListener('classic_cut_realtime', handleRealtime);
+    return () => window.removeEventListener('classic_cut_realtime', handleRealtime);
+  }, [user?._id]);
+
 
   // Handle Save Mobile Phone
   const handleSavePhone = async (e) => {

@@ -2,6 +2,7 @@ import { User } from '../models/User.js';
 import { VisitLog } from '../models/VisitLog.js';
 import { OfferCoupon } from '../models/OfferCoupon.js';
 import { SiteConfig } from '../models/SiteConfig.js';
+import { broadcastRealtimeEvent } from '../services/realtimeService.js';
 
 // Helper: Generate unique coupon code
 const generateCouponCode = () => {
@@ -117,6 +118,22 @@ export const addVisitStamp = async (req, res) => {
     }
 
     await user.save();
+
+    // Broadcast live event to customer's phone/desktop and all admins in real-time without reload
+    broadcastRealtimeEvent({
+      type: 'STAMP_AWARDED',
+      targetUserId: user._id,
+      userId: user._id,
+      customerName: user.name,
+      currentStamps: user.currentStamps,
+      lifetimeVisits: user.lifetimeVisits,
+      lastStampDate: user.lastStampDate,
+      daysUntilStampDecay: 45,
+      offerUnlocked,
+      coupon: newCoupon,
+      serviceName: serviceName || 'Salon Grooming & Haircut',
+      timestamp: new Date(),
+    });
 
     res.status(200).json({
       message: offerUnlocked
@@ -286,6 +303,16 @@ export const redeemCoupon = async (req, res) => {
 
     // Permanently remove redeemed coupon from DB as requested
     await OfferCoupon.findByIdAndDelete(coupon._id);
+
+    // Broadcast live event so customer's active coupons remove this coupon instantly without reload
+    broadcastRealtimeEvent({
+      type: 'COUPON_REDEEMED',
+      targetUserId: coupon.user?._id || coupon.user,
+      userId: coupon.user?._id || coupon.user,
+      code: coupon.code,
+      customerName,
+      timestamp: new Date(),
+    });
 
     res.status(200).json({
       message: `✅ Coupon ${couponCode} redeemed successfully for ${customerName} and cleared from system!`,
@@ -484,6 +511,16 @@ export const updateCustomerByAdmin = async (req, res) => {
     // Email is strictly non-editable as required by owner
 
     await user.save();
+
+    // Broadcast customer update so customer profile updates without reload
+    broadcastRealtimeEvent({
+      type: 'CUSTOMER_UPDATED',
+      targetUserId: user._id,
+      userId: user._id,
+      name: user.name,
+      phone: user.phone,
+      timestamp: new Date(),
+    });
 
     res.status(200).json({
       message: `Customer ${user.name} updated successfully!`,
