@@ -19,27 +19,16 @@ export const SmoothScrollProvider = ({ children }) => {
   const lenisRef = useRef(null);
 
   useEffect(() => {
-    const isMobile = typeof window !== 'undefined' && (
-      window.innerWidth < 860 ||
-      ('ontouchstart' in window) ||
-      navigator.maxTouchPoints > 0
-    );
-
-    // On mobile devices, disable Lenis completely so native 120Hz touch kinetic scroll
-    // runs purely through the browser and does not conflict with touch gestures or cause reverse snaps.
-    if (isMobile) {
-      return;
-    }
+    if (typeof window === 'undefined') return;
 
     const lenis = new Lenis({
-      duration: 0.95,
+      duration: 1.05,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       orientation: 'vertical',
       gestureOrientation: 'vertical',
       smoothWheel: true,
-      wheelMultiplier: 0.85,
-      syncTouch: false,
-      touchMultiplier: 1.0,
+      wheelMultiplier: 0.95,
+      touchMultiplier: 1.25,
       infinite: false,
       prevent: (node) => {
         if (!node) return false;
@@ -47,7 +36,9 @@ export const SmoothScrollProvider = ({ children }) => {
           node.hasAttribute?.('data-lenis-prevent') ||
           node.closest?.('[data-lenis-prevent="true"]') ||
           node.closest?.('.modal-overlay') ||
-          node.closest?.('.modal-content')
+          node.closest?.('.modal-content') ||
+          node.closest?.('.admin-modal-content') ||
+          node.closest?.('.mobile-drawer-overlay')
         );
       },
     });

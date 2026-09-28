@@ -37,7 +37,14 @@ export const StampCard = ({
   const { config } = useSiteConfig();
 
   const [activeTab, setActiveTab] = useState(initialTab);
-  const [loyaltyData, setLoyaltyData] = useState(null);
+  const [loyaltyData, setLoyaltyData] = useState(() => {
+    try {
+      const cached = localStorage.getItem('classic_cut_loyalty');
+      return cached ? JSON.parse(cached) : null;
+    } catch (e) {
+      return null;
+    }
+  });
   const [loading, setLoading] = useState(false);
   // Profile Edit State
   const [isEditingPhone, setIsEditingPhone] = useState(false);
@@ -91,10 +98,12 @@ export const StampCard = ({
 
   const fetchLoyalty = async () => {
     if (!isAuthenticated) return;
-    setLoading(true);
     try {
       const res = await API.get('/loyalty/my-stamps');
       setLoyaltyData(res.data);
+      try {
+        localStorage.setItem('classic_cut_loyalty', JSON.stringify(res.data));
+      } catch (e) {}
       if (refreshUser) refreshUser();
 
       if (res.data.coupons && res.data.coupons.length > 0 && !res.data.coupons[0].isRedeemed) {
@@ -130,7 +139,7 @@ export const StampCard = ({
             const updatedCoupons = data.coupon
               ? [data.coupon, ...(prev.coupons || [])]
               : prev.coupons || [];
-            return {
+            const nextLoyalty = {
               ...prev,
               currentStamps: data.currentStamps,
               lifetimeVisits: data.lifetimeVisits,
@@ -139,6 +148,10 @@ export const StampCard = ({
               stampsNeeded: 5 - data.currentStamps,
               coupons: updatedCoupons,
             };
+            try {
+              localStorage.setItem('classic_cut_loyalty', JSON.stringify(nextLoyalty));
+            } catch (e) {}
+            return nextLoyalty;
           });
 
           // Celebration confetti
@@ -152,10 +165,14 @@ export const StampCard = ({
         if (user && (data.userId === user._id || data.targetUserId === user._id)) {
           setLoyaltyData((prev) => {
             if (!prev) return prev;
-            return {
+            const nextLoyalty = {
               ...prev,
               coupons: (prev.coupons || []).filter((c) => c.code !== data.code),
             };
+            try {
+              localStorage.setItem('classic_cut_loyalty', JSON.stringify(nextLoyalty));
+            } catch (e) {}
+            return nextLoyalty;
           });
         }
       }
@@ -220,11 +237,6 @@ export const StampCard = ({
       className="modal-overlay"
       data-lenis-prevent="true"
       onClick={onClose}
-      onTouchMove={(e) => {
-        if (e.target === e.currentTarget) {
-          e.preventDefault();
-        }
-      }}
       style={{ padding: '0.75rem' }}
     >
       <div
@@ -237,11 +249,13 @@ export const StampCard = ({
           padding: '1.4rem 1.25rem 2rem 1.25rem',
           border: '1px solid var(--border-glow)',
           background: '#12141c',
-          maxHeight: '90vh',
+          maxHeight: 'min(90vh, 90dvh)',
           overflowY: 'auto',
           WebkitOverflowScrolling: 'touch',
           overscrollBehavior: 'contain',
           touchAction: 'pan-y',
+          transform: 'translateZ(0)',
+          willChange: 'scroll-position',
         }}
       >
         {!isAuthenticated ? (
@@ -1063,16 +1077,10 @@ export const StampCard = ({
                     </div>
                   ) : (
                     <div
-                      data-lenis-prevent="true"
                       style={{
                         display: 'flex',
                         flexDirection: 'column',
                         gap: '0.6rem',
-                        maxHeight: '260px',
-                        overflowY: 'auto',
-                        paddingRight: '0.35rem',
-                        overscrollBehavior: 'contain',
-                        WebkitOverflowScrolling: 'touch',
                       }}
                     >
                       {activeCoupons.map((coupon) => (

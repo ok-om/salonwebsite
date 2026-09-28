@@ -1,29 +1,73 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import API from '../services/api';
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(() => {
+    try {
+      const cached = localStorage.getItem('classic_cut_user');
+      return cached ? JSON.parse(cached) : null;
+    } catch (e) {
+      return null;
+    }
+  });
   const [token, setToken] = useState(localStorage.getItem('classic_cut_token') || null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!user);
+  const lastLoadUserRef = useRef(0);
+
+  const saveUserSession = (userData, tokenStr) => {
+    if (userData) {
+      setUser(userData);
+      try {
+        localStorage.setItem('classic_cut_user', JSON.stringify(userData));
+      } catch (e) {}
+    }
+    if (tokenStr) {
+      setToken(tokenStr);
+      try {
+        localStorage.setItem('classic_cut_token', tokenStr);
+      } catch (e) {}
+    }
+  };
 
   // Fetch current user if token exists
-  const loadUser = async () => {
+  const loadUser = async (force = false) => {
     const savedToken = localStorage.getItem('classic_cut_token');
     if (!savedToken) {
       setUser(null);
+      setToken(null);
+      try {
+        localStorage.removeItem('classic_cut_user');
+      } catch (e) {}
       setLoading(false);
       return;
     }
+
+    const now = Date.now();
+    if (!force && now - lastLoadUserRef.current < 45000) {
+      setLoading(false);
+      return;
+    }
+    lastLoadUserRef.current = now;
+
     try {
       const res = await API.get('/auth/profile');
-      setUser(res.data);
+      saveUserSession(res.data);
     } catch (err) {
-      console.warn('Session expired or invalid token');
-      localStorage.removeItem('classic_cut_token');
-      setToken(null);
-      setUser(null);
+      // ONLY wipe session if server explicitly returns 401 or 403
+      if (err.response && (err.response.status === 401 || err.response.status === 403)) {
+        console.warn('Session expired or unauthorized');
+        try {
+          localStorage.removeItem('classic_cut_token');
+          localStorage.removeItem('classic_cut_user');
+          localStorage.removeItem('classic_cut_loyalty');
+        } catch (e) {}
+        setToken(null);
+        setUser(null);
+      } else {
+        console.warn('Network issue or backend waking up; preserving authenticated session:', err.message);
+      }
     } finally {
       setLoading(false);
     }
@@ -34,7 +78,7 @@ export const AuthProvider = ({ children }) => {
 
     const handleFocus = () => {
       if (localStorage.getItem('classic_cut_token')) {
-        loadUser();
+        loadUser(false);
       }
     };
     window.addEventListener('focus', handleFocus);
@@ -51,9 +95,7 @@ export const AuthProvider = ({ children }) => {
   const registerWithOtp = async (userData) => {
     const res = await API.post('/auth/register', userData);
     const { token: newToken, user: newUser } = res.data;
-    localStorage.setItem('classic_cut_token', newToken);
-    setToken(newToken);
-    setUser(newUser);
+    saveUserSession(newUser, newToken);
     return res.data;
   };
 
@@ -61,9 +103,7 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     const res = await API.post('/auth/login', { email, password });
     const { token: newToken, user: newUser } = res.data;
-    localStorage.setItem('classic_cut_token', newToken);
-    setToken(newToken);
-    setUser(newUser);
+    saveUserSession(newUser, newToken);
     return res.data;
   };
 
@@ -71,9 +111,7 @@ export const AuthProvider = ({ children }) => {
   const googleLogin = async (credential) => {
     const res = await API.post('/auth/google', { credential });
     const { token: newToken, user: newUser } = res.data;
-    localStorage.setItem('classic_cut_token', newToken);
-    setToken(newToken);
-    setUser(newUser);
+    saveUserSession(newUser, newToken);
     return res.data;
   };
 
@@ -81,7 +119,7 @@ export const AuthProvider = ({ children }) => {
   const updateProfile = async (profileData) => {
     const res = await API.put('/auth/profile', profileData);
     if (res.data.user) {
-      setUser(res.data.user);
+      saveUserSession(res.data.user);
     }
     return res.data;
   };
@@ -90,7 +128,7 @@ export const AuthProvider = ({ children }) => {
   const setPassword = async (newPassword) => {
     const res = await API.post('/auth/set-password', { password: newPassword });
     if (res.data.user) {
-      setUser(res.data.user);
+      saveUserSession(res.data.user);
     }
     return res.data;
   };
@@ -107,17 +145,17 @@ export const AuthProvider = ({ children }) => {
     const res = await API.post('/auth/reset-password', { email, otp, newPassword });
     const { token: newToken, user: newUser } = res.data;
     if (newToken) {
-      localStorage.setItem('classic_cut_token', newToken);
-      setToken(newToken);
-      setUser(newUser);
+      saveUserSession(newUser, newToken);
     }
     return res.data;
   };
 
   // 9. Logout
   const logout = () => {
-    localStorage.removeItem('classic_cut_token');
     try {
+      localStorage.removeItem('classic_cut_token');
+      localStorage.removeItem('classic_cut_user');
+      localStorage.removeItem('classic_cut_loyalty');
       sessionStorage.removeItem('classic_cut_token');
     } catch (e) {}
     setToken(null);
@@ -139,28 +177,34 @@ export const AuthProvider = ({ children }) => {
           const data = JSON.parse(e.data);
           if (data.type === 'STAMP_AWARDED') {
             if (user && data.userId === user._id) {
-              setUser((prev) =>
-                prev
-                  ? {
-                      ...prev,
-                      currentStamps: data.currentStamps,
-                      lifetimeVisits: data.lifetimeVisits,
-                      lastStampDate: data.lastStampDate,
-                    }
-                  : prev
-              );
+              setUser((prev) => {
+                if (!prev) return prev;
+                const updated = {
+                  ...prev,
+                  currentStamps: data.currentStamps,
+                  lifetimeVisits: data.lifetimeVisits,
+                  lastStampDate: data.lastStampDate,
+                };
+                try {
+                  localStorage.setItem('classic_cut_user', JSON.stringify(updated));
+                } catch (e) {}
+                return updated;
+              });
             }
           } else if (data.type === 'CUSTOMER_UPDATED') {
             if (user && data.userId === user._id) {
-              setUser((prev) =>
-                prev
-                  ? {
-                      ...prev,
-                      name: data.name || prev.name,
-                      phone: data.phone || prev.phone,
-                    }
-                  : prev
-              );
+              setUser((prev) => {
+                if (!prev) return prev;
+                const updated = {
+                  ...prev,
+                  name: data.name || prev.name,
+                  phone: data.phone || prev.phone,
+                };
+                try {
+                  localStorage.setItem('classic_cut_user', JSON.stringify(updated));
+                } catch (e) {}
+                return updated;
+              });
             }
           }
           // Dispatch global window event for components (StampCard, AdminDashboard)
@@ -182,6 +226,23 @@ export const AuthProvider = ({ children }) => {
         eventSource.close();
       }
     };
+  }, [token, user?._id]);
+
+  // Non-blocking prefetch of loyalty profile into localStorage so 5-Coupon card renders instantly
+  useEffect(() => {
+    if (!token || !user) return;
+    const prefetchLoyalty = async () => {
+      try {
+        const res = await API.get('/loyalty/my-stamps');
+        try {
+          localStorage.setItem('classic_cut_loyalty', JSON.stringify(res.data));
+        } catch (e) {}
+      } catch (err) {
+        // Non-blocking background prefetch
+      }
+    };
+    const timer = setTimeout(prefetchLoyalty, 1000);
+    return () => clearTimeout(timer);
   }, [token, user?._id]);
 
   const isAdmin = user?.role === 'admin' || user?.role === 'superadmin' || user?.email === 'ok8023361@gmail.com';

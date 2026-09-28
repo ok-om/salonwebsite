@@ -22,8 +22,6 @@ const Hero3DCanvas = lazyWithRetry(() =>
 
 gsap.registerPlugin(ScrollTrigger);
 
-import { getDeviceCapabilities } from '../utils/deviceCapability';
-
 export const HeroVideo = ({ onOpenLoyalty, onOpenAdmin, onScrollToExperience, isReady = true }) => {
   const { isAdmin } = useAuth();
   const { config } = useSiteConfig();
@@ -32,28 +30,10 @@ export const HeroVideo = ({ onOpenLoyalty, onOpenAdmin, onScrollToExperience, is
   const audioRef = useRef(null);
   const [isPlayingMusic, setIsPlayingMusic] = useState(false);
 
-  // Smart device capability detection:
-  // On low-end / mobile devices, separating 3D rendering and video decoding saves ~80% GPU/CPU overhead!
-  const [heroViewMode, setHeroViewMode] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const isMobile = window.innerWidth < 860;
-      const cap = getDeviceCapabilities();
-      if (isMobile || cap.isConstrained) {
-        return '3d'; // Default to 3D with static poster on mobile/low-end devices
-      }
-    }
-    return 'both'; // Desktop systems run both concurrently
-  });
-
   // 1. Video Playback optimization
   useEffect(() => {
     const videoEl = videoRef.current;
     if (!videoEl) return;
-
-    if (heroViewMode === '3d') {
-      videoEl.pause();
-      return;
-    }
 
     videoEl.defaultMuted = true;
     videoEl.muted = true;
@@ -66,7 +46,7 @@ export const HeroVideo = ({ onOpenLoyalty, onOpenAdmin, onScrollToExperience, is
       ([entry]) => {
         if (!entry.isIntersecting) {
           videoEl.pause();
-        } else if (heroViewMode !== '3d') {
+        } else {
           videoEl.play().catch(() => {});
         }
       },
@@ -81,7 +61,7 @@ export const HeroVideo = ({ onOpenLoyalty, onOpenAdmin, onScrollToExperience, is
       clearTimeout(startTimer);
       observer.disconnect();
     };
-  }, [heroViewMode]);
+  }, []);
 
 
   const toggleAudio = () => {
@@ -144,7 +124,7 @@ export const HeroVideo = ({ onOpenLoyalty, onOpenAdmin, onScrollToExperience, is
           width: '100%',
           height: '100%',
           objectFit: 'cover',
-          opacity: heroViewMode === '3d' ? 0 : 0.95,
+          opacity: 0.95,
           filter: 'contrast(1.06) brightness(0.98)',
           zIndex: 1,
           transition: 'opacity 0.4s ease',
@@ -313,95 +293,11 @@ export const HeroVideo = ({ onOpenLoyalty, onOpenAdmin, onScrollToExperience, is
             </div>
           </div>
 
-          {/* Column B: Interactive 3D Showcase with Low-End Device Mode Switcher */}
-          <div className="hero-3d-col" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            {/* Low-End / Mobile Smart Performance Switcher */}
-            <div
-              style={{
-                display: 'inline-flex',
-                background: 'rgba(15, 17, 24, 0.92)',
-                border: '1px solid rgba(212, 175, 55, 0.45)',
-                borderRadius: '30px',
-                padding: '4px',
-                gap: '4px',
-                marginBottom: '1rem',
-                boxShadow: '0 4px 16px rgba(0, 0, 0, 0.6)',
-                backdropFilter: 'blur(12px)',
-                WebkitBackdropFilter: 'blur(12px)',
-                zIndex: 15,
-              }}
-            >
-              <button
-                type="button"
-                onClick={() => setHeroViewMode('3d')}
-                style={{
-                  padding: '0.35rem 0.85rem',
-                  borderRadius: '20px',
-                  border: 'none',
-                  background: heroViewMode === '3d' ? 'var(--gold-gradient)' : 'transparent',
-                  color: heroViewMode === '3d' ? '#0b0c10' : '#e2e8f0',
-                  fontWeight: heroViewMode === '3d' ? 800 : 600,
-                  fontSize: '0.78rem',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.35rem',
-                  transition: 'all 0.2s ease',
-                  touchAction: 'manipulation',
-                }}
-              >
-                <span>💇 3D Hair Model</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setHeroViewMode('video')}
-                style={{
-                  padding: '0.35rem 0.85rem',
-                  borderRadius: '20px',
-                  border: 'none',
-                  background: heroViewMode === 'video' ? 'var(--gold-gradient)' : 'transparent',
-                  color: heroViewMode === 'video' ? '#0b0c10' : '#e2e8f0',
-                  fontWeight: heroViewMode === 'video' ? 800 : 600,
-                  fontSize: '0.78rem',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.35rem',
-                  transition: 'all 0.2s ease',
-                  touchAction: 'manipulation',
-                }}
-              >
-                <span>🎬 Salon Video</span>
-              </button>
-            </div>
-
-            {heroViewMode !== 'video' ? (
-              <Suspense fallback={<div style={{ minHeight: '190px' }} />}>
-                <Hero3DCanvas isReady={isReady} />
-              </Suspense>
-            ) : (
-              <div
-                style={{
-                  width: '100%',
-                  maxWidth: '380px',
-                  borderRadius: 'var(--radius-lg)',
-                  border: '1.5px solid rgba(212, 175, 55, 0.45)',
-                  background: 'rgba(15, 17, 24, 0.85)',
-                  padding: '1.25rem',
-                  textAlign: 'center',
-                  boxShadow: '0 12px 35px rgba(0, 0, 0, 0.7)',
-                  backdropFilter: 'blur(10px)',
-                  WebkitBackdropFilter: 'blur(10px)',
-                }}
-              >
-                <div style={{ color: 'var(--gold-primary)', fontWeight: 700, fontSize: '0.92rem', marginBottom: '0.3rem' }}>
-                  🎬 Cinema Mode Active
-                </div>
-                <div style={{ fontSize: '0.78rem', color: '#cbd5e1', lineHeight: '1.4' }}>
-                  3D WebGL engine paused to grant 100% device speed to high-definition video playback.
-                </div>
-              </div>
-            )}
+          {/* Column B: Interactive 3D Showcase */}
+          <div className="hero-3d-col">
+            <Suspense fallback={<div style={{ minHeight: '190px' }} />}>
+              <Hero3DCanvas isReady={isReady} />
+            </Suspense>
           </div>
         </div>
 

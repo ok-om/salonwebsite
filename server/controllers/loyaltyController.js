@@ -234,36 +234,54 @@ export const getVisitHistory = async (req, res) => {
 // 4. User: Get Current User's Loyalty Profile, 45-Day Stamp Inactivity Check & Coupons
 export const getMyLoyalty = async (req, res) => {
   try {
-    // Purge any expired coupons (>35 days) or redeemed coupons permanently from database
-    await OfferCoupon.deleteMany({
+    // Asynchronous background purge of expired/redeemed coupons (non-blocking)
+    OfferCoupon.deleteMany({
       $or: [
         { isRedeemed: true },
         { expiresAt: { $lt: new Date() } },
       ],
-    });
+    }).catch(() => {});
 
     const user = await User.findById(req.user._id).select('name email phone currentStamps lifetimeVisits lastStampDate');
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
     const decayInfo = await applyStampInactivityCheck(user);
 
-    const coupons = await OfferCoupon.find({
-      user: req.user._id,
-      isRedeemed: { $ne: true },
-      expiresAt: { $gt: new Date() },
-    }).sort({ createdAt: -1 });
-
-    const recentVisits = await VisitLog.find({ user: req.user._id }).sort({ visitedAt: -1 }).limit(5);
+    const [coupons, recentVisits] = await Promise.all([
+      OfferCoupon.find({
+        user: req.user._id,
+        isRedeemed: { $ne: true },
+        expiresAt: { $gt: new Date() },
+      })
+        .sort({ createdAt: -1 })
+        .lean(),
+      VisitLog.find({ user: req.user._id })
+        .sort({ visitedAt: -1 })
+        .limit(5)
+        .lean(),
+    ]);
 
     res.status(200).json({
-      user,
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        currentStamps: user.currentStamps,
+        lifetimeVisits: user.lifetimeVisits,
+        lastStampDate: user.lastStampDate,
+      },
       currentStamps: user.currentStamps,
       lifetimeVisits: user.lifetimeVisits,
       lastStampDate: user.lastStampDate,
       daysUntilStampDecay: decayInfo.daysUntilDecay,
-      stampsNeeded: 5 - user.currentStamps,
+      stampsNeeded: Math.max(0, 5 - user.currentStamps),
       coupons,
       recentVisits,
     });
   } catch (error) {
+    console.error('Get Loyalty Error:', error);
     res.status(500).json({ message: 'Failed to fetch loyalty status' });
   }
 };
