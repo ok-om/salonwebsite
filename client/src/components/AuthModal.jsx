@@ -3,9 +3,9 @@ import { useAuth } from '../context/AuthContext';
 import { Mail, Lock, User, Phone, KeyRound, Sparkles, X, CheckCircle, AlertCircle, RotateCcw } from 'lucide-react';
 
 export const AuthModal = ({ isOpen, onClose, onAuthSuccess }) => {
-  const { requestOtp, registerWithOtp, login, googleLogin, updateProfile } = useAuth();
+  const { requestOtp, registerWithOtp, login, googleLogin, updateProfile, requestForgotPasswordOtp, resetPasswordWithOtp } = useAuth();
 
-  const [mode, setMode] = useState('login'); // 'login' | 'register'
+  const [mode, setMode] = useState('login'); // 'login' | 'register' | 'forgot'
   const [step, setStep] = useState(1); // 1: form, 2: otp verification, 3: mobile number
 
   // Form State
@@ -13,6 +13,8 @@ export const AuthModal = ({ isOpen, onClose, onAuthSuccess }) => {
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [otp, setOtp] = useState('');
 
   const [loading, setLoading] = useState(false);
@@ -24,6 +26,7 @@ export const AuthModal = ({ isOpen, onClose, onAuthSuccess }) => {
   // Reset states when modal is reopened/closed
   useEffect(() => {
     if (!isOpen) {
+      setMode('login');
       setStep(1);
       setError('');
       setSuccessMsg('');
@@ -33,6 +36,8 @@ export const AuthModal = ({ isOpen, onClose, onAuthSuccess }) => {
       setEmail('');
       setPhone('');
       setPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
       setOtp('');
     }
   }, [isOpen]);
@@ -84,7 +89,7 @@ export const AuthModal = ({ isOpen, onClose, onAuthSuccess }) => {
     }
     setLoading(true);
     try {
-      const data = await requestOtp(email);
+      const data = await requestOtp(email.trim());
       setSuccessMsg(data?.message || 'A 6-digit verification code has been sent to your email inbox!');
       setResendCooldown(30);
       setStep(2);
@@ -95,18 +100,81 @@ export const AuthModal = ({ isOpen, onClose, onAuthSuccess }) => {
     }
   };
 
-  // Handle Resend OTP
+  // Step 1 for Forgot Password: Request Reset OTP
+  const handleRequestForgotOtp = async (e) => {
+    e.preventDefault();
+    setError('');
+    setSuccessMsg('');
+    if (!email || !email.trim()) {
+      setError('Please enter your registered email address.');
+      return;
+    }
+    setLoading(true);
+    try {
+      const data = await requestForgotPasswordOtp(email.trim());
+      setSuccessMsg(data?.message || 'A 6-digit password reset code has been sent to your email inbox!');
+      setResendCooldown(30);
+      setStep(2);
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to send password reset code. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Step 2 for Forgot Password: Confirm OTP & Reset Password
+  const handleResetPassword = async (e) => {
+    e.preventDefault();
+    setError('');
+    const cleanOtp = String(otp || '').trim().replace(/[^0-9]/g, '');
+    if (!cleanOtp || cleanOtp.length !== 6) {
+      setError('Please enter the 6-digit code sent to your email.');
+      return;
+    }
+    if (!newPassword || newPassword.length < 6) {
+      setError('New password must be at least 6 characters long.');
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setError('Passwords do not match. Please enter the same password in both fields.');
+      return;
+    }
+    setLoading(true);
+    try {
+      const res = await resetPasswordWithOtp({
+        email: email.trim(),
+        otp: cleanOtp,
+        newPassword,
+      });
+      setSuccessMsg('Password reset successful! Logging you in...');
+      setTimeout(() => {
+        onAuthSuccess?.(res?.user);
+        onClose();
+      }, 500);
+    } catch (err) {
+      setError(err.response?.data?.message || 'Password reset failed. Please check the OTP code.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handle Resend OTP (Handles both Registration and Forgot Password)
   const handleResendOtp = async () => {
     if (resendCooldown > 0 || resendLoading) return;
     setError('');
     setSuccessMsg('');
     setResendLoading(true);
     try {
-      const data = await requestOtp(email);
-      setSuccessMsg(data?.message || 'A fresh 6-digit verification code has been sent to your email inbox!');
+      if (mode === 'forgot') {
+        const data = await requestForgotPasswordOtp(email.trim());
+        setSuccessMsg(data?.message || 'A fresh 6-digit reset code has been sent to your email inbox!');
+      } else {
+        const data = await requestOtp(email.trim());
+        setSuccessMsg(data?.message || 'A fresh 6-digit verification code has been sent to your email inbox!');
+      }
       setResendCooldown(30);
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to resend OTP. Please try again.');
+      setError(err.response?.data?.message || 'Failed to resend code. Please try again.');
     } finally {
       setResendLoading(false);
     }
@@ -140,7 +208,7 @@ export const AuthModal = ({ isOpen, onClose, onAuthSuccess }) => {
     }
   };
 
-  // Handle Save Mobile Number (Step 3)
+  // Handle Save Mobile Number (Step 3 optional)
   const handleSavePhoneNumber = async (e) => {
     e.preventDefault();
     const cleanPhone = phone.replace(/[^0-9]/g, '');
@@ -156,7 +224,7 @@ export const AuthModal = ({ isOpen, onClose, onAuthSuccess }) => {
       setTimeout(() => {
         onAuthSuccess?.();
         onClose();
-      }, 600);
+      }, 500);
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to save mobile number.');
     } finally {
@@ -178,17 +246,9 @@ export const AuthModal = ({ isOpen, onClose, onAuthSuccess }) => {
       setError('');
       try {
         const res = await googleLogin(response.credential);
-        const isNewUser = Boolean(res?.isNewUser || res?.user?.isNewUser);
-        const needsPhone = Boolean(res?.user?.needsPhone && !res?.user?.phone);
-
-        // ONLY brand-new users that don't have a phone yet are prompted for step 3
-        if (isNewUser && needsPhone) {
-          setStep(3);
-        } else {
-          // Existing users (or users with phone) ALWAYS CLOSE THE MODAL IMMEDIATELY!
-          onAuthSuccess?.(res?.user);
-          onClose();
-        }
+        // Seamlessly close the modal immediately on successful Google auth
+        onAuthSuccess?.(res?.user);
+        onClose();
       } catch (err) {
         setError('Google Sign-In failed: ' + (err.response?.data?.message || err.message));
       } finally {
@@ -346,6 +406,8 @@ export const AuthModal = ({ isOpen, onClose, onAuthSuccess }) => {
           <h3 style={{ fontSize: '1.5rem', marginBottom: '0.25rem' }}>
             {step === 3
               ? 'Enter Your Mobile Number'
+              : mode === 'forgot'
+              ? 'Reset Your Password'
               : mode === 'login'
               ? 'Welcome Back'
               : 'Join VIP Grooming Club'}
@@ -353,6 +415,8 @@ export const AuthModal = ({ isOpen, onClose, onAuthSuccess }) => {
           <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
             {step === 3
               ? 'Link your phone number to receive appointment confirmations & loyalty stamps'
+              : mode === 'forgot'
+              ? 'Recover your account with a secure 6-digit email OTP'
               : mode === 'login'
               ? 'Access your 5-Coupon Card, appointment history & 30% to 40% OFF rewards'
               : 'Register to unlock automated visit stamps & 30% to 40% OFF grooming offers'}
@@ -491,6 +555,35 @@ export const AuthModal = ({ isOpen, onClose, onAuthSuccess }) => {
               />
             </div>
 
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '-0.35rem', marginBottom: '1.1rem' }}>
+              <button
+                type="button"
+                onClick={() => {
+                  setMode('forgot');
+                  setStep(1);
+                  setError('');
+                  setSuccessMsg('');
+                  setOtp('');
+                  setPassword('');
+                  setNewPassword('');
+                  setConfirmPassword('');
+                }}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: 'var(--gold-primary)',
+                  fontSize: '0.8rem',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  textDecoration: 'underline',
+                  padding: 0,
+                  touchAction: 'manipulation',
+                }}
+              >
+                Forgot Password?
+              </button>
+            </div>
+
             <button
               type="submit"
               disabled={loading}
@@ -500,6 +593,202 @@ export const AuthModal = ({ isOpen, onClose, onAuthSuccess }) => {
               {loading ? 'Authenticating...' : 'Sign In To Account'}
             </button>
           </form>
+        ) : mode === 'forgot' ? (
+          /* ========================================================================= */
+          /* FORGOT PASSWORD WITH EMAIL OTP FLOW */
+          /* ========================================================================= */
+          step === 1 ? (
+            <form onSubmit={handleRequestForgotOtp}>
+              <div
+                style={{
+                  background: 'rgba(212, 175, 55, 0.08)',
+                  border: '1px solid rgba(212, 175, 55, 0.25)',
+                  padding: '0.75rem 1rem',
+                  borderRadius: '8px',
+                  marginBottom: '1.25rem',
+                  fontSize: '0.82rem',
+                  color: '#cbd5e1',
+                  lineHeight: 1.5,
+                }}
+              >
+                Enter your registered email address below. We'll send a <strong>6-digit OTP code</strong> to reset your password.
+              </div>
+
+              <div className="input-group">
+                <label className="input-label">Registered Email Address</label>
+                <input
+                  type="email"
+                  required
+                  placeholder="name@example.com"
+                  className="input-field"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="btn btn-primary"
+                style={{ width: '100%', marginBottom: '0.75rem' }}
+              >
+                {loading ? 'Sending Code...' : 'Send 6-Digit Reset Code'}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setMode('login');
+                  setError('');
+                  setSuccessMsg('');
+                }}
+                className="btn btn-secondary btn-sm"
+                style={{ width: '100%' }}
+              >
+                Back to Sign In
+              </button>
+            </form>
+          ) : (
+            <form onSubmit={handleResetPassword}>
+              <div
+                style={{
+                  background: 'rgba(212, 175, 55, 0.08)',
+                  border: '1px solid rgba(212, 175, 55, 0.25)',
+                  padding: '0.75rem 1rem',
+                  borderRadius: '8px',
+                  marginBottom: '1.25rem',
+                  textAlign: 'center',
+                }}
+              >
+                <div style={{ color: 'var(--gold-primary)', fontWeight: 600, fontSize: '0.85rem' }}>
+                  📩 Check Your Email Inbox
+                </div>
+                <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '0.25rem' }}>
+                  Enter the 6-digit reset code sent to <strong style={{ color: '#f4f4f6' }}>{email}</strong>
+                </div>
+              </div>
+
+              <div className="input-group" style={{ textAlign: 'center' }}>
+                <label className="input-label">6-Digit Reset OTP Code</label>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  autoComplete="one-time-code"
+                  maxLength={6}
+                  required
+                  placeholder="123456"
+                  className="input-field"
+                  style={{
+                    letterSpacing: '0.4em',
+                    fontSize: '1.5rem',
+                    textAlign: 'center',
+                    fontFamily: 'monospace',
+                  }}
+                  value={otp}
+                  onChange={(e) => {
+                    const val = e.target.value.replace(/[^0-9]/g, '').slice(0, 6);
+                    setOtp(val);
+                    if (error) setError('');
+                  }}
+                />
+              </div>
+
+              <div className="input-group">
+                <label className="input-label">New Password (Min 6 Characters)</label>
+                <input
+                  type="password"
+                  required
+                  minLength={6}
+                  placeholder="Enter new strong password"
+                  className="input-field"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                />
+              </div>
+
+              <div className="input-group">
+                <label className="input-label">Confirm New Password</label>
+                <input
+                  type="password"
+                  required
+                  minLength={6}
+                  placeholder="Re-enter new password"
+                  className="input-field"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                />
+              </div>
+
+              {/* Resend OTP Button with Countdown */}
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  margin: '0.5rem 0 1rem',
+                  fontSize: '0.82rem',
+                }}
+              >
+                <span style={{ color: 'var(--text-muted)' }}>Didn't receive code?</span>
+                {resendCooldown > 0 ? (
+                  <span
+                    style={{
+                      color: 'var(--gold-primary)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.35rem',
+                      fontWeight: 600,
+                    }}
+                  >
+                    <RotateCcw size={13} />
+                    Resend in {resendCooldown}s
+                  </span>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handleResendOtp}
+                    disabled={resendLoading}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      color: 'var(--gold-primary)',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      textDecoration: 'underline',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.35rem',
+                    }}
+                  >
+                    <RotateCcw size={13} />
+                    <span>{resendLoading ? 'Resending...' : 'Resend Code'}</span>
+                  </button>
+                )}
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="btn btn-primary"
+                style={{ width: '100%', marginBottom: '0.75rem' }}
+              >
+                {loading ? 'Resetting Password...' : 'Reset Password & Sign In'}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setMode('login');
+                  setError('');
+                  setSuccessMsg('');
+                }}
+                className="btn btn-secondary btn-sm"
+                style={{ width: '100%' }}
+              >
+                Cancel / Back to Sign In
+              </button>
+            </form>
+          )
         ) : (
           /* ========================================================================= */
           /* REGISTER WITH OTP FORM */
@@ -707,10 +996,33 @@ export const AuthModal = ({ isOpen, onClose, onAuthSuccess }) => {
           )
         )}
 
+        {/* Render Cold-Start Server Wakeup Notice */}
+        {loading && (
+          <div
+            style={{
+              textAlign: 'center',
+              fontSize: '0.78rem',
+              color: 'var(--gold-primary)',
+              background: 'rgba(212, 175, 55, 0.08)',
+              border: '1px solid rgba(212, 175, 55, 0.25)',
+              borderRadius: '8px',
+              padding: '0.5rem',
+              margin: '0.75rem 0',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '0.4rem',
+            }}
+          >
+            <Sparkles size={14} />
+            <span>Connecting to secure server... (If Render was asleep, waking up takes ~15-25s)</span>
+          </div>
+        )}
+
         {/* ========================================================================= */}
-        {/* GOOGLE SIGN-IN & FOOTER (HIDDEN DURING STEP 3) */}
+        {/* GOOGLE SIGN-IN & FOOTER (HIDDEN DURING STEP 3 & FORGOT PASSWORD) */}
         {/* ========================================================================= */}
-        {step !== 3 && (
+        {step !== 3 && mode !== 'forgot' && (
           <>
             {/* Divider */}
             <div

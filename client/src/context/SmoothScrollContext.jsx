@@ -10,6 +10,7 @@ const SmoothScrollContext = createContext({
   scrollTo: () => {},
   stopScroll: () => {},
   startScroll: () => {},
+  forceUnlock: () => {},
 });
 
 export const useSmoothScroll = () => useContext(SmoothScrollContext);
@@ -91,48 +92,58 @@ export const SmoothScrollProvider = ({ children }) => {
   };
 
   const lockCountRef = useRef(0);
-  const scrollYRef = useRef(0);
+
+  // Force clean all scroll lock styles from body and html
+  const resetScrollStyles = () => {
+    lockCountRef.current = 0;
+    document.body.classList.remove('lenis-stopped');
+    document.body.style.position = '';
+    document.body.style.top = '';
+    document.body.style.left = '';
+    document.body.style.right = '';
+    document.body.style.width = '';
+    document.body.style.overflow = '';
+    document.documentElement.style.overflow = '';
+    lenisRef.current?.start();
+  };
 
   const stopScroll = () => {
-    lockCountRef.current += 1;
-    if (lockCountRef.current === 1) {
-      scrollYRef.current = window.scrollY || window.pageYOffset || 0;
-      lenisRef.current?.stop();
-      document.body.classList.add('lenis-stopped');
-      document.body.style.position = 'fixed';
-      document.body.style.top = `-${scrollYRef.current}px`;
-      document.body.style.left = '0';
-      document.body.style.right = '0';
-      document.body.style.width = '100%';
-      document.body.style.overflow = 'hidden';
-      document.documentElement.style.overflow = 'hidden';
-    }
+    lockCountRef.current = Math.max(0, lockCountRef.current) + 1;
+    lenisRef.current?.stop();
+    document.body.classList.add('lenis-stopped');
+    // Lock background scroll cleanly without breaking native touch kinetic physics
+    document.body.style.overflow = 'hidden';
+    document.documentElement.style.overflow = 'hidden';
   };
 
   const startScroll = () => {
     if (lockCountRef.current > 0) {
       lockCountRef.current -= 1;
     }
-    if (lockCountRef.current === 0) {
-      const top = document.body.style.top;
-      document.body.classList.remove('lenis-stopped');
-      document.body.style.position = '';
-      document.body.style.top = '';
-      document.body.style.left = '';
-      document.body.style.right = '';
-      document.body.style.width = '';
-      document.body.style.overflow = '';
-      document.documentElement.style.overflow = '';
-      if (top) {
-        const y = Math.abs(parseInt(top, 10)) || scrollYRef.current || 0;
-        window.scrollTo(0, y);
-        if (lenisRef.current) {
-          lenisRef.current.scrollTo(y, { immediate: true });
-        }
-      }
-      lenisRef.current?.start();
+    if (lockCountRef.current <= 0) {
+      resetScrollStyles();
     }
   };
+
+  // Failsafe auto-recovery: Listen for route/escape/history changes to guarantee page never stays frozen
+  useEffect(() => {
+    const handleSafetyUnlock = () => {
+      // Check if any modal or drawer is actively in DOM
+      const hasActiveModal = document.querySelector(
+        '[role="dialog"], .modal-overlay, .mobile-drawer-overlay, .service-modal-backdrop'
+      );
+      if (!hasActiveModal) {
+        resetScrollStyles();
+      }
+    };
+
+    window.addEventListener('popstate', handleSafetyUnlock);
+    window.addEventListener('hashchange', handleSafetyUnlock);
+    return () => {
+      window.removeEventListener('popstate', handleSafetyUnlock);
+      window.removeEventListener('hashchange', handleSafetyUnlock);
+    };
+  }, []);
 
   return (
     <SmoothScrollContext.Provider
@@ -141,6 +152,7 @@ export const SmoothScrollProvider = ({ children }) => {
         scrollTo,
         stopScroll,
         startScroll,
+        forceUnlock: resetScrollStyles,
       }}
     >
       {children}

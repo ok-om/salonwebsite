@@ -851,7 +851,10 @@ export const StampCard = ({
                   )}
 
                   <button
-                    onClick={() => {
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
                       logout();
                       onClose();
                     }}
@@ -863,8 +866,10 @@ export const StampCard = ({
                       color: '#ff8080',
                       borderColor: 'rgba(229, 62, 62, 0.35)',
                       justifyContent: 'center',
+                      cursor: 'pointer',
+                      touchAction: 'manipulation',
                     }}
-                    title="Log Out of Account"
+                    aria-label="Logout"
                   >
                     <LogOut size={16} />
                     <span>Logout</span>

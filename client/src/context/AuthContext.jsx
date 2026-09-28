@@ -96,9 +96,30 @@ export const AuthProvider = ({ children }) => {
   };
   const setAdminPassword = setPassword;
 
-  // 7. Logout
+  // 7. Request Forgot Password OTP
+  const requestForgotPasswordOtp = async (email) => {
+    const res = await API.post('/auth/forgot-password-otp', { email });
+    return res.data;
+  };
+
+  // 8. Reset Password with OTP
+  const resetPasswordWithOtp = async ({ email, otp, newPassword }) => {
+    const res = await API.post('/auth/reset-password', { email, otp, newPassword });
+    const { token: newToken, user: newUser } = res.data;
+    if (newToken) {
+      localStorage.setItem('classic_cut_token', newToken);
+      setToken(newToken);
+      setUser(newUser);
+    }
+    return res.data;
+  };
+
+  // 9. Logout
   const logout = () => {
     localStorage.removeItem('classic_cut_token');
+    try {
+      sessionStorage.removeItem('classic_cut_token');
+    } catch (e) {}
     setToken(null);
     setUser(null);
   };
@@ -182,6 +203,8 @@ export const AuthProvider = ({ children }) => {
         updateProfile,
         setPassword,
         setAdminPassword,
+        requestForgotPasswordOtp,
+        resetPasswordWithOtp,
         logout,
         refreshUser: loadUser,
       }}

@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useSiteConfig } from '../context/SiteConfigContext';
+import { useSmoothScroll } from '../context/SmoothScrollContext';
 import { Scissors, User as UserIcon, Menu, X, Phone, MessageSquare, ShieldCheck, MapPin, Clock, LogOut } from 'lucide-react';
 
 export const Navbar = ({ onOpenAuth, onOpenAdmin, onOpenLoyalty, onOpenProfile }) => {
   const { user, isAdmin, isAuthenticated, logout } = useAuth();
   const { config } = useSiteConfig();
+  const { stopScroll, startScroll } = useSmoothScroll();
   const [scrolled, setScrolled] = useState(false);
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
 
@@ -25,17 +27,17 @@ export const Navbar = ({ onOpenAuth, onOpenAdmin, onOpenLoyalty, onOpenProfile }
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Prevent background scroll when mobile drawer is open
+  // Prevent background scroll cleanly when mobile drawer is open
   useEffect(() => {
     if (mobileDrawerOpen) {
-      document.body.style.overflow = 'hidden';
+      stopScroll?.();
     } else {
-      document.body.style.overflow = 'unset';
+      startScroll?.();
     }
     return () => {
-      document.body.style.overflow = 'unset';
+      startScroll?.();
     };
-  }, [mobileDrawerOpen]);
+  }, [mobileDrawerOpen, stopScroll, startScroll]);
 
   const scrollToSection = (id) => {
     setMobileDrawerOpen(false);
@@ -238,10 +240,21 @@ export const Navbar = ({ onOpenAuth, onOpenAdmin, onOpenLoyalty, onOpenProfile }
                 </button>
 
                 <button
-                  onClick={logout}
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    logout();
+                  }}
                   className="btn btn-secondary btn-sm"
-                  style={{ padding: '0.42rem 0.65rem', fontSize: '0.78rem', borderRadius: '8px' }}
-                  title="Logout"
+                  style={{
+                    padding: '0.42rem 0.65rem',
+                    fontSize: '0.78rem',
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+                    touchAction: 'manipulation',
+                  }}
+                  aria-label="Logout"
                 >
                   <LogOut size={14} />
                 </button>
@@ -504,12 +517,23 @@ export const Navbar = ({ onOpenAuth, onOpenAdmin, onOpenLoyalty, onOpenProfile }
                   </div>
 
                   <button
-                    onClick={() => {
-                      setMobileDrawerOpen(false);
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
                       logout();
+                      setMobileDrawerOpen(false);
                     }}
                     className="btn btn-secondary btn-sm"
-                    style={{ width: '100%', padding: '0.38rem', fontSize: '0.74rem', color: '#ff8080' }}
+                    style={{
+                      width: '100%',
+                      padding: '0.45rem',
+                      fontSize: '0.8rem',
+                      color: '#ff8080',
+                      cursor: 'pointer',
+                      touchAction: 'manipulation',
+                    }}
+                    aria-label="Logout"
                   >
                     Logout
                   </button>

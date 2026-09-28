@@ -8,6 +8,8 @@ import {
   updateProfile,
   setPassword,
   setAdminPassword,
+  requestForgotPasswordOtp,
+  resetPasswordWithOtp,
 } from '../controllers/authController.js';
 import { protect } from '../middleware/authMiddleware.js';
 import { authLimiter, otpLimiter } from '../middleware/rateLimiter.js';
@@ -18,6 +20,8 @@ router.post('/request-otp', otpLimiter, requestOtp);
 router.post('/register', authLimiter, registerWithOtp);
 router.post('/login', authLimiter, login);
 router.post('/google', authLimiter, googleAuth);
+router.post('/forgot-password-otp', otpLimiter, requestForgotPasswordOtp);
+router.post('/reset-password', authLimiter, resetPasswordWithOtp);
 router.get('/profile', protect, getProfile);
 router.put('/profile', protect, updateProfile);
 router.post('/set-password', protect, setPassword);

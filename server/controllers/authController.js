@@ -435,3 +435,145 @@ export const setPassword = async (req, res) => {
 
 export const setAdminPassword = setPassword;
 
+// 8. Request Password Reset OTP
+export const requestForgotPasswordOtp = async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      return res.status(400).json({ message: 'Email is required' });
+    }
+
+    const cleanEmail = email.toLowerCase().trim();
+
+    // Verify user exists in database
+    const user = await User.findOne({ email: cleanEmail });
+    if (!user) {
+      return res.status(404).json({
+        message: 'No account registered with this email address. Please check your email or register a new account.',
+      });
+    }
+
+    // Generate random 6-digit OTP
+    const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+
+    // Invalidate existing OTPs for this email
+    await Otp.deleteMany({ email: cleanEmail });
+
+    // Store new OTP with 10-minute expiry
+    await Otp.create({
+      email: cleanEmail,
+      otp: otpCode,
+    });
+
+    console.log(`🔑 [PASSWORD RESET OTP] Generated for ${cleanEmail}: ${otpCode}`);
+
+    // Send email with custom title
+    const emailResult = await sendOtpEmail(cleanEmail, otpCode, 'Password Reset Code');
+    if (!emailResult.success) {
+      console.error(`❌ [PASSWORD RESET OTP] Outbound email failed for ${cleanEmail}: ${emailResult.error}`);
+      await Otp.deleteMany({ email: cleanEmail });
+      return res.status(500).json({
+        message: 'Failed to deliver password reset code to your email. Please try again later.',
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'A 6-digit password reset code has been sent to your email inbox.',
+    });
+  } catch (error) {
+    console.error('Request Forgot Password OTP Error:', error);
+    res.status(500).json({ message: 'Failed to process request: ' + error.message });
+  }
+};
+
+// 9. Reset Password using Email OTP
+export const resetPasswordWithOtp = async (req, res) => {
+  try {
+    const { email, otp, newPassword } = req.body;
+
+    if (!email || !otp || !newPassword) {
+      return res.status(400).json({ message: 'Email, OTP, and new password are required' });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({ message: 'Password must be at least 6 characters long' });
+    }
+
+    const cleanEmail = email.toLowerCase().trim();
+    const cleanOtp = String(otp || '').trim().replace(/[^0-9]/g, '');
+
+    if (cleanOtp.length !== 6) {
+      return res.status(400).json({ message: 'Please enter a valid 6-digit OTP code' });
+    }
+
+    // Verify OTP against active unexpired OTP records
+    const matchingOtp = await Otp.findOne({
+      email: cleanEmail,
+      otp: cleanOtp,
+      expiresAt: { $gt: new Date() },
+    });
+
+    if (!matchingOtp) {
+      const latestOtp = await Otp.findOne({ email: cleanEmail }).sort({ createdAt: -1 });
+      if (!latestOtp) {
+        return res.status(400).json({
+          message: 'No reset request found for this email. Please request a new code.',
+        });
+      }
+      if (new Date() > new Date(latestOtp.expiresAt)) {
+        return res.status(400).json({
+          message: 'Your reset code has expired. Please request a fresh code.',
+        });
+      }
+      return res.status(400).json({
+        message: 'Incorrect verification code. Please check your email and try again.',
+      });
+    }
+
+    const user = await User.findOne({ email: cleanEmail });
+    if (!user) {
+      return res.status(404).json({ message: 'User account not found' });
+    }
+
+    // Set new password (pre-save hook will hash it with bcrypt)
+    user.password = newPassword;
+    user.isVerified = true;
+    if (user.isDeleted) {
+      user.isDeleted = false;
+      user.deletedAt = null;
+      user.restoreExpiresAt = null;
+      user.currentStamps = 0;
+      user.archivedStamps = 0;
+    }
+    await user.save();
+
+    // Clean up OTP
+    await Otp.deleteMany({ email: cleanEmail });
+
+    // Automatically issue fresh JWT login token
+    const token = generateToken(user._id);
+
+    res.status(200).json({
+      success: true,
+      message: 'Password reset successfully! You are now logged in.',
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone || '',
+        role: user.role,
+        currentStamps: user.currentStamps,
+        lifetimeVisits: user.lifetimeVisits,
+        hasPassword: true,
+        needsPasswordSetup: false,
+        needsAdminPassword: false,
+      },
+      token,
+    });
+  } catch (error) {
+    console.error('Reset Password Error:', error);
+    res.status(500).json({ message: 'Password reset failed: ' + error.message });
+  }
+};
+

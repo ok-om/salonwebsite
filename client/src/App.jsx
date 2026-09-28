@@ -47,6 +47,13 @@ const MainContent = ({ isLoading }) => {
     }
   }, [authModalOpen, stampCardOpen, adminDashboardOpen]);
 
+  // Auto-dismiss auth modal when authenticated (guarantees modal cuts from screen after Google or OTP login)
+  React.useEffect(() => {
+    if (isAuthenticated) {
+      setAuthModalOpen(false);
+    }
+  }, [isAuthenticated]);
+
   const scrollToHaircuts = () => {
     scrollTo('#haircuts', { offset: -65 });
   };

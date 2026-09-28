@@ -2030,14 +2030,15 @@ export const AdminDashboard = ({ isOpen, onClose }) => {
             style={{
               position: 'fixed',
               inset: 0,
-              background: 'rgba(0, 0, 0, 0.82)',
+              background: 'rgba(0, 0, 0, 0.85)',
               backdropFilter: 'blur(8px)',
               WebkitBackdropFilter: 'blur(8px)',
               zIndex: 99999,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              padding: '1.25rem',
+              padding: 'clamp(0.5rem, 3vw, 1.25rem)',
+              boxSizing: 'border-box',
             }}
             onClick={() => !deleteLoading && setCustomerToDelete(null)}
           >
@@ -2047,9 +2048,10 @@ export const AdminDashboard = ({ isOpen, onClose }) => {
                 border: '1px solid rgba(197, 34, 34, 0.4)',
                 boxShadow: '0 20px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(197, 34, 34, 0.2)',
                 borderRadius: 'var(--radius-lg)',
-                maxWidth: '480px',
+                maxWidth: '460px',
                 width: '100%',
-                padding: '2rem',
+                padding: 'clamp(1.1rem, 4vw, 1.75rem)',
+                boxSizing: 'border-box',
                 color: '#ffffff',
                 position: 'relative',
               }}
@@ -2109,13 +2111,28 @@ export const AdminDashboard = ({ isOpen, onClose }) => {
                 </p>
               </div>
 
-              <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
+              <div
+                style={{
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  gap: '0.65rem',
+                  width: '100%',
+                  marginTop: '1.25rem',
+                }}
+              >
                 <button
                   type="button"
                   disabled={deleteLoading}
                   onClick={() => setCustomerToDelete(null)}
                   className="btn btn-secondary"
-                  style={{ flex: 1 }}
+                  style={{
+                    flex: '1 1 110px',
+                    minWidth: '100px',
+                    padding: '0.65rem 0.85rem',
+                    fontSize: '0.85rem',
+                    justifyContent: 'center',
+                    touchAction: 'manipulation',
+                  }}
                 >
                   Cancel
                 </button>
@@ -2125,7 +2142,8 @@ export const AdminDashboard = ({ isOpen, onClose }) => {
                   onClick={handleConfirmDeleteCustomer}
                   className="btn"
                   style={{
-                    flex: 1.3,
+                    flex: '1.2 1 140px',
+                    minWidth: '130px',
                     background: '#c52222',
                     borderColor: '#ff4d4d',
                     color: '#ffffff',
@@ -2133,6 +2151,9 @@ export const AdminDashboard = ({ isOpen, onClose }) => {
                     alignItems: 'center',
                     justifyContent: 'center',
                     gap: '0.4rem',
+                    padding: '0.65rem 0.85rem',
+                    fontSize: '0.85rem',
+                    touchAction: 'manipulation',
                   }}
                 >
                   {deleteLoading ? (
@@ -2391,7 +2412,8 @@ export const AdminDashboard = ({ isOpen, onClose }) => {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              padding: '1.25rem',
+              padding: 'clamp(0.5rem, 3vw, 1.25rem)',
+              boxSizing: 'border-box',
             }}
             onClick={() => !addAdminLoading && setShowAddAdminModal(false)}
           >
@@ -2401,9 +2423,10 @@ export const AdminDashboard = ({ isOpen, onClose }) => {
                 border: '1px solid rgba(212, 175, 55, 0.4)',
                 boxShadow: '0 25px 60px rgba(0, 0, 0, 0.9), 0 0 35px rgba(212, 175, 55, 0.2)',
                 borderRadius: 'var(--radius-lg)',
-                maxWidth: '480px',
+                maxWidth: '460px',
                 width: '100%',
-                padding: '2rem',
+                padding: 'clamp(1.1rem, 4vw, 1.75rem)',
+                boxSizing: 'border-box',
                 color: '#ffffff',
                 position: 'relative',
               }}
@@ -2488,13 +2511,20 @@ export const AdminDashboard = ({ isOpen, onClose }) => {
                   </span>
                 </div>
 
-                <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.5rem', justifyContent: 'flex-end' }}>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.65rem', marginTop: '0.75rem', width: '100%' }}>
                   <button
                     type="button"
                     disabled={addAdminLoading}
                     onClick={() => setShowAddAdminModal(false)}
                     className="btn btn-secondary"
-                    style={{ flex: 1 }}
+                    style={{
+                      flex: '1 1 110px',
+                      minWidth: '100px',
+                      padding: '0.65rem 0.85rem',
+                      fontSize: '0.85rem',
+                      justifyContent: 'center',
+                      touchAction: 'manipulation',
+                    }}
                   >
                     Cancel
                   </button>
@@ -2502,7 +2532,14 @@ export const AdminDashboard = ({ isOpen, onClose }) => {
                     type="submit"
                     disabled={addAdminLoading}
                     className="btn btn-primary"
-                    style={{ flex: 1.3 }}
+                    style={{
+                      flex: '1.2 1 140px',
+                      minWidth: '130px',
+                      padding: '0.65rem 0.85rem',
+                      fontSize: '0.85rem',
+                      justifyContent: 'center',
+                      touchAction: 'manipulation',
+                    }}
                   >
                     {addAdminLoading ? 'Promoting...' : 'Promote to Admin'}
                   </button>
