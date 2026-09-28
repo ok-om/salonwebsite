@@ -4,7 +4,6 @@ import { SiteConfigProvider, useSiteConfig } from './context/SiteConfigContext';
 import { SmoothScrollProvider, useSmoothScroll } from './context/SmoothScrollContext';
 import { Navbar } from './components/Navbar';
 import { HeroVideo } from './components/HeroVideo';
-import { HairCutScrollShowcase } from './components/HairCutScrollShowcase';
 import { ModernServicesExperience } from './components/ModernServicesExperience';
 import { LocationContact } from './components/LocationContact';
 import { Footer } from './components/Footer';
@@ -54,8 +53,8 @@ const MainContent = ({ isLoading }) => {
     }
   }, [isAuthenticated]);
 
-  const scrollToHaircuts = () => {
-    scrollTo('#haircuts', { offset: -65 });
+  const scrollToServices = () => {
+    scrollTo('#services', { offset: -65 });
   };
 
   return (
@@ -72,20 +71,14 @@ const MainContent = ({ isLoading }) => {
       <HeroVideo
         onOpenLoyalty={() => handleOpenLoyalty('stamps')}
         onOpenAdmin={() => setAdminDashboardOpen(true)}
-        onScrollToExperience={scrollToHaircuts}
+        onScrollToExperience={scrollToServices}
         isReady={!isLoading}
       />
 
-      {/* 3. The Centerpiece Master Haircut Scroll Experience */}
-      <HairCutScrollShowcase
-        onOpenLoyalty={() => handleOpenLoyalty('stamps')}
-        onOpenAdmin={() => setAdminDashboardOpen(true)}
-      />
-
-      {/* 4. Modern Services Experience (Scalloped canopy, Scissor ribbon headline, 8 Pop Shapes, 3 Vibrant Cards, and Extra Atelier Art) */}
+      {/* 3. Modern Services Experience (Scalloped canopy, Scissor ribbon headline, 8 Pop Shapes, 3 Vibrant Cards, and Extra Atelier Art) */}
       <ModernServicesExperience />
 
-      {/* 5. Salon Location, Hours & WhatsApp Desk */}
+      {/* 4. Salon Location, Hours & WhatsApp Desk */}
       <LocationContact />
 
       {/* 5. Footer */}
@@ -109,9 +102,9 @@ const MainContent = ({ isLoading }) => {
           <span>Home</span>
         </button>
 
-        <button onClick={scrollToHaircuts} className="mobile-nav-item">
+        <button onClick={scrollToServices} className="mobile-nav-item">
           <Scissors size={18} />
-          <span>Haircuts</span>
+          <span>Services</span>
         </button>
 
         {isAdmin ? (

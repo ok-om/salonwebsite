@@ -143,8 +143,8 @@ export const Navbar = ({ onOpenAuth, onOpenAdmin, onOpenLoyalty, onOpenProfile }
 
           {/* Desktop Navigation Menu (hidden on screens <= 860px) */}
           <nav className="desktop-nav-menu" style={{ display: 'none', alignItems: 'center', gap: '1.75rem' }}>
-            <button onClick={() => scrollToSection('haircuts')} style={desktopLinkStyle}>
-              Haircut Collection
+            <button onClick={() => scrollToSection('services')} style={desktopLinkStyle}>
+              Services & Styling
             </button>
             {!isAdmin && (
               <button onClick={onOpenLoyalty} style={desktopLinkStyle}>
@@ -568,8 +568,8 @@ export const Navbar = ({ onOpenAuth, onOpenAdmin, onOpenLoyalty, onOpenProfile }
 
               {/* Navigation Menu Items */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem' }}>
-                <button onClick={() => scrollToSection('haircuts')} style={mobileMenuItemStyle}>
-                  <span>✂️</span> The Master Haircut Gallery
+                <button onClick={() => scrollToSection('services')} style={mobileMenuItemStyle}>
+                  <span>✂️</span> Services & Grooming
                 </button>
                 {!isAdmin && (
                   <button
