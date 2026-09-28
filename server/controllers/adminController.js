@@ -9,7 +9,8 @@ export const getAllStaffAdmins = async (req, res) => {
       isDeleted: { $ne: true },
     })
       .select('-password')
-      .sort({ role: -1, createdAt: -1 });
+      .sort({ role: -1, createdAt: -1 })
+      .lean();
 
     res.status(200).json(staff);
   } catch (error) {
