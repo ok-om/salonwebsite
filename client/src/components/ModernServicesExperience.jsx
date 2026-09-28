@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Scissors, Sparkles, MessageSquare, ArrowRight, CheckCircle2, Clock, X, ZoomIn, Eye, ShieldCheck, Flame } from 'lucide-react';
+import { createPortal } from 'react-dom';
+import { Scissors, Sparkles, MessageSquare, ArrowRight, CheckCircle2, Clock, X, ZoomIn, Eye, ShieldCheck, Flame, BookOpen } from 'lucide-react';
 import { useSiteConfig } from '../context/SiteConfigContext';
 import { useSmoothScroll } from '../context/SmoothScrollContext';
 
@@ -8,16 +9,30 @@ export const ModernServicesExperience = () => {
   const { stopScroll, startScroll } = useSmoothScroll();
   const [activeServiceModal, setActiveServiceModal] = useState(null);
   const [selectedPoster, setSelectedPoster] = useState(null);
+  const [seeAllServicesOpen, setSeeAllServicesOpen] = useState(false);
 
-  // Lock background scroll completely on both desktop and mobile when service modal or poster is open
+  // Lock background scroll completely on both desktop and mobile when any modal is open
   useEffect(() => {
-    if (activeServiceModal || selectedPoster) {
+    if (activeServiceModal || selectedPoster || seeAllServicesOpen) {
       stopScroll?.();
       return () => {
         startScroll?.();
       };
     }
-  }, [activeServiceModal, selectedPoster, stopScroll, startScroll]);
+  }, [activeServiceModal, selectedPoster, seeAllServicesOpen, stopScroll, startScroll]);
+
+  // Close modals on Escape key
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        setActiveServiceModal(null);
+        setSelectedPoster(null);
+        setSeeAllServicesOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   // 3 Vibrant Shaped Cards (directly from Screenshot 2026-09-07 232400.png)
   const FEATURED_SERVICES = [
@@ -566,8 +581,9 @@ export const ModernServicesExperience = () => {
             </div>
 
             <div>
-              <a
-                href="#haircuts"
+              <button
+                type="button"
+                onClick={() => setSeeAllServicesOpen(true)}
                 style={{
                   background: '#ea580c',
                   color: '#ffffff',
@@ -579,13 +595,14 @@ export const ModernServicesExperience = () => {
                   alignItems: 'center',
                   gap: '0.45rem',
                   boxShadow: '0 8px 20px rgba(234, 88, 12, 0.4)',
-                  textDecoration: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
                   transition: 'all 0.25s ease',
                 }}
               >
                 <span>See All Services</span>
                 <ArrowRight size={16} />
-              </a>
+              </button>
             </div>
           </div>
 
@@ -595,6 +612,7 @@ export const ModernServicesExperience = () => {
               <div
                 key={srv.id}
                 className="vibrant-service-card"
+                onClick={() => setActiveServiceModal(srv)}
                 style={{
                   background: srv.color,
                   borderRadius: '32px',
@@ -606,6 +624,7 @@ export const ModernServicesExperience = () => {
                   boxShadow: '0 18px 45px rgba(0, 0, 0, 0.25)',
                   position: 'relative',
                   overflow: 'hidden',
+                  cursor: 'pointer',
                   transition: 'transform 0.3s ease, box-shadow 0.3s ease',
                 }}
               >
@@ -870,30 +889,27 @@ export const ModernServicesExperience = () => {
       </div>
 
       {/* ========================================================================= */}
-      {/* SERVICE DETAIL MODAL */}
+      {/* 1. SERVICE DETAIL MODAL (Rendered into document.body via Portal) */}
       {/* ========================================================================= */}
-      {activeServiceModal && (
+      {activeServiceModal && typeof document !== 'undefined' && createPortal(
         <div
+          className="modal-overlay"
           data-lenis-prevent="true"
           style={{
             position: 'fixed',
             inset: 0,
-            zIndex: 9999,
-            background: 'rgba(3, 5, 8, 0.88)',
-            backdropFilter: 'blur(16px)',
+            zIndex: 999999,
+            background: 'rgba(5, 7, 12, 0.88)',
+            backdropFilter: 'blur(14px)',
+            WebkitBackdropFilter: 'blur(14px)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            padding: '1rem',
+            padding: '0.75rem',
             overscrollBehavior: 'contain',
-            touchAction: 'none',
+            touchAction: 'pan-y',
           }}
           onClick={() => setActiveServiceModal(null)}
-          onTouchMove={(e) => {
-            if (e.target === e.currentTarget) {
-              e.preventDefault();
-            }
-          }}
         >
           <div
             data-lenis-prevent="true"
@@ -901,23 +917,24 @@ export const ModernServicesExperience = () => {
             style={{
               background: '#0d111a',
               border: `2px solid ${activeServiceModal.color}`,
-              borderRadius: '24px',
+              borderRadius: '22px',
               maxWidth: '520px',
               width: '100%',
-              maxHeight: '90vh',
+              maxHeight: 'min(90vh, 90dvh)',
               overflow: 'hidden',
-              boxShadow: `0 25px 60px rgba(0, 0, 0, 0.95), 0 0 30px ${activeServiceModal.color}44`,
+              boxShadow: `0 25px 60px rgba(0, 0, 0, 0.95), 0 0 35px ${activeServiceModal.color}44`,
               position: 'relative',
               display: 'flex',
               flexDirection: 'column',
-              overscrollBehavior: 'contain',
+              transform: 'translateZ(0)',
+              willChange: 'transform',
             }}
           >
             {/* Modal Header */}
             <div
               style={{
                 flexShrink: 0,
-                padding: '1.25rem 1.5rem',
+                padding: '1.15rem 1.4rem',
                 borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
                 display: 'flex',
                 alignItems: 'center',
@@ -937,25 +954,27 @@ export const ModernServicesExperience = () => {
                 >
                   {activeServiceModal.category}
                 </span>
-                <h3 style={{ fontSize: '1.35rem', color: '#ffffff', margin: '0.2rem 0 0', fontWeight: 800 }}>
+                <h3 style={{ fontSize: '1.3rem', color: '#ffffff', margin: '0.15rem 0 0', fontWeight: 800 }}>
                   {activeServiceModal.title}
                 </h3>
               </div>
               <button
+                type="button"
                 onClick={() => setActiveServiceModal(null)}
                 aria-label="Close modal"
                 style={{
                   background: 'rgba(255, 255, 255, 0.08)',
-                  border: '1px solid rgba(255, 255, 255, 0.15)',
+                  border: '1px solid rgba(255, 255, 255, 0.16)',
                   color: '#ffffff',
-                  width: '34px',
-                  height: '34px',
+                  width: '36px',
+                  height: '36px',
                   borderRadius: '50%',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   cursor: 'pointer',
                   flexShrink: 0,
+                  transition: 'all 0.2s ease',
                 }}
               >
                 <X size={18} />
@@ -968,7 +987,7 @@ export const ModernServicesExperience = () => {
               style={{
                 flex: 1,
                 minHeight: 0,
-                padding: '1.4rem 1.5rem',
+                padding: '1.25rem 1.35rem',
                 overflowY: 'auto',
                 WebkitOverflowScrolling: 'touch',
                 overscrollBehavior: 'contain',
@@ -980,53 +999,55 @@ export const ModernServicesExperience = () => {
                 style={{
                   borderRadius: '16px',
                   overflow: 'hidden',
-                  height: '180px',
-                  marginBottom: '1.25rem',
+                  height: '190px',
+                  marginBottom: '1.15rem',
                   border: '1.5px solid rgba(255, 255, 255, 0.1)',
                 }}
               >
                 <img
                   src={activeServiceModal.image}
                   alt={activeServiceModal.title}
-                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
                 />
               </div>
 
-              <p style={{ fontSize: '0.88rem', color: '#cbd5e1', lineHeight: 1.6, marginBottom: '1.25rem' }}>
+              <p style={{ fontSize: '0.88rem', color: '#cbd5e1', lineHeight: 1.6, marginBottom: '1.15rem' }}>
                 {activeServiceModal.fullDescription}
               </p>
 
               {/* Inclusions */}
-              <div style={{ marginBottom: '1.25rem' }}>
-                <h5 style={{ fontSize: '0.75rem', color: 'var(--gold-primary)', textTransform: 'uppercase', fontWeight: 800, marginBottom: '0.65rem' }}>
+              <div style={{ marginBottom: '1.15rem' }}>
+                <h5 style={{ fontSize: '0.75rem', color: 'var(--gold-primary)', textTransform: 'uppercase', fontWeight: 800, marginBottom: '0.6rem' }}>
                   What's Included:
                 </h5>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem' }}>
                   {activeServiceModal.inclusions.map((inc, i) => (
                     <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.55rem', fontSize: '0.82rem', color: '#e2e8f0' }}>
-                      <CheckCircle2 size={15} color={activeServiceModal.color} />
+                      <CheckCircle2 size={15} color={activeServiceModal.color} style={{ flexShrink: 0 }} />
                       <span>{inc}</span>
                     </div>
                   ))}
                 </div>
               </div>
 
-              {/* Duration Info */}
+              {/* Duration Info & Pricing */}
               <div
                 style={{
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
                   background: 'rgba(255, 255, 255, 0.05)',
-                  padding: '0.85rem 1.15rem',
-                  borderRadius: '14px',
+                  padding: '0.8rem 1rem',
+                  borderRadius: '12px',
                   border: '1px solid rgba(255, 255, 255, 0.08)',
                 }}
               >
-                <span style={{ fontSize: '0.82rem', color: '#cbd5e1' }}>Service Duration</span>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--gold-primary)', fontSize: '0.88rem', fontWeight: 700 }}>
-                  <Clock size={16} />
-                  <span>{activeServiceModal.duration}</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#e2e8f0', fontSize: '0.82rem' }}>
+                  <Clock size={15} color="var(--gold-primary)" />
+                  <span>Duration: <strong>{activeServiceModal.duration}</strong></span>
+                </div>
+                <div style={{ color: 'var(--gold-primary)', fontSize: '1.1rem', fontWeight: 800 }}>
+                  {activeServiceModal.price}
                 </div>
               </div>
             </div>
@@ -1035,7 +1056,7 @@ export const ModernServicesExperience = () => {
             <div
               style={{
                 flexShrink: 0,
-                padding: '1rem 1.5rem',
+                padding: '0.9rem 1.35rem',
                 borderTop: '1px solid rgba(255, 255, 255, 0.08)',
                 display: 'flex',
                 gap: '0.75rem',
@@ -1047,41 +1068,39 @@ export const ModernServicesExperience = () => {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn btn-primary"
-                style={{ flex: 1, padding: '0.7rem 1.25rem', fontSize: '0.88rem', justifyContent: 'center' }}
+                style={{ flex: 1, padding: '0.75rem 1.25rem', fontSize: '0.88rem', justifyContent: 'center' }}
               >
                 <MessageSquare size={16} />
                 <span>Book on WhatsApp</span>
               </a>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* ========================================================================= */}
-      {/* POSTER / BLUEPRINT FULLSCREEN LIGHTBOX */}
+      {/* 2. POSTER / BLUEPRINT / HAIRCUT DETAIL LIGHTBOX (Rendered into document.body) */}
       {/* ========================================================================= */}
-      {selectedPoster && (
+      {selectedPoster && typeof document !== 'undefined' && createPortal(
         <div
+          className="modal-overlay"
           data-lenis-prevent="true"
           style={{
             position: 'fixed',
             inset: 0,
-            zIndex: 9999,
-            background: 'rgba(3, 5, 8, 0.92)',
-            backdropFilter: 'blur(16px)',
+            zIndex: 999999,
+            background: 'rgba(5, 7, 12, 0.92)',
+            backdropFilter: 'blur(14px)',
+            WebkitBackdropFilter: 'blur(14px)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            padding: '1rem',
+            padding: '0.75rem',
             overscrollBehavior: 'contain',
-            touchAction: 'none',
+            touchAction: 'pan-y',
           }}
           onClick={() => setSelectedPoster(null)}
-          onTouchMove={(e) => {
-            if (e.target === e.currentTarget) {
-              e.preventDefault();
-            }
-          }}
         >
           <div
             data-lenis-prevent="true"
@@ -1089,71 +1108,79 @@ export const ModernServicesExperience = () => {
             style={{
               background: '#0d111a',
               border: '2px solid var(--gold-primary)',
-              borderRadius: '24px',
-              maxWidth: '500px',
+              borderRadius: '22px',
+              maxWidth: '540px',
               width: '100%',
-              maxHeight: '92vh',
+              maxHeight: 'min(92vh, 92dvh)',
               overflow: 'hidden',
               boxShadow: '0 25px 60px rgba(0, 0, 0, 0.95), 0 0 35px rgba(212, 175, 55, 0.3)',
               position: 'relative',
               display: 'flex',
               flexDirection: 'column',
-              overscrollBehavior: 'contain',
+              transform: 'translateZ(0)',
+              willChange: 'transform',
             }}
           >
+            {/* Header */}
             <div
               style={{
                 flexShrink: 0,
-                padding: '0.85rem 1.25rem',
+                padding: '0.9rem 1.25rem',
                 borderBottom: '1px solid rgba(212, 175, 55, 0.25)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                background: 'rgba(18, 22, 32, 0.95)',
+                background: 'rgba(18, 22, 32, 0.98)',
               }}
             >
               <div>
-                <h4 style={{ fontSize: '0.98rem', color: 'var(--gold-primary)', margin: 0, fontWeight: 700 }}>
+                <h4 style={{ fontSize: '1.05rem', color: 'var(--gold-primary)', margin: 0, fontWeight: 700 }}>
                   {selectedPoster.title}
                 </h4>
-                <p style={{ fontSize: '0.74rem', color: '#94a3b8', margin: '0.15rem 0 0' }}>
+                <p style={{ fontSize: '0.75rem', color: '#94a3b8', margin: '0.15rem 0 0' }}>
                   {selectedPoster.subtitle}
                 </p>
               </div>
               <button
+                type="button"
                 onClick={() => setSelectedPoster(null)}
                 aria-label="Close modal"
                 style={{
                   background: 'rgba(255, 255, 255, 0.08)',
-                  border: '1px solid rgba(255, 255, 255, 0.15)',
+                  border: '1px solid rgba(255, 255, 255, 0.16)',
                   color: '#ffffff',
-                  width: '32px',
-                  height: '32px',
+                  width: '36px',
+                  height: '36px',
                   borderRadius: '50%',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   cursor: 'pointer',
                   flexShrink: 0,
+                  transition: 'all 0.2s ease',
                 }}
               >
-                <X size={16} />
+                <X size={18} />
               </button>
             </div>
 
+            {/* Poster / Haircut Image Container */}
             <div
               data-lenis-prevent="true"
               style={{
                 flex: 1,
                 minHeight: 0,
-                padding: '0.75rem',
+                padding: '0.85rem',
                 textAlign: 'center',
-                background: '#05070a',
+                background: '#07090e',
                 overflowY: 'auto',
                 WebkitOverflowScrolling: 'touch',
                 overscrollBehavior: 'contain',
                 touchAction: 'pan-y',
-                maxHeight: '62vh',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
               }}
             >
               <img
@@ -1161,7 +1188,7 @@ export const ModernServicesExperience = () => {
                 alt={selectedPoster.title}
                 style={{
                   maxWidth: '100%',
-                  maxHeight: '58vh',
+                  maxHeight: 'min(60vh, 480px)',
                   objectFit: 'contain',
                   borderRadius: '12px',
                   display: 'block',
@@ -1171,6 +1198,7 @@ export const ModernServicesExperience = () => {
               />
             </div>
 
+            {/* Footer with WhatsApp Booking */}
             <div
               style={{
                 flexShrink: 0,
@@ -1180,24 +1208,277 @@ export const ModernServicesExperience = () => {
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 gap: '0.75rem',
-                background: 'rgba(18, 22, 32, 0.95)',
+                background: 'rgba(18, 22, 32, 0.98)',
               }}
             >
-              <span style={{ fontSize: '0.75rem', color: '#cbd5e1' }}>
-                Consult stylist on this style?
+              <span style={{ fontSize: '0.78rem', color: '#cbd5e1' }}>
+                Want this signature look?
               </span>
               <a
-                href={`https://wa.me/${config.whatsapp?.replace(/[^0-9]/g, '')}?text=Hi!%20I%20saw%20the%20"${encodeURIComponent(selectedPoster.title)}"%20chart%20and%20would%20like%20to%20book%20a%20consultation.`}
+                href={`https://wa.me/${config.whatsapp?.replace(/[^0-9]/g, '') || '919322188848'}?text=Hi!%20I%20am%20interested%20in%20the%20"${encodeURIComponent(selectedPoster.title)}"%20style.%20Please%20let%20me%20know%20availability.`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn btn-primary btn-sm"
-                style={{ padding: '0.45rem 1.1rem', fontSize: '0.8rem' }}
+                style={{ padding: '0.45rem 1.15rem', fontSize: '0.82rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}
               >
-                <MessageSquare size={14} /> Book Style
+                <MessageSquare size={14} />
+                <span>Book This Look</span>
               </a>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
+      )}
+
+      {/* ========================================================================= */}
+      {/* 3. "SEE ALL SERVICES" COMPLETE CATALOG MODAL (Rendered into document.body) */}
+      {/* ========================================================================= */}
+      {seeAllServicesOpen && typeof document !== 'undefined' && createPortal(
+        <div
+          className="modal-overlay"
+          data-lenis-prevent="true"
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 999999,
+            background: 'rgba(5, 7, 12, 0.9)',
+            backdropFilter: 'blur(14px)',
+            WebkitBackdropFilter: 'blur(14px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '0.75rem',
+            overscrollBehavior: 'contain',
+            touchAction: 'pan-y',
+          }}
+          onClick={() => setSeeAllServicesOpen(false)}
+        >
+          <div
+            data-lenis-prevent="true"
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              background: '#0d111a',
+              border: '2px solid var(--gold-primary)',
+              borderRadius: '22px',
+              maxWidth: '640px',
+              width: '100%',
+              maxHeight: 'min(90vh, 90dvh)',
+              overflow: 'hidden',
+              boxShadow: '0 25px 60px rgba(0, 0, 0, 0.95), 0 0 35px rgba(212, 175, 55, 0.3)',
+              position: 'relative',
+              display: 'flex',
+              flexDirection: 'column',
+              transform: 'translateZ(0)',
+              willChange: 'transform',
+            }}
+          >
+            {/* Header */}
+            <div
+              style={{
+                flexShrink: 0,
+                padding: '1.15rem 1.4rem',
+                borderBottom: '1px solid rgba(212, 175, 55, 0.25)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.15) 0%, #0d111a 100%)',
+              }}
+            >
+              <div>
+                <span
+                  style={{
+                    fontSize: '0.7rem',
+                    color: 'var(--gold-primary)',
+                    fontWeight: 800,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.1em',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.35rem',
+                  }}
+                >
+                  <Scissors size={13} /> The Classic Cut Salon Menu
+                </span>
+                <h3 style={{ fontSize: '1.3rem', color: '#ffffff', margin: '0.2rem 0 0', fontWeight: 800 }}>
+                  Complete Services & Rates
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSeeAllServicesOpen(false)}
+                aria-label="Close modal"
+                style={{
+                  background: 'rgba(255, 255, 255, 0.08)',
+                  border: '1px solid rgba(255, 255, 255, 0.16)',
+                  color: '#ffffff',
+                  width: '36px',
+                  height: '36px',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  flexShrink: 0,
+                  transition: 'all 0.2s ease',
+                }}
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* Scrollable Services Menu Body */}
+            <div
+              data-lenis-prevent="true"
+              style={{
+                flex: 1,
+                minHeight: 0,
+                padding: '1.25rem 1.4rem',
+                overflowY: 'auto',
+                WebkitOverflowScrolling: 'touch',
+                overscrollBehavior: 'contain',
+                touchAction: 'pan-y',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '1.5rem',
+              }}
+            >
+              {[
+                {
+                  category: '💈 Master Haircuts & Precision Fades',
+                  items: [
+                    { name: 'Classic Gentleman Haircut', price: '₹499', duration: '35 Mins', desc: 'Face profile consultation, shear sectioning, taper fade & botanical finish.' },
+                    { name: 'Textured Crop Fade & Low Taper', price: '₹499', duration: '40 Mins', desc: 'Modern jagged scissor texturizing with zero skin taper fade.' },
+                    { name: 'Executive Quiff & Pompadour Cut', price: '₹549', duration: '40 Mins', desc: 'Voluminous directional quiff blow-dry sculpt with premium matte clay.' },
+                    { name: 'Skin Fade / Drop Fade Special', price: '₹549', duration: '40 Mins', desc: 'Zero shaver blend with surgical foil detailing and crisp edge-up.' },
+                    { name: 'Junior Grooming (Kids under 12)', price: '₹349', duration: '25 Mins', desc: 'Patient scissor & clipper styling designed for young gentlemen.' },
+                  ],
+                },
+                {
+                  category: '✂️ Beard Sculpting & Royal Shaves',
+                  items: [
+                    { name: 'Royal Hot Towel Shave', price: '₹399', duration: '30 Mins', desc: 'Pre-shave essential oils, warm herbal badger lather, straight razor & double hot eucalyptus towels.' },
+                    { name: 'Beard Trim & Razor Line Sculpt', price: '₹299', duration: '25 Mins', desc: 'Symmetry alignment, cheek and neck straight-razor cleaning & cedarwood balm massage.' },
+                    { name: 'Moustache & Goatee Detailing', price: '₹199', duration: '15 Mins', desc: 'Precision contour shaping with organic styling wax.' },
+                    { name: 'Express Beard Shape & Conditioning', price: '₹249', duration: '20 Mins', desc: 'Clipper beard graduation with argan oil steam treatment.' },
+                  ],
+                },
+                {
+                  category: '💆 Scalp Therapies & Hair Spa',
+                  items: [
+                    { name: 'Scalp Detox & Deep Conditioning', price: '₹399', duration: '25 Mins', desc: 'Charcoal follicle purification, invigorating scalp massage & nutrient mask.' },
+                    { name: 'Ayurvedic Hot Oil Scalp Massage', price: '₹349', duration: '25 Mins', desc: 'Herbal root stimulation, acupressure temple relief & warm towel wrap.' },
+                    { name: 'Keratin Nourish Hair Spa', price: '₹599', duration: '40 Mins', desc: 'Intensive restorative protein infusion for dry or frizzy hair.' },
+                  ],
+                },
+                {
+                  category: '👑 Complete VIP Makeover Packages',
+                  items: [
+                    { name: 'The Classic Gentleman Trio (Haircut + Beard + Shave)', price: '₹799', duration: '60 Mins', desc: 'Complete signature transformation package with steam towels and styling finish.' },
+                    { name: 'Royal Groom Transformation (Haircut + Shave + Scalp Detox)', price: '₹1,099', duration: '75 Mins', desc: 'The ultimate royal indulgence. Full haircut, hot towel straight razor shave, and luxury detox spa.' },
+                  ],
+                },
+              ].map((section, idx) => (
+                <div key={idx}>
+                  <div
+                    style={{
+                      fontSize: '0.85rem',
+                      fontWeight: 800,
+                      color: 'var(--gold-primary)',
+                      marginBottom: '0.75rem',
+                      paddingBottom: '0.35rem',
+                      borderBottom: '1px solid rgba(212, 175, 55, 0.2)',
+                      letterSpacing: '0.04em',
+                    }}
+                  >
+                    {section.category}
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
+                    {section.items.map((item, itemIdx) => (
+                      <div
+                        key={itemIdx}
+                        style={{
+                          background: 'rgba(255, 255, 255, 0.03)',
+                          border: '1px solid rgba(255, 255, 255, 0.07)',
+                          borderRadius: '12px',
+                          padding: '0.75rem 0.95rem',
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          gap: '0.75rem',
+                        }}
+                      >
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '0.2rem' }}>
+                            <span style={{ fontWeight: 700, fontSize: '0.88rem', color: '#ffffff' }}>
+                              {item.name}
+                            </span>
+                            <span
+                              style={{
+                                fontSize: '0.68rem',
+                                color: 'var(--gold-light)',
+                                background: 'rgba(212, 175, 55, 0.15)',
+                                padding: '0.1rem 0.45rem',
+                                borderRadius: '10px',
+                                fontWeight: 600,
+                              }}
+                            >
+                              {item.duration}
+                            </span>
+                          </div>
+                          <p style={{ fontSize: '0.74rem', color: '#94a3b8', margin: 0, lineHeight: 1.4 }}>
+                            {item.desc}
+                          </p>
+                        </div>
+                        <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                          <div style={{ color: 'var(--gold-primary)', fontWeight: 800, fontSize: '0.98rem', marginBottom: '0.35rem' }}>
+                            {item.price}
+                          </div>
+                          <a
+                            href={`https://wa.me/${config.whatsapp?.replace(/[^0-9]/g, '') || '919322188848'}?text=Hello!%20I%20would%20like%20to%20book%20the%20"${encodeURIComponent(item.name)}"%20(${item.price})%20service.`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="btn btn-primary btn-sm"
+                            style={{ padding: '0.28rem 0.65rem', fontSize: '0.72rem' }}
+                          >
+                            Book
+                          </a>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Footer */}
+            <div
+              style={{
+                flexShrink: 0,
+                padding: '0.9rem 1.4rem',
+                borderTop: '1px solid rgba(212, 175, 55, 0.2)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                background: 'rgba(18, 22, 32, 0.98)',
+              }}
+            >
+              <span style={{ fontSize: '0.78rem', color: '#94a3b8' }}>
+                Need custom consultation or group bookings?
+              </span>
+              <a
+                href={`https://wa.me/${config.whatsapp?.replace(/[^0-9]/g, '') || '919322188848'}?text=Hello!%20I%20have%20a%20question%20about%20your%20services.`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-outline btn-sm"
+                style={{ padding: '0.4rem 0.85rem', fontSize: '0.78rem' }}
+              >
+                <MessageSquare size={13} />
+                <span>WhatsApp Desk</span>
+              </a>
+            </div>
+          </div>
+        </div>,
+        document.body
       )}
 
       {/* Embedded CSS for Shapes & Responsive Grids */}
