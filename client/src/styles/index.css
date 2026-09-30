@@ -393,6 +393,11 @@ h1, h2, h3, h4, .font-serif {
   box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15);
 }
 
+.input-with-icons {
+  padding-left: 2.85rem !important;
+  padding-right: 2.85rem !important;
+}
+
 /* Floating Bottom Mobile Nav */
 .mobile-bottom-nav {
   display: flex;
@@ -920,8 +925,14 @@ html.lenis body {
   }
 
   .input-field {
-    padding: 0.6rem 0.75rem !important;
+    padding-top: 0.65rem !important;
+    padding-bottom: 0.65rem !important;
     font-size: 0.88rem !important;
+  }
+
+  .input-field.input-with-icons {
+    padding-left: 2.85rem !important;
+    padding-right: 2.85rem !important;
   }
 
   .input-label {

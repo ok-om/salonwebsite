@@ -7,6 +7,7 @@ export const SetAdminPasswordModal = ({ isOpen, onClose }) => {
   const [password, setPasswordInput] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -69,7 +70,7 @@ export const SetAdminPasswordModal = ({ isOpen, onClose }) => {
           borderRadius: '16px',
           maxWidth: '440px',
           width: '100%',
-          padding: '2rem',
+          padding: 'clamp(1.2rem, 3.5vw, 1.85rem)',
           color: '#ffffff',
           position: 'relative',
         }}
@@ -196,77 +197,162 @@ export const SetAdminPasswordModal = ({ isOpen, onClose }) => {
         )}
 
         {/* Form */}
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          <div className="input-group">
-            <label className="input-label" style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span>{isAdmin ? 'Choose Admin Password *' : 'Choose Your Password *'}</span>
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.15rem' }}>
+          <div className="input-group" style={{ marginBottom: 0 }}>
+            <label className="input-label" style={{ marginBottom: '0.45rem', display: 'block', fontWeight: 600, fontSize: '0.84rem', color: '#e2e8f0' }}>
+              {isAdmin ? 'Choose Admin Password *' : 'Choose Your Password *'}
+            </label>
+            <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+              <div
                 style={{
-                  background: 'none',
-                  border: 'none',
-                  color: 'var(--gold-primary)',
-                  cursor: 'pointer',
-                  fontSize: '0.75rem',
+                  position: 'absolute',
+                  left: '0.95rem',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  pointerEvents: 'none',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '0.25rem',
+                  justifyContent: 'center',
+                  color: 'var(--gold-primary)',
+                  zIndex: 2,
                 }}
               >
-                {showPassword ? <EyeOff size={14} /> : <Eye size={14} />}
-                <span>{showPassword ? 'Hide' : 'Show'}</span>
-              </button>
-            </label>
-            <div style={{ position: 'relative' }}>
+                <Lock size={17} />
+              </div>
               <input
                 type={showPassword ? 'text' : 'password'}
                 required
                 minLength={6}
                 value={password}
                 onChange={(e) => setPasswordInput(e.target.value)}
-                className="input-field"
+                className="input-field input-with-icons"
                 placeholder="Minimum 6 characters"
-                style={{ paddingLeft: '2.5rem' }}
-              />
-              <Lock
-                size={16}
-                color="var(--gold-primary)"
                 style={{
-                  position: 'absolute',
-                  left: '0.85rem',
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  opacity: 0.8,
+                  paddingLeft: '2.85rem',
+                  paddingRight: '2.85rem',
+                  width: '100%',
+                  height: '46px',
+                  borderRadius: '10px',
+                  background: 'rgba(10, 13, 20, 0.95)',
+                  border: '1.5px solid rgba(212, 175, 55, 0.35)',
+                  color: '#ffffff',
+                  fontSize: '0.92rem',
+                  outline: 'none',
+                  transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = 'var(--gold-primary)';
+                  e.target.style.boxShadow = '0 0 14px rgba(212, 175, 55, 0.25)';
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = 'rgba(212, 175, 55, 0.35)';
+                  e.target.style.boxShadow = 'none';
                 }}
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+                title={showPassword ? 'Hide password' : 'Show password'}
+                style={{
+                  position: 'absolute',
+                  right: '0.75rem',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'transparent',
+                  border: 'none',
+                  color: showPassword ? 'var(--gold-primary)' : '#94a3b8',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: '0.35rem',
+                  borderRadius: '6px',
+                  zIndex: 2,
+                  transition: 'color 0.2s ease',
+                }}
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
             </div>
           </div>
 
-          <div className="input-group">
-            <label className="input-label">{isAdmin ? 'Confirm Admin Password *' : 'Confirm Your Password *'}</label>
-            <div style={{ position: 'relative' }}>
+          <div className="input-group" style={{ marginBottom: 0 }}>
+            <label className="input-label" style={{ marginBottom: '0.45rem', display: 'block', fontWeight: 600, fontSize: '0.84rem', color: '#e2e8f0' }}>
+              {isAdmin ? 'Confirm Admin Password *' : 'Confirm Your Password *'}
+            </label>
+            <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+              <div
+                style={{
+                  position: 'absolute',
+                  left: '0.95rem',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  pointerEvents: 'none',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: 'var(--gold-primary)',
+                  zIndex: 2,
+                }}
+              >
+                <Lock size={17} />
+              </div>
               <input
-                type={showPassword ? 'text' : 'password'}
+                type={showConfirmPassword ? 'text' : 'password'}
                 required
                 minLength={6}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className="input-field"
+                className="input-field input-with-icons"
                 placeholder="Re-enter your chosen password"
-                style={{ paddingLeft: '2.5rem' }}
-              />
-              <Lock
-                size={16}
-                color="var(--gold-primary)"
                 style={{
-                  position: 'absolute',
-                  left: '0.85rem',
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  opacity: 0.8,
+                  paddingLeft: '2.85rem',
+                  paddingRight: '2.85rem',
+                  width: '100%',
+                  height: '46px',
+                  borderRadius: '10px',
+                  background: 'rgba(10, 13, 20, 0.95)',
+                  border: '1.5px solid rgba(212, 175, 55, 0.35)',
+                  color: '#ffffff',
+                  fontSize: '0.92rem',
+                  outline: 'none',
+                  transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = 'var(--gold-primary)';
+                  e.target.style.boxShadow = '0 0 14px rgba(212, 175, 55, 0.25)';
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = 'rgba(212, 175, 55, 0.35)';
+                  e.target.style.boxShadow = 'none';
                 }}
               />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+                title={showConfirmPassword ? 'Hide password' : 'Show password'}
+                style={{
+                  position: 'absolute',
+                  right: '0.75rem',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'transparent',
+                  border: 'none',
+                  color: showConfirmPassword ? 'var(--gold-primary)' : '#94a3b8',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: '0.35rem',
+                  borderRadius: '6px',
+                  zIndex: 2,
+                  transition: 'color 0.2s ease',
+                }}
+              >
+                {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
             </div>
           </div>
 
