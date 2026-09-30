@@ -469,7 +469,7 @@ export const HeroVideo = ({ onOpenLoyalty, onOpenAdmin, onScrollToExperience, is
         /* Unified Responsive Compact Mobile Composition (<= 860px) */
         @media (max-width: 860px) {
           #hero-section {
-            padding-top: calc(var(--nav-height) + clamp(0.25rem, 0.9vh, 0.75rem)) !important;
+            padding-top: calc(var(--nav-height, 68px) + clamp(1.2rem, 3.2vh, 1.85rem)) !important;
             padding-bottom: calc(64px + clamp(0.4rem, 1.2vh, 1rem)) !important;
             min-height: auto !important;
           }
@@ -518,6 +518,9 @@ export const HeroVideo = ({ onOpenLoyalty, onOpenAdmin, onScrollToExperience, is
           }
         }
         @media (max-width: 360px) {
+          #hero-section {
+            padding-top: calc(var(--nav-height, 68px) + 1.35rem) !important;
+          }
           .hero-action-buttons {
             gap: 0.35rem !important;
           }
