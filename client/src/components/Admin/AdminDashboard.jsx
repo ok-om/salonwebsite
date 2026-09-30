@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useSiteConfig } from '../../context/SiteConfigContext';
 import API from '../../services/api';
@@ -2025,7 +2026,7 @@ export const AdminDashboard = ({ isOpen, onClose }) => {
         </div>
 
         {/* Customer Delete Confirmation Modal */}
-        {customerToDelete && (
+        {customerToDelete && typeof document !== 'undefined' && createPortal(
           <div
             style={{
               position: 'fixed',
@@ -2033,7 +2034,7 @@ export const AdminDashboard = ({ isOpen, onClose }) => {
               background: 'rgba(0, 0, 0, 0.85)',
               backdropFilter: 'blur(8px)',
               WebkitBackdropFilter: 'blur(8px)',
-              zIndex: 99999,
+              zIndex: 999999,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -2046,10 +2047,13 @@ export const AdminDashboard = ({ isOpen, onClose }) => {
               style={{
                 background: '#14171f',
                 border: '1px solid rgba(197, 34, 34, 0.4)',
-                boxShadow: '0 20px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(197, 34, 34, 0.2)',
+                boxShadow: '0 25px 60px rgba(0, 0, 0, 0.9), 0 0 35px rgba(197, 34, 34, 0.2)',
                 borderRadius: 'var(--radius-lg)',
-                maxWidth: '460px',
+                maxWidth: '440px',
                 width: '100%',
+                maxHeight: '92vh',
+                overflowY: 'auto',
+                WebkitOverflowScrolling: 'touch',
                 padding: 'clamp(1.1rem, 4vw, 1.75rem)',
                 boxSizing: 'border-box',
                 color: '#ffffff',
@@ -2074,7 +2078,7 @@ export const AdminDashboard = ({ isOpen, onClose }) => {
                 <AlertTriangle size={28} />
               </div>
 
-              <h3 style={{ textAlign: 'center', fontSize: '1.25rem', marginBottom: '0.6rem', color: '#ffffff' }}>
+              <h3 style={{ textAlign: 'center', fontSize: 'clamp(1.1rem, 3.6vw, 1.25rem)', marginBottom: '0.6rem', color: '#ffffff', fontWeight: 700 }}>
                 Delete Customer Account?
               </h3>
 
@@ -2099,7 +2103,7 @@ export const AdminDashboard = ({ isOpen, onClose }) => {
                 </div>
               </div>
 
-              <div style={{ fontSize: '0.85rem', color: '#94a3b8', lineHeight: '1.5', marginBottom: '1.5rem' }}>
+              <div style={{ fontSize: '0.85rem', color: '#94a3b8', lineHeight: '1.5', marginBottom: '1.25rem' }}>
                 <p style={{ margin: '0 0 0.5rem 0' }}>
                   ⚠️ This user will be moved to the <strong>24-Hour Recovery Bin</strong>.
                 </p>
@@ -2114,10 +2118,10 @@ export const AdminDashboard = ({ isOpen, onClose }) => {
               <div
                 style={{
                   display: 'flex',
-                  flexWrap: 'wrap',
-                  gap: '0.65rem',
+                  gap: '0.75rem',
+                  marginTop: '1rem',
                   width: '100%',
-                  marginTop: '1.25rem',
+                  boxSizing: 'border-box',
                 }}
               >
                 <button
@@ -2126,12 +2130,16 @@ export const AdminDashboard = ({ isOpen, onClose }) => {
                   onClick={() => setCustomerToDelete(null)}
                   className="btn btn-secondary"
                   style={{
-                    flex: '1 1 110px',
-                    minWidth: '100px',
-                    padding: '0.65rem 0.85rem',
-                    fontSize: '0.85rem',
+                    flex: '1 1 0',
+                    padding: '0.75rem 1rem',
+                    fontSize: '0.9rem',
+                    fontWeight: 600,
+                    borderRadius: 'var(--radius-full)',
+                    display: 'flex',
+                    alignItems: 'center',
                     justifyContent: 'center',
                     touchAction: 'manipulation',
+                    boxSizing: 'border-box',
                   }}
                 >
                   Cancel
@@ -2142,8 +2150,7 @@ export const AdminDashboard = ({ isOpen, onClose }) => {
                   onClick={handleConfirmDeleteCustomer}
                   className="btn"
                   style={{
-                    flex: '1.2 1 140px',
-                    minWidth: '130px',
+                    flex: '1.4 1 0',
                     background: '#c52222',
                     borderColor: '#ff4d4d',
                     color: '#ffffff',
@@ -2151,9 +2158,12 @@ export const AdminDashboard = ({ isOpen, onClose }) => {
                     alignItems: 'center',
                     justifyContent: 'center',
                     gap: '0.4rem',
-                    padding: '0.65rem 0.85rem',
-                    fontSize: '0.85rem',
+                    padding: '0.75rem 1rem',
+                    fontSize: '0.9rem',
+                    fontWeight: 700,
+                    borderRadius: 'var(--radius-full)',
                     touchAction: 'manipulation',
+                    boxSizing: 'border-box',
                   }}
                 >
                   {deleteLoading ? (
@@ -2167,23 +2177,25 @@ export const AdminDashboard = ({ isOpen, onClose }) => {
                 </button>
               </div>
             </div>
-          </div>
+          </div>,
+          document.body
         )}
 
         {/* Customer Edit Modal (Name & Mobile Number Only - Email Locked) */}
-        {customerToEdit && (
+        {customerToEdit && typeof document !== 'undefined' && createPortal(
           <div
             style={{
               position: 'fixed',
               inset: 0,
-              background: 'rgba(0, 0, 0, 0.82)',
+              background: 'rgba(0, 0, 0, 0.85)',
               backdropFilter: 'blur(8px)',
               WebkitBackdropFilter: 'blur(8px)',
-              zIndex: 99999,
+              zIndex: 999999,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              padding: '1.25rem',
+              padding: 'clamp(0.6rem, 3vw, 1.25rem)',
+              boxSizing: 'border-box',
             }}
             onClick={() => !editLoading && setCustomerToEdit(null)}
           >
@@ -2191,35 +2203,51 @@ export const AdminDashboard = ({ isOpen, onClose }) => {
               style={{
                 background: '#14171f',
                 border: '1px solid rgba(212, 175, 55, 0.4)',
-                boxShadow: '0 20px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(212, 175, 55, 0.15)',
+                boxShadow: '0 25px 60px rgba(0, 0, 0, 0.9), 0 0 35px rgba(212, 175, 55, 0.2)',
                 borderRadius: 'var(--radius-lg)',
-                maxWidth: '480px',
+                maxWidth: '440px',
                 width: '100%',
-                padding: '2rem',
+                maxHeight: '92vh',
+                overflowY: 'auto',
+                WebkitOverflowScrolling: 'touch',
+                padding: 'clamp(1.1rem, 4vw, 1.75rem)',
+                boxSizing: 'border-box',
                 color: '#ffffff',
                 position: 'relative',
               }}
               onClick={(e) => e.stopPropagation()}
             >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', gap: '0.75rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', minWidth: 0 }}>
                   <div
                     style={{
-                      width: '40px',
-                      height: '40px',
-                      borderRadius: '8px',
+                      width: '42px',
+                      height: '42px',
+                      borderRadius: '10px',
                       background: 'rgba(212, 175, 55, 0.15)',
                       border: '1px solid rgba(212, 175, 55, 0.3)',
                       color: 'var(--gold-primary)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
+                      flexShrink: 0,
                     }}
                   >
                     <Edit2 size={20} />
                   </div>
-                  <div>
-                    <h3 style={{ fontSize: '1.2rem', color: '#ffffff', margin: 0 }}>Edit Customer</h3>
+                  <div style={{ minWidth: 0 }}>
+                    <h3
+                      style={{
+                        fontSize: 'clamp(1.1rem, 3.6vw, 1.25rem)',
+                        fontWeight: 700,
+                        color: '#ffffff',
+                        margin: 0,
+                        lineHeight: 1.2,
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      Edit Customer
+                    </h3>
                     <p style={{ fontSize: '0.75rem', color: 'var(--gold-primary)', margin: '0.2rem 0 0 0' }}>
                       Update Name & Mobile Number
                     </p>
@@ -2229,9 +2257,23 @@ export const AdminDashboard = ({ isOpen, onClose }) => {
                   type="button"
                   disabled={editLoading}
                   onClick={() => setCustomerToEdit(null)}
-                  style={{ background: 'none', border: 'none', color: '#ffffff', cursor: 'pointer' }}
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.06)',
+                    border: '1px solid rgba(255, 255, 255, 0.12)',
+                    borderRadius: '50%',
+                    width: '32px',
+                    height: '32px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#ffffff',
+                    cursor: 'pointer',
+                    flexShrink: 0,
+                    transition: 'all 0.2s ease',
+                  }}
+                  aria-label="Close"
                 >
-                  <X size={20} />
+                  <X size={18} />
                 </button>
               </div>
 
@@ -2248,7 +2290,7 @@ export const AdminDashboard = ({ isOpen, onClose }) => {
                     value={customerToEdit.email}
                     className="input-field"
                     style={{
-                      opacity: 0.65,
+                      opacity: 0.7,
                       cursor: 'not-allowed',
                       background: 'rgba(255, 255, 255, 0.03)',
                       border: '1px dashed rgba(255, 255, 255, 0.15)',
@@ -2305,13 +2347,32 @@ export const AdminDashboard = ({ isOpen, onClose }) => {
                   </span>
                 </div>
 
-                <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.75rem', justifyContent: 'flex-end' }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    gap: '0.75rem',
+                    marginTop: '0.85rem',
+                    width: '100%',
+                    boxSizing: 'border-box',
+                  }}
+                >
                   <button
                     type="button"
                     disabled={editLoading}
                     onClick={() => setCustomerToEdit(null)}
                     className="btn btn-secondary"
-                    style={{ flex: 1 }}
+                    style={{
+                      flex: '1 1 0',
+                      padding: '0.75rem 1rem',
+                      fontSize: '0.9rem',
+                      fontWeight: 600,
+                      borderRadius: 'var(--radius-full)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      touchAction: 'manipulation',
+                      boxSizing: 'border-box',
+                    }}
                   >
                     Cancel
                   </button>
@@ -2319,88 +2380,30 @@ export const AdminDashboard = ({ isOpen, onClose }) => {
                     type="submit"
                     disabled={editLoading}
                     className="btn btn-primary"
-                    style={{ flex: 1.2 }}
+                    style={{
+                      flex: '1.4 1 0',
+                      padding: '0.75rem 1rem',
+                      fontSize: '0.9rem',
+                      fontWeight: 700,
+                      borderRadius: 'var(--radius-full)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      touchAction: 'manipulation',
+                      boxSizing: 'border-box',
+                    }}
                   >
                     {editLoading ? 'Saving...' : 'Save Changes'}
                   </button>
                 </div>
               </form>
             </div>
-          </div>
+          </div>,
+          document.body
         )}
 
         {/* Customer Visit History Submodal */}
-        {selectedCustomerHistory && (
-          <div
-            style={{
-              position: 'absolute',
-              inset: 0,
-              background: 'rgba(11, 12, 16, 0.97)',
-              borderRadius: 'var(--radius-lg)',
-              padding: '2rem',
-              zIndex: 100,
-              display: 'flex',
-              flexDirection: 'column',
-            }}
-          >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
-              <div>
-                <h4 style={{ fontSize: '1.3rem', color: '#ffffff' }}>
-                  Visit Logs: {selectedCustomerHistory.name}
-                </h4>
-                <p style={{ fontSize: '0.8rem', color: 'var(--gold-primary)' }}>
-                  Active Stamps: {selectedCustomerHistory.currentStamps}/5 • Lifetime: {selectedCustomerHistory.lifetimeVisits}
-                </p>
-              </div>
-              <button
-                onClick={() => setSelectedCustomerHistory(null)}
-                style={{ background: 'none', border: 'none', color: '#ffffff', cursor: 'pointer' }}
-              >
-                <X size={22} />
-              </button>
-            </div>
-
-            <div style={{ flex: 1, overflowY: 'auto' }}>
-              {historyVisits.length === 0 ? (
-                <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>
-                  No visit history recorded yet for this customer.
-                </div>
-              ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
-                  {historyVisits.map((v) => (
-                    <div
-                      key={v._id}
-                      style={{
-                        padding: '0.85rem 1rem',
-                        background: 'rgba(255, 255, 255, 0.04)',
-                        borderRadius: 'var(--radius-sm)',
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                      }}
-                    >
-                      <div>
-                        <div style={{ fontWeight: 600, color: '#ffffff' }}>{v.serviceName}</div>
-                        <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{v.notes}</div>
-                      </div>
-                      <div style={{ textAlign: 'right' }}>
-                        <div style={{ color: 'var(--gold-primary)', fontWeight: 500, fontSize: '0.85rem' }}>
-                          {new Date(v.visitedAt).toLocaleDateString()}
-                        </div>
-                        <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-                          {new Date(v.visitedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* Super Admin: Add New Staff Admin Modal */}
-        {showAddAdminModal && (
+        {selectedCustomerHistory && typeof document !== 'undefined' && createPortal(
           <div
             style={{
               position: 'fixed',
@@ -2408,7 +2411,115 @@ export const AdminDashboard = ({ isOpen, onClose }) => {
               background: 'rgba(0, 0, 0, 0.85)',
               backdropFilter: 'blur(8px)',
               WebkitBackdropFilter: 'blur(8px)',
-              zIndex: 99999,
+              zIndex: 999999,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: 'clamp(0.5rem, 3vw, 1.25rem)',
+              boxSizing: 'border-box',
+            }}
+            onClick={() => setSelectedCustomerHistory(null)}
+          >
+            <div
+              style={{
+                background: '#14171f',
+                border: '1px solid rgba(212, 175, 55, 0.4)',
+                boxShadow: '0 25px 60px rgba(0, 0, 0, 0.9), 0 0 35px rgba(212, 175, 55, 0.2)',
+                borderRadius: 'var(--radius-lg)',
+                maxWidth: '560px',
+                width: '100%',
+                maxHeight: '90vh',
+                display: 'flex',
+                flexDirection: 'column',
+                padding: 'clamp(1.1rem, 4vw, 1.75rem)',
+                boxSizing: 'border-box',
+                color: '#ffffff',
+                position: 'relative',
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', gap: '0.75rem' }}>
+                <div style={{ minWidth: 0 }}>
+                  <h4 style={{ fontSize: 'clamp(1.1rem, 3.6vw, 1.3rem)', color: '#ffffff', margin: 0, fontWeight: 700 }}>
+                    Visit Logs: {selectedCustomerHistory.name}
+                  </h4>
+                  <p style={{ fontSize: '0.8rem', color: 'var(--gold-primary)', margin: '0.2rem 0 0 0' }}>
+                    Active Stamps: {selectedCustomerHistory.currentStamps}/5 • Lifetime: {selectedCustomerHistory.lifetimeVisits}
+                  </p>
+                </div>
+                <button
+                  onClick={() => setSelectedCustomerHistory(null)}
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.06)',
+                    border: '1px solid rgba(255, 255, 255, 0.12)',
+                    borderRadius: '50%',
+                    width: '32px',
+                    height: '32px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#ffffff',
+                    cursor: 'pointer',
+                    flexShrink: 0,
+                  }}
+                  aria-label="Close"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              <div style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch' }}>
+                {historyVisits.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>
+                    No visit history recorded yet for this customer.
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+                    {historyVisits.map((v) => (
+                      <div
+                        key={v._id}
+                        style={{
+                          padding: '0.85rem 1rem',
+                          background: 'rgba(255, 255, 255, 0.04)',
+                          borderRadius: 'var(--radius-sm)',
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          gap: '0.5rem',
+                        }}
+                      >
+                        <div>
+                          <div style={{ fontWeight: 600, color: '#ffffff' }}>{v.serviceName}</div>
+                          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{v.notes}</div>
+                        </div>
+                        <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                          <div style={{ color: 'var(--gold-primary)', fontWeight: 500, fontSize: '0.85rem' }}>
+                            {new Date(v.visitedAt).toLocaleDateString()}
+                          </div>
+                          <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                            {new Date(v.visitedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>,
+          document.body
+        )}
+
+        {/* Super Admin: Add New Staff Admin Modal */}
+        {showAddAdminModal && typeof document !== 'undefined' && createPortal(
+          <div
+            style={{
+              position: 'fixed',
+              inset: 0,
+              background: 'rgba(0, 0, 0, 0.85)',
+              backdropFilter: 'blur(8px)',
+              WebkitBackdropFilter: 'blur(8px)',
+              zIndex: 999999,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -2423,8 +2534,11 @@ export const AdminDashboard = ({ isOpen, onClose }) => {
                 border: '1px solid rgba(212, 175, 55, 0.4)',
                 boxShadow: '0 25px 60px rgba(0, 0, 0, 0.9), 0 0 35px rgba(212, 175, 55, 0.2)',
                 borderRadius: 'var(--radius-lg)',
-                maxWidth: '460px',
+                maxWidth: '440px',
                 width: '100%',
+                maxHeight: '92vh',
+                overflowY: 'auto',
+                WebkitOverflowScrolling: 'touch',
                 padding: 'clamp(1.1rem, 4vw, 1.75rem)',
                 boxSizing: 'border-box',
                 color: '#ffffff',
@@ -2432,27 +2546,39 @@ export const AdminDashboard = ({ isOpen, onClose }) => {
               }}
               onClick={(e) => e.stopPropagation()}
             >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', gap: '0.75rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', minWidth: 0 }}>
                   <div
                     style={{
-                      width: '40px',
-                      height: '40px',
-                      borderRadius: '8px',
+                      width: '42px',
+                      height: '42px',
+                      borderRadius: '10px',
                       background: 'rgba(212, 175, 55, 0.15)',
                       border: '1px solid rgba(212, 175, 55, 0.3)',
                       color: 'var(--gold-primary)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
+                      flexShrink: 0,
                     }}
                   >
                     <UserPlus size={20} />
                   </div>
-                  <div>
-                    <h3 style={{ fontSize: '1.2rem', color: '#ffffff', margin: 0 }}>Promote User to Admin</h3>
+                  <div style={{ minWidth: 0 }}>
+                    <h3
+                      style={{
+                        fontSize: 'clamp(1.1rem, 3.6vw, 1.25rem)',
+                        fontWeight: 700,
+                        color: '#ffffff',
+                        margin: 0,
+                        lineHeight: 1.2,
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      Promote to Admin
+                    </h3>
                     <p style={{ fontSize: '0.75rem', color: 'var(--gold-primary)', margin: '0.2rem 0 0 0' }}>
-                      Grant Salon Admin Privileges to an Existing User
+                      Grant Salon Admin Privileges
                     </p>
                   </div>
                 </div>
@@ -2460,9 +2586,23 @@ export const AdminDashboard = ({ isOpen, onClose }) => {
                   type="button"
                   disabled={addAdminLoading}
                   onClick={() => setShowAddAdminModal(false)}
-                  style={{ background: 'none', border: 'none', color: '#ffffff', cursor: 'pointer' }}
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.06)',
+                    border: '1px solid rgba(255, 255, 255, 0.12)',
+                    borderRadius: '50%',
+                    width: '32px',
+                    height: '32px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#ffffff',
+                    cursor: 'pointer',
+                    flexShrink: 0,
+                    transition: 'all 0.2s ease',
+                  }}
+                  aria-label="Close"
                 >
-                  <X size={20} />
+                  <X size={18} />
                 </button>
               </div>
 
@@ -2511,19 +2651,31 @@ export const AdminDashboard = ({ isOpen, onClose }) => {
                   </span>
                 </div>
 
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.65rem', marginTop: '0.75rem', width: '100%' }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    gap: '0.75rem',
+                    marginTop: '0.85rem',
+                    width: '100%',
+                    boxSizing: 'border-box',
+                  }}
+                >
                   <button
                     type="button"
                     disabled={addAdminLoading}
                     onClick={() => setShowAddAdminModal(false)}
                     className="btn btn-secondary"
                     style={{
-                      flex: '1 1 110px',
-                      minWidth: '100px',
-                      padding: '0.65rem 0.85rem',
-                      fontSize: '0.85rem',
+                      flex: '1 1 0',
+                      padding: '0.75rem 1rem',
+                      fontSize: '0.9rem',
+                      fontWeight: 600,
+                      borderRadius: 'var(--radius-full)',
+                      display: 'flex',
+                      alignItems: 'center',
                       justifyContent: 'center',
                       touchAction: 'manipulation',
+                      boxSizing: 'border-box',
                     }}
                   >
                     Cancel
@@ -2533,12 +2685,16 @@ export const AdminDashboard = ({ isOpen, onClose }) => {
                     disabled={addAdminLoading}
                     className="btn btn-primary"
                     style={{
-                      flex: '1.2 1 140px',
-                      minWidth: '130px',
-                      padding: '0.65rem 0.85rem',
-                      fontSize: '0.85rem',
+                      flex: '1.4 1 0',
+                      padding: '0.75rem 1rem',
+                      fontSize: '0.9rem',
+                      fontWeight: 700,
+                      borderRadius: 'var(--radius-full)',
+                      display: 'flex',
+                      alignItems: 'center',
                       justifyContent: 'center',
                       touchAction: 'manipulation',
+                      boxSizing: 'border-box',
                     }}
                   >
                     {addAdminLoading ? 'Promoting...' : 'Promote to Admin'}
@@ -2546,7 +2702,8 @@ export const AdminDashboard = ({ isOpen, onClose }) => {
                 </div>
               </form>
             </div>
-          </div>
+          </div>,
+          document.body
         )}
       </div>
     </div>
