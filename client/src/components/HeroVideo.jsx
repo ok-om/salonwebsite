@@ -239,11 +239,13 @@ export const HeroVideo = ({ onOpenLoyalty, onOpenAdmin, onScrollToExperience, is
 
             {/* Action Buttons */}
             <div
+              className="hero-action-buttons"
               style={{
                 display: 'flex',
-                flexWrap: 'wrap',
+                flexWrap: 'nowrap',
                 alignItems: 'center',
-                gap: '0.85rem',
+                justifyContent: 'center',
+                gap: '0.65rem',
               }}
             >
               {isAdmin ? (
@@ -489,12 +491,21 @@ export const HeroVideo = ({ onOpenLoyalty, onOpenAdmin, onScrollToExperience, is
             line-height: 1.35 !important;
             max-width: 480px !important;
           }
-          .hero-text-col > div:last-child {
-            gap: clamp(0.35rem, 0.9vh, 0.65rem) !important;
+          .hero-action-buttons {
+            display: flex !important;
+            flex-direction: row !important;
+            flex-wrap: nowrap !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 0.5rem !important;
+            width: 100% !important;
+            max-width: 440px !important;
           }
           .hero-btn {
-            padding: clamp(0.38rem, 1vh, 0.65rem) clamp(0.85rem, 2.2vw, 1.3rem) !important;
-            font-size: clamp(0.76rem, 2vw, 0.88rem) !important;
+            white-space: nowrap !important;
+            flex: 0 1 auto !important;
+            padding: clamp(0.42rem, 1vh, 0.65rem) clamp(0.65rem, 2vw, 1.15rem) !important;
+            font-size: clamp(0.74rem, 2vw, 0.88rem) !important;
           }
           .hero-3d-responsive-canvas {
             height: clamp(100px, 16vh, 185px) !important;
@@ -507,17 +518,20 @@ export const HeroVideo = ({ onOpenLoyalty, onOpenAdmin, onScrollToExperience, is
           }
         }
         @media (max-width: 360px) {
-          .hero-highlight-stats-bar {
-            grid-template-columns: 1fr !important;
-            gap: 0.5rem !important;
-            padding: 0.65rem 0.75rem !important;
-          }
-          .hero-text-col h1 {
-            font-size: 1.45rem !important;
+          .hero-action-buttons {
+            gap: 0.35rem !important;
           }
           .hero-btn {
-            width: 100% !important;
-            justify-content: center !important;
+            padding: 0.44rem 0.55rem !important;
+            font-size: 0.72rem !important;
+          }
+          .hero-highlight-stats-bar {
+            grid-template-columns: repeat(3, 1fr) !important;
+            gap: 0.25rem !important;
+            padding: 0.45rem 0.35rem !important;
+          }
+          .hero-text-col h1 {
+            font-size: 1.5rem !important;
           }
         }
         @media (min-width: 2000px) {

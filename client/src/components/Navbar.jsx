@@ -72,13 +72,15 @@ export const Navbar = ({ onOpenAuth, onOpenAdmin, onOpenLoyalty, onOpenProfile }
         }}
       >
         <div
-          className="container"
+          className="container navbar-container"
           style={{
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
             height: '100%',
-            gap: '0.5rem',
+            gap: '0.4rem',
+            paddingLeft: 'clamp(0.45rem, 2vw, 1.25rem)',
+            paddingRight: 'clamp(0.45rem, 2vw, 1.25rem)',
           }}
         >
           {/* Brand Logo & Name */}
@@ -87,10 +89,11 @@ export const Navbar = ({ onOpenAuth, onOpenAdmin, onOpenLoyalty, onOpenProfile }
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '0.6rem',
+              gap: 'clamp(0.35rem, 1.5vw, 0.6rem)',
               cursor: 'pointer',
               textDecoration: 'none',
-              minWidth: 0, // prevents flex item blowout on 320px
+              minWidth: 0,
+              flexShrink: 1,
             }}
           >
             <img
@@ -100,8 +103,8 @@ export const Navbar = ({ onOpenAuth, onOpenAdmin, onOpenLoyalty, onOpenProfile }
               height="38"
               decoding="async"
               style={{
-                width: '38px',
-                height: '38px',
+                width: 'clamp(30px, 8vw, 38px)',
+                height: 'clamp(30px, 8vw, 38px)',
                 borderRadius: '50%',
                 border: '2px solid var(--gold-primary)',
                 objectFit: 'cover',
@@ -113,14 +116,12 @@ export const Navbar = ({ onOpenAuth, onOpenAdmin, onOpenLoyalty, onOpenProfile }
               <span
                 style={{
                   fontFamily: 'var(--font-serif)',
-                  fontSize: 'clamp(0.95rem, 3.5vw, 1.15rem)',
+                  fontSize: 'clamp(0.78rem, 3.4vw, 1.15rem)',
                   fontWeight: 700,
-                  letterSpacing: '0.04em',
+                  letterSpacing: '0.01em',
                   color: '#ffffff',
                   display: 'block',
                   whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
                   lineHeight: 1.1,
                 }}
               >
@@ -128,9 +129,9 @@ export const Navbar = ({ onOpenAuth, onOpenAdmin, onOpenLoyalty, onOpenProfile }
               </span>
               <span
                 style={{
-                  fontSize: '0.62rem',
+                  fontSize: '0.58rem',
                   color: 'var(--gold-primary)',
-                  letterSpacing: '0.15em',
+                  letterSpacing: '0.12em',
                   textTransform: 'uppercase',
                   fontWeight: 600,
                   display: 'block',
