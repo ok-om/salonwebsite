@@ -31,6 +31,8 @@ import {
   Crown,
   UserPlus,
   Shield,
+  Bell,
+  Calendar,
 } from 'lucide-react';
 
 const PaginationControl = ({
@@ -260,6 +262,29 @@ export const AdminDashboard = ({ isOpen, onClose }) => {
     validDeletedPage * deletedPageSize
   );
 
+  // Coupon Management & Expiry Extension State
+  const [couponsList, setCouponsList] = useState([]);
+  const [couponStats, setCouponStats] = useState({ total: 0, active: 0, expiringSoon: 0, expired: 0, redeemed: 0 });
+  const [couponsLoading, setCouponsLoading] = useState(false);
+  const [couponFilterStatus, setCouponFilterStatus] = useState('all'); // 'all' | 'expiring_soon' | 'active' | 'expired' | 'redeemed'
+  const [couponSearchQuery, setCouponSearchQuery] = useState('');
+  const [couponToExtend, setCouponToExtend] = useState(null);
+  const [extendDays, setExtendDays] = useState(15);
+  const [extendCustomDate, setExtendCustomDate] = useState('');
+  const [extendLoading, setExtendLoading] = useState(false);
+  const [extendMsg, setExtendMsg] = useState('');
+  const [extendError, setExtendError] = useState('');
+  const [couponPage, setCouponPage] = useState(1);
+  const [couponPageSize, setCouponPageSize] = useState(5);
+
+  // Paginated coupons calculation
+  const totalCouponPages = Math.ceil(couponsList.length / couponPageSize) || 1;
+  const validCouponPage = Math.min(Math.max(1, couponPage), totalCouponPages);
+  const paginatedCoupons = couponsList.slice(
+    (validCouponPage - 1) * couponPageSize,
+    validCouponPage * couponPageSize
+  );
+
   useEffect(() => {
     if (config) {
       setCmsForm({ ...config });
@@ -303,15 +328,60 @@ export const AdminDashboard = ({ isOpen, onClose }) => {
     }
   };
 
+  // Load All Offer Coupons (Active, Expiring Soon, Expired, Redeemed)
+  const fetchCoupons = async (status = couponFilterStatus, search = couponSearchQuery) => {
+    setCouponsLoading(true);
+    try {
+      const res = await API.get('/loyalty/all-coupons', {
+        params: { status, search },
+      });
+      setCouponsList(res.data.coupons || []);
+      setCouponStats(res.data.stats || { total: 0, active: 0, expiringSoon: 0, expired: 0, redeemed: 0 });
+    } catch (err) {
+      console.error('Failed to load coupons:', err);
+    } finally {
+      setCouponsLoading(false);
+    }
+  };
+
+  // Extend or Increase Coupon Expiry Date
+  const handleExtendCoupon = async (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    if (!couponToExtend) return;
+    setExtendLoading(true);
+    setExtendError('');
+    setExtendMsg('');
+    try {
+      const res = await API.put(`/loyalty/coupons/${couponToExtend._id}/extend`, {
+        daysToAdd: extendCustomDate ? undefined : extendDays,
+        customDate: extendCustomDate || undefined,
+      });
+      setExtendMsg(res.data.message || 'Validity extended successfully!');
+      setFeedback({ type: 'success', msg: res.data.message });
+      await fetchCoupons(couponFilterStatus, couponSearchQuery);
+      await fetchCustomers(searchQuery);
+      setTimeout(() => {
+        setCouponToExtend(null);
+        setExtendMsg('');
+        setExtendCustomDate('');
+      }, 1200);
+    } catch (err) {
+      setExtendError(err.response?.data?.message || 'Failed to extend coupon validity.');
+    } finally {
+      setExtendLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (isOpen && isAdmin) {
       fetchCustomers(searchQuery);
       fetchDeletedCustomers();
+      fetchCoupons(couponFilterStatus, couponSearchQuery);
       if (isSuperAdmin) {
         fetchStaffList();
       }
     }
-  }, [isOpen, isAdmin, isSuperAdmin]);
+  }, [isOpen, isAdmin, isSuperAdmin, searchQuery, couponFilterStatus, couponSearchQuery]);
 
   // Zero-Reload Real-time Updates Listener
   useEffect(() => {
@@ -320,6 +390,7 @@ export const AdminDashboard = ({ isOpen, onClose }) => {
       if (!data) return;
 
       if (data.type === 'STAMP_AWARDED') {
+        fetchCoupons(couponFilterStatus, couponSearchQuery);
         setCustomers((prevCustomers) =>
           prevCustomers.map((c) =>
             c._id === data.userId
@@ -334,7 +405,8 @@ export const AdminDashboard = ({ isOpen, onClose }) => {
               : c
           )
         );
-      } else if (data.type === 'COUPON_REDEEMED') {
+      } else if (data.type === 'COUPON_REDEEMED' || data.type === 'COUPON_EXTENDED') {
+        fetchCoupons(couponFilterStatus, couponSearchQuery);
         setCustomers((prevCustomers) =>
           prevCustomers.map((c) =>
             c._id === data.userId
@@ -1153,11 +1225,9 @@ export const AdminDashboard = ({ isOpen, onClose }) => {
           {/* ========================================================================= */}
           {/* TAB 2: REDEEM COUPON AT COUNTER */}
           {/* ========================================================================= */}
-          {/* ========================================================================= */}
-          {/* TAB 2: REDEEM COUPON AT COUNTER */}
-          {/* ========================================================================= */}
           {activeTab === 'redeem' && (
-            <div style={{ maxWidth: '560px', margin: '1rem auto 2rem', textAlign: 'center' }}>
+            <div>
+              <div style={{ maxWidth: '560px', margin: '1rem auto 2rem', textAlign: 'center' }}>
               <div
                 style={{
                   width: '64px',
@@ -1399,7 +1469,322 @@ export const AdminDashboard = ({ isOpen, onClose }) => {
                 </button>
               </form>
             </div>
-          )}
+
+            {/* Gold Divider */}
+            <div
+              style={{
+                height: '1px',
+                background: 'radial-gradient(ellipse at center, rgba(212, 175, 55, 0.4) 0%, transparent 75%)',
+                margin: '2.5rem 0 1.5rem',
+              }}
+            />
+
+            {/* Offer Coupon Expiry Control Center & Validity Extension */}
+            <div style={{ marginTop: '1rem' }}>
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  flexWrap: 'wrap',
+                  gap: '0.75rem',
+                  marginBottom: '1rem',
+                }}
+              >
+                <div>
+                  <h3 style={{ fontSize: '1.25rem', color: '#ffffff', display: 'flex', alignItems: 'center', gap: '0.5rem', margin: 0 }}>
+                    <Gift size={20} color="var(--gold-primary)" />
+                    <span>Offer Coupons & Expiry Control Center</span>
+                  </h3>
+                  <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', margin: '0.25rem 0 0' }}>
+                    Track 35-day duration deadlines, 5-day advance warnings, and extend validity dates directly.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => fetchCoupons(couponFilterStatus, couponSearchQuery)}
+                  className="btn btn-secondary btn-sm"
+                  style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}
+                >
+                  <RefreshCw size={13} className={couponsLoading ? 'spin' : ''} />
+                  <span>Refresh List</span>
+                </button>
+              </div>
+
+              {/* Filter Status Pills */}
+              <div style={{ display: 'flex', gap: '0.45rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
+                {[
+                  { id: 'all', label: `All Coupons (${couponStats.total})` },
+                  { id: 'expiring_soon', label: `⚠️ Expiring in ≤5 Days (${couponStats.expiringSoon})`, urgent: couponStats.expiringSoon > 0 },
+                  { id: 'active', label: `Active (${couponStats.active})` },
+                  { id: 'expired', label: `Expired / Removed (${couponStats.expired})` },
+                  { id: 'redeemed', label: `Redeemed (${couponStats.redeemed})` },
+                ].map((filter) => (
+                  <button
+                    key={filter.id}
+                    type="button"
+                    onClick={() => {
+                      setCouponFilterStatus(filter.id);
+                      setCouponPage(1);
+                    }}
+                    className={`btn btn-sm ${couponFilterStatus === filter.id ? 'btn-primary' : 'btn-secondary'}`}
+                    style={{
+                      fontSize: '0.76rem',
+                      padding: '0.35rem 0.75rem',
+                      ...(filter.urgent && couponFilterStatus !== filter.id
+                        ? { borderColor: '#f59e0b', color: '#fbbf24', background: 'rgba(245, 158, 11, 0.1)' }
+                        : {}),
+                    }}
+                  >
+                    {filter.label}
+                  </button>
+                ))}
+              </div>
+
+              {/* Search Bar */}
+              <div style={{ position: 'relative', marginBottom: '1.25rem' }}>
+                <Search size={15} style={{ position: 'absolute', left: '0.85rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+                <input
+                  type="text"
+                  placeholder="Search by coupon code, customer name, email, or mobile..."
+                  value={couponSearchQuery}
+                  onChange={(e) => {
+                    setCouponSearchQuery(e.target.value);
+                    setCouponPage(1);
+                  }}
+                  className="input-field"
+                  style={{ paddingLeft: '2.4rem', fontSize: '0.86rem' }}
+                />
+              </div>
+
+              {/* Coupons List */}
+              {couponsLoading ? (
+                <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>
+                  <RefreshCw size={22} className="spin" style={{ margin: '0 auto 0.5rem' }} />
+                  <div>Loading coupons and validity status...</div>
+                </div>
+              ) : couponsList.length === 0 ? (
+                <div
+                  style={{
+                    padding: '2rem',
+                    textAlign: 'center',
+                    background: 'rgba(255, 255, 255, 0.02)',
+                    border: '1px dashed rgba(255, 255, 255, 0.1)',
+                    borderRadius: 'var(--radius-sm)',
+                    color: 'var(--text-muted)',
+                    fontSize: '0.86rem',
+                  }}
+                >
+                  No coupons found matching your current filter.
+                </div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                  {paginatedCoupons.map((coupon) => (
+                    <div
+                      key={coupon._id}
+                      style={{
+                        background: coupon.status === 'expired'
+                          ? 'rgba(239, 68, 68, 0.04)'
+                          : coupon.isExpiringSoon
+                          ? 'rgba(245, 158, 11, 0.05)'
+                          : 'rgba(255, 255, 255, 0.03)',
+                        border: coupon.status === 'expired'
+                          ? '1px dashed rgba(239, 68, 68, 0.35)'
+                          : coupon.isExpiringSoon
+                          ? '1.5px solid rgba(245, 158, 11, 0.5)'
+                          : '1px solid rgba(255, 255, 255, 0.08)',
+                        borderRadius: 'var(--radius-sm)',
+                        padding: '1rem',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '0.65rem',
+                      }}
+                    >
+                      {/* Top bar: Code, Badges, & Action */}
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                          <span
+                            style={{
+                              fontFamily: 'monospace',
+                              fontWeight: 800,
+                              fontSize: '1.05rem',
+                              color: coupon.status === 'expired' ? '#f87171' : 'var(--gold-primary)',
+                              background: 'rgba(0, 0, 0, 0.5)',
+                              padding: '0.2rem 0.6rem',
+                              borderRadius: '6px',
+                              border: '1px solid currentColor',
+                              letterSpacing: '0.08em',
+                            }}
+                          >
+                            {coupon.code}
+                          </span>
+
+                          {coupon.status === 'expired' ? (
+                            <span
+                              style={{
+                                background: 'rgba(239, 68, 68, 0.2)',
+                                color: '#fca5a5',
+                                border: '1px solid #ef4444',
+                                padding: '0.15rem 0.5rem',
+                                borderRadius: '4px',
+                                fontSize: '0.68rem',
+                                fontWeight: 700,
+                              }}
+                            >
+                              EXPIRED
+                            </span>
+                          ) : coupon.status === 'redeemed' ? (
+                            <span
+                              style={{
+                                background: 'rgba(59, 130, 246, 0.15)',
+                                color: '#93c5fd',
+                                border: '1px solid #3b82f6',
+                                padding: '0.15rem 0.5rem',
+                                borderRadius: '4px',
+                                fontSize: '0.68rem',
+                                fontWeight: 700,
+                              }}
+                            >
+                              REDEEMED
+                            </span>
+                          ) : coupon.isExpiringSoon ? (
+                            <span
+                              style={{
+                                background: 'rgba(245, 158, 11, 0.2)',
+                                color: '#fbbf24',
+                                border: '1px solid #f59e0b',
+                                padding: '0.15rem 0.5rem',
+                                borderRadius: '4px',
+                                fontSize: '0.68rem',
+                                fontWeight: 700,
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '0.3rem',
+                              }}
+                            >
+                              <Bell size={11} /> EXPIRES IN {coupon.daysRemaining} DAY{coupon.daysRemaining === 1 ? '' : 'S'}
+                            </span>
+                          ) : (
+                            <span
+                              style={{
+                                background: 'rgba(46, 204, 113, 0.15)',
+                                color: '#2ecc71',
+                                border: '1px solid #2ecc71',
+                                padding: '0.15rem 0.5rem',
+                                borderRadius: '4px',
+                                fontSize: '0.68rem',
+                                fontWeight: 700,
+                              }}
+                            >
+                              ACTIVE
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Quick Extend Expiry Date Button */}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setCouponToExtend(coupon);
+                            setExtendDays(15);
+                            setExtendCustomDate('');
+                            setExtendMsg('');
+                            setExtendError('');
+                          }}
+                          className="btn btn-secondary btn-sm"
+                          style={{
+                            borderColor: 'var(--gold-primary)',
+                            color: 'var(--gold-primary)',
+                            fontSize: '0.78rem',
+                            padding: '0.35rem 0.75rem',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.35rem',
+                          }}
+                        >
+                          <Calendar size={13} />
+                          <span>{coupon.status === 'expired' ? 'Reactivate & Extend Expiry' : 'Increase Expiry Date'}</span>
+                        </button>
+                      </div>
+
+                      {/* Customer & Offer Meta */}
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.5rem', fontSize: '0.78rem', marginTop: '0.2rem' }}>
+                        <div>
+                          <span style={{ color: 'var(--text-muted)' }}>Customer: </span>
+                          <strong style={{ color: '#ffffff' }}>{coupon.user?.name || 'Customer'}</strong>
+                          <div style={{ color: 'var(--text-secondary)', fontSize: '0.74rem' }}>
+                            {coupon.user?.phone || 'No phone'} • {coupon.user?.email || 'N/A'}
+                          </div>
+                        </div>
+
+                        <div>
+                          <span style={{ color: 'var(--text-muted)' }}>Reward Offer: </span>
+                          <span style={{ color: '#e2e8f0', fontWeight: 600 }}>{coupon.title}</span>
+                          <div style={{ color: 'var(--gold-primary)', fontWeight: 700, fontSize: '0.74rem' }}>
+                            {coupon.discountType}
+                          </div>
+                        </div>
+
+                        <div>
+                          <span style={{ color: 'var(--text-muted)' }}>Validity Deadline: </span>
+                          <div style={{ color: coupon.status === 'expired' ? '#f87171' : coupon.isExpiringSoon ? '#fbbf24' : '#ffffff', fontWeight: 600 }}>
+                            {new Date(coupon.expiresAt).toLocaleDateString()}
+                            {coupon.status === 'active' && ` (${coupon.daysRemaining} days remaining)`}
+                          </div>
+                          <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                            Issued: {new Date(coupon.createdAt).toLocaleDateString()}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* If Expired: Prominent Reason Display */}
+                      {coupon.status === 'expired' && (
+                        <div
+                          style={{
+                            background: 'rgba(239, 68, 68, 0.1)',
+                            borderLeft: '3px solid #ef4444',
+                            borderRadius: '4px',
+                            padding: '0.5rem 0.75rem',
+                            fontSize: '0.76rem',
+                            color: '#fca5a5',
+                            lineHeight: 1.45,
+                          }}
+                        >
+                          <strong>❌ Reason for Expiry / Removal:</strong>{' '}
+                          {coupon.expiredReason || 'Validity duration of 35 days expired without salon counter redemption.'}
+                          <div style={{ fontSize: '0.7rem', color: '#cbd5e1', marginTop: '0.2rem' }}>
+                            💡 <em>You can click "Reactivate & Extend Expiry" above to restore this coupon to active status.</em>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Extension History Audit Trail */}
+                      {coupon.extendedCount > 0 && (
+                        <div style={{ fontSize: '0.72rem', color: '#38bdf8', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                          <Clock size={12} />
+                          <span>
+                            Extended {coupon.extendedCount} time(s). Last extended on {new Date(coupon.lastExtendedAt).toLocaleDateString()}
+                            {coupon.extendedBy?.name ? ` by ${coupon.extendedBy.name}` : ''}.
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Pagination */}
+              <PaginationControl
+                currentPage={validCouponPage}
+                totalItems={couponsList.length}
+                pageSize={couponPageSize}
+                onPageChange={setCouponPage}
+                onPageSizeChange={setCouponPageSize}
+                itemLabel="coupons"
+              />
+            </div>
+          </div>
+        )}
 
           {/* ========================================================================= */}
           {/* TAB 3: LIVE WEBSITE CMS */}
@@ -2698,6 +3083,233 @@ export const AdminDashboard = ({ isOpen, onClose }) => {
                     }}
                   >
                     {addAdminLoading ? 'Promoting...' : 'Promote to Admin'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>,
+          document.body
+        )}
+
+        {/* ========================================================================= */}
+        {/* MODAL 5: EXTEND / INCREASE COUPON EXPIRY DATE (PORTALIZED) */}
+        {/* ========================================================================= */}
+        {couponToExtend && createPortal(
+          <div
+            className="modal-overlay"
+            style={{
+              position: 'fixed',
+              inset: 0,
+              zIndex: 99999,
+              background: 'rgba(0, 0, 0, 0.85)',
+              backdropFilter: 'blur(8px)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '1rem',
+            }}
+            onClick={() => setCouponToExtend(null)}
+          >
+            <div
+              className="modal-content"
+              style={{
+                width: '100%',
+                maxWidth: '480px',
+                background: '#12141c',
+                border: '1.5px solid var(--gold-primary)',
+                borderRadius: 'var(--radius-md)',
+                padding: '1.5rem',
+                boxShadow: '0 20px 50px rgba(0, 0, 0, 0.9)',
+                color: '#ffffff',
+                boxSizing: 'border-box',
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
+                <h3 style={{ fontSize: '1.15rem', color: '#ffffff', display: 'flex', alignItems: 'center', gap: '0.45rem', margin: 0 }}>
+                  <Calendar size={18} color="var(--gold-primary)" />
+                  <span>Extend Coupon Validity Date</span>
+                </h3>
+                <button
+                  type="button"
+                  onClick={() => setCouponToExtend(null)}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: 'var(--text-muted)',
+                    cursor: 'pointer',
+                    padding: '0.25rem',
+                  }}
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              {/* Status & Coupon Preview */}
+              <div
+                style={{
+                  background: 'rgba(255, 255, 255, 0.03)',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  borderRadius: 'var(--radius-sm)',
+                  padding: '0.85rem',
+                  marginBottom: '1.25rem',
+                  fontSize: '0.82rem',
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
+                  <span style={{ color: 'var(--text-muted)' }}>Coupon Code:</span>
+                  <span style={{ fontFamily: 'monospace', fontWeight: 800, color: 'var(--gold-primary)', fontSize: '0.96rem' }}>
+                    {couponToExtend.code}
+                  </span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
+                  <span style={{ color: 'var(--text-muted)' }}>Customer:</span>
+                  <span style={{ fontWeight: 600, color: '#ffffff' }}>
+                    {couponToExtend.user?.name || 'Customer'}
+                  </span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
+                  <span style={{ color: 'var(--text-muted)' }}>Current Status:</span>
+                  <span
+                    style={{
+                      fontWeight: 700,
+                      color: couponToExtend.status === 'expired' ? '#f87171' : '#2ecc71',
+                      fontSize: '0.74rem',
+                    }}
+                  >
+                    {couponToExtend.status.toUpperCase()}
+                  </span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ color: 'var(--text-muted)' }}>Current Expiry:</span>
+                  <span style={{ color: '#cbd5e1' }}>
+                    {new Date(couponToExtend.expiresAt).toLocaleDateString()}
+                  </span>
+                </div>
+
+                {couponToExtend.status === 'expired' && (
+                  <div
+                    style={{
+                      marginTop: '0.65rem',
+                      padding: '0.45rem 0.65rem',
+                      background: 'rgba(212, 175, 55, 0.1)',
+                      border: '1px solid rgba(212, 175, 55, 0.3)',
+                      borderRadius: '4px',
+                      fontSize: '0.74rem',
+                      color: '#fef08a',
+                    }}
+                  >
+                    ✨ <strong>Auto-Reactivation:</strong> Increasing the date will automatically clear the expired status and restore this coupon to <strong>ACTIVE</strong>!
+                  </div>
+                )}
+              </div>
+
+              {/* Extension Options Form */}
+              <form onSubmit={handleExtendCoupon}>
+                <div style={{ marginBottom: '1.25rem' }}>
+                  <label className="input-label" style={{ marginBottom: '0.5rem', display: 'block' }}>
+                    Quick Extension Presets
+                  </label>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.5rem' }}>
+                    {[
+                      { days: 7, label: '+7 Days' },
+                      { days: 15, label: '+15 Days' },
+                      { days: 30, label: '+30 Days (1 Month)' },
+                    ].map((opt) => (
+                      <button
+                        key={opt.days}
+                        type="button"
+                        onClick={() => {
+                          setExtendDays(opt.days);
+                          setExtendCustomDate('');
+                        }}
+                        className={`btn btn-sm ${extendDays === opt.days && !extendCustomDate ? 'btn-primary' : 'btn-secondary'}`}
+                        style={{ fontSize: '0.78rem', padding: '0.5rem 0.35rem', textAlign: 'center' }}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Custom Date Input */}
+                <div className="input-group" style={{ marginBottom: '1.25rem' }}>
+                  <label className="input-label">Or Pick Specific Custom Expiry Date</label>
+                  <input
+                    type="date"
+                    min={new Date().toISOString().split('T')[0]}
+                    value={extendCustomDate}
+                    onChange={(e) => {
+                      setExtendCustomDate(e.target.value);
+                    }}
+                    className="input-field"
+                    style={{ fontSize: '0.9rem', color: '#ffffff' }}
+                  />
+                  <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '0.25rem', display: 'block' }}>
+                    Leave empty to use the quick preset (+{extendDays} days) above.
+                  </span>
+                </div>
+
+                {/* Preview Calculated New Expiry */}
+                <div
+                  style={{
+                    background: 'rgba(46, 204, 113, 0.08)',
+                    border: '1px solid rgba(46, 204, 113, 0.3)',
+                    borderRadius: 'var(--radius-sm)',
+                    padding: '0.65rem 0.85rem',
+                    marginBottom: '1.25rem',
+                    fontSize: '0.8rem',
+                    color: '#86efac',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                  }}
+                >
+                  <span>New Expiry Date:</span>
+                  <strong style={{ fontSize: '0.92rem', color: '#2ecc71' }}>
+                    {(() => {
+                      if (extendCustomDate) {
+                        const d = new Date(extendCustomDate);
+                        return isNaN(d.getTime()) ? 'Invalid date' : d.toLocaleDateString();
+                      }
+                      const base = couponToExtend.expiresAt && new Date(couponToExtend.expiresAt).getTime() > Date.now()
+                        ? new Date(couponToExtend.expiresAt).getTime()
+                        : Date.now();
+                      const d = new Date(base + extendDays * 24 * 60 * 60 * 1000);
+                      return d.toLocaleDateString();
+                    })()}
+                  </strong>
+                </div>
+
+                {extendMsg && (
+                  <div style={{ color: '#2ecc71', fontSize: '0.82rem', marginBottom: '0.75rem', textAlign: 'center' }}>
+                    {extendMsg}
+                  </div>
+                )}
+                {extendError && (
+                  <div style={{ color: '#ef4444', fontSize: '0.82rem', marginBottom: '0.75rem', textAlign: 'center' }}>
+                    {extendError}
+                  </div>
+                )}
+
+                {/* Buttons */}
+                <div style={{ display: 'flex', gap: '0.75rem' }}>
+                  <button
+                    type="button"
+                    disabled={extendLoading}
+                    onClick={() => setCouponToExtend(null)}
+                    className="btn btn-secondary"
+                    style={{ flex: 1, padding: '0.65rem', justifyContent: 'center' }}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={extendLoading}
+                    className="btn btn-primary"
+                    style={{ flex: 1.5, padding: '0.65rem', justifyContent: 'center', fontWeight: 700 }}
+                  >
+                    {extendLoading ? 'Saving...' : 'Confirm & Increase Expiry'}
                   </button>
                 </div>
               </form>

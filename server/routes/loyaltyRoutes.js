@@ -10,6 +10,8 @@ import {
   restoreCustomer,
   permanentDeleteCustomer,
   updateCustomerByAdmin,
+  getAllCouponsAdmin,
+  extendCouponExpiryAdmin,
 } from '../controllers/loyaltyController.js';
 import { protect, adminOnly } from '../middleware/authMiddleware.js';
 
@@ -43,6 +45,8 @@ router.post('/add-stamp', protect, adminOnly, addVisitStamp);
 router.get('/customers', protect, adminOnly, getAllCustomers);
 router.put('/customers/:id', protect, adminOnly, updateCustomerByAdmin);
 router.post('/redeem-coupon', protect, adminOnly, redeemCoupon);
+router.get('/all-coupons', protect, adminOnly, getAllCouponsAdmin);
+router.put('/coupons/:id/extend', protect, adminOnly, extendCouponExpiryAdmin);
 
 // Customer soft delete & 24h recovery endpoints
 router.delete('/customers/:id', protect, adminOnly, deleteCustomer);

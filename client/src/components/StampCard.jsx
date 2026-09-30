@@ -24,6 +24,10 @@ import {
   QrCode,
   Copy,
   Check,
+  Bell,
+  AlertTriangle,
+  ChevronDown,
+  ChevronUp,
 } from 'lucide-react';
 
 export const StampCard = ({
@@ -59,6 +63,7 @@ export const StampCard = ({
   const [selectedCouponQr, setSelectedCouponQr] = useState(null);
   const [qrDataUrl, setQrDataUrl] = useState('');
   const [copiedCouponCode, setCopiedCouponCode] = useState(null);
+  const [showExpiredCoupons, setShowExpiredCoupons] = useState(false);
 
   const showQrCode = async (coupon) => {
     try {
@@ -230,7 +235,10 @@ export const StampCard = ({
 
   const currentStamps = loyaltyData?.currentStamps ?? user?.currentStamps ?? 0;
   const stampsNeeded = 5 - currentStamps;
-  const activeCoupons = loyaltyData?.coupons?.filter((c) => !c.isRedeemed) || [];
+  const activeCoupons = loyaltyData?.coupons?.filter((c) => !c.isRedeemed && c.status !== 'expired') || [];
+  const expiredCoupons = loyaltyData?.expiredCoupons || [];
+  const redeemedCoupons = loyaltyData?.redeemedCoupons || [];
+  const hasExpiringSoonCoupon = activeCoupons.some((c) => c.isExpiringSoon || (c.daysRemaining !== undefined && c.daysRemaining <= 5));
 
   return (
     <div
@@ -897,26 +905,62 @@ export const StampCard = ({
             {/* ===================================================================== */}
             {!isAdmin && activeTab === 'stamps' && (
               <div>
+                {/* 5-Day Advance Expiry Reminder Notification Banner */}
+                {hasExpiringSoonCoupon && (
+                  <div
+                    style={{
+                      marginBottom: '1rem',
+                      background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.16) 0%, rgba(212, 175, 55, 0.08) 100%)',
+                      border: '1.5px solid rgba(245, 158, 11, 0.6)',
+                      borderRadius: 'var(--radius-sm)',
+                      padding: '0.8rem 1rem',
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      gap: '0.75rem',
+                      color: '#fef08a',
+                      boxShadow: '0 4px 18px rgba(245, 158, 11, 0.2)',
+                    }}
+                  >
+                    <Bell size={20} color="#f59e0b" style={{ flexShrink: 0, marginTop: '2px' }} />
+                    <div style={{ lineHeight: 1.45 }}>
+                      <div style={{ fontWeight: 800, color: '#fbbf24', fontSize: '0.86rem', display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.2rem' }}>
+                        <span>🔔 Expiry Reminder (5 Days or Less Remaining)!</span>
+                      </div>
+                      <span style={{ fontSize: '0.8rem', color: '#fef3c7' }}>
+                        You have an active 30% to 40% OFF reward coupon expiring very soon! Visit the salon before the deadline and present your coupon at the counter to redeem.
+                      </span>
+                    </div>
+                  </div>
+                )}
+
                 {/* 45-Day Stamp Inactivity Policy Banner (Only visible when user has stamps) */}
                 {currentStamps > 0 && (
                   <div
                     style={{
                       marginBottom: '1rem',
-                      background: 'rgba(212, 175, 55, 0.08)',
-                      border: '1px solid rgba(212, 175, 55, 0.38)',
+                      background: loyaltyData?.isStampDecayWarning
+                        ? 'rgba(239, 68, 68, 0.12)'
+                        : 'rgba(212, 175, 55, 0.08)',
+                      border: loyaltyData?.isStampDecayWarning
+                        ? '1.5px solid rgba(239, 68, 68, 0.5)'
+                        : '1px solid rgba(212, 175, 55, 0.38)',
                       borderRadius: 'var(--radius-sm)',
                       padding: '0.65rem 0.85rem',
                       display: 'flex',
                       alignItems: 'center',
                       gap: '0.65rem',
                       fontSize: '0.78rem',
-                      color: '#fef08a',
+                      color: loyaltyData?.isStampDecayWarning ? '#fca5a5' : '#fef08a',
                     }}
                   >
-                    <Clock size={16} color="var(--gold-primary)" style={{ flexShrink: 0 }} />
+                    {loyaltyData?.isStampDecayWarning ? (
+                      <AlertTriangle size={18} color="#ef4444" style={{ flexShrink: 0 }} />
+                    ) : (
+                      <Clock size={16} color="var(--gold-primary)" style={{ flexShrink: 0 }} />
+                    )}
                     <div style={{ lineHeight: 1.45 }}>
-                      <span style={{ fontWeight: 700, color: 'var(--gold-primary)' }}>
-                        ⏳ 45-Day Visit Policy:
+                      <span style={{ fontWeight: 700, color: loyaltyData?.isStampDecayWarning ? '#f87171' : 'var(--gold-primary)' }}>
+                        {loyaltyData?.isStampDecayWarning ? '⚠️ URGENT — Inactivity Warning:' : '⏳ 45-Day Visit Policy:'}
                       </span>{' '}
                       {loyaltyData?.daysUntilStampDecay !== undefined ? (
                         <span>
@@ -1189,15 +1233,153 @@ export const StampCard = ({
                                 })()}
                               </span>
                             </div>
-                            <span style={{ fontSize: '0.72rem', color: '#94a3b8' }}>
-                              ⏱️ 35 Days Validity (Expires {new Date(coupon.expiresAt).toLocaleDateString()})
-                            </span>
+                            {coupon.isExpiringSoon || (coupon.daysRemaining !== undefined && coupon.daysRemaining <= 5) ? (
+                              <div
+                                style={{
+                                  marginTop: '0.45rem',
+                                  background: 'rgba(239, 68, 68, 0.15)',
+                                  border: '1px solid rgba(239, 68, 68, 0.4)',
+                                  borderRadius: '4px',
+                                  padding: '0.35rem 0.6rem',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '0.4rem',
+                                  color: '#fca5a5',
+                                  fontSize: '0.72rem',
+                                  fontWeight: 600,
+                                }}
+                              >
+                                <AlertTriangle size={13} color="#ef4444" style={{ flexShrink: 0 }} />
+                                <span>
+                                  ⚠️ Expiring in {coupon.daysRemaining ?? 'few'} day{(coupon.daysRemaining ?? 2) === 1 ? '' : 's'} (on {new Date(coupon.expiresAt).toLocaleDateString()})!
+                                </span>
+                              </div>
+                            ) : (
+                              <span style={{ fontSize: '0.72rem', color: '#94a3b8' }}>
+                                ⏱️ 35 Days Validity (Expires {new Date(coupon.expiresAt).toLocaleDateString()}{coupon.daysRemaining !== undefined ? ` • ${coupon.daysRemaining} days left` : ''})
+                              </span>
+                            )}
                           </div>
                         </div>
                       ))}
                     </div>
                   )}
                 </div>
+
+                {/* Expired / Removed Coupons Section with Clear Reason */}
+                {expiredCoupons.length > 0 && (
+                  <div style={{ marginBottom: '1.25rem' }}>
+                    <button
+                      type="button"
+                      onClick={() => setShowExpiredCoupons(!showExpiredCoupons)}
+                      style={{
+                        width: '100%',
+                        background: 'rgba(255, 255, 255, 0.03)',
+                        border: '1px solid rgba(255, 255, 255, 0.08)',
+                        borderRadius: 'var(--radius-sm)',
+                        padding: '0.65rem 0.85rem',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        cursor: 'pointer',
+                        color: '#94a3b8',
+                        fontSize: '0.82rem',
+                        fontWeight: 600,
+                        transition: 'all 0.2s ease',
+                      }}
+                    >
+                      <span style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+                        <Clock size={15} color="#ef4444" />
+                        <span>Expired / Removed Coupons ({expiredCoupons.length})</span>
+                      </span>
+                      <span style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', fontSize: '0.75rem', color: 'var(--gold-primary)' }}>
+                        {showExpiredCoupons ? (
+                          <>
+                            <span>Hide</span>
+                            <ChevronUp size={14} />
+                          </>
+                        ) : (
+                          <>
+                            <span>View Details & Reasons</span>
+                            <ChevronDown size={14} />
+                          </>
+                        )}
+                      </span>
+                    </button>
+
+                    {showExpiredCoupons && (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', marginTop: '0.65rem' }}>
+                        {expiredCoupons.map((coupon) => (
+                          <div
+                            key={coupon._id}
+                            style={{
+                              background: 'rgba(239, 68, 68, 0.05)',
+                              border: '1px dashed rgba(239, 68, 68, 0.35)',
+                              borderRadius: 'var(--radius-sm)',
+                              padding: '0.85rem',
+                              display: 'flex',
+                              flexDirection: 'column',
+                              gap: '0.45rem',
+                            }}
+                          >
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                              <span
+                                style={{
+                                  fontFamily: 'monospace',
+                                  fontWeight: 800,
+                                  fontSize: '0.92rem',
+                                  color: '#f87171',
+                                  letterSpacing: '0.06em',
+                                }}
+                              >
+                                {coupon.code}
+                              </span>
+                              <span
+                                style={{
+                                  background: 'rgba(239, 68, 68, 0.2)',
+                                  color: '#fca5a5',
+                                  border: '1px solid rgba(239, 68, 68, 0.4)',
+                                  padding: '0.15rem 0.5rem',
+                                  borderRadius: '4px',
+                                  fontSize: '0.65rem',
+                                  fontWeight: 700,
+                                }}
+                              >
+                                EXPIRED
+                              </span>
+                            </div>
+
+                            <div style={{ fontSize: '0.8rem', color: '#e2e8f0', fontWeight: 500 }}>
+                              {coupon.title} • {coupon.discountType}
+                            </div>
+
+                            <div
+                              style={{
+                                background: 'rgba(0, 0, 0, 0.35)',
+                                padding: '0.45rem 0.65rem',
+                                borderRadius: '4px',
+                                borderLeft: '3px solid #ef4444',
+                              }}
+                            >
+                              <div style={{ fontSize: '0.72rem', color: '#fca5a5', lineHeight: 1.45 }}>
+                                <strong>Reason for Expiry:</strong>{' '}
+                                {coupon.expiredReason || 'Validity duration of 35 days expired without salon counter redemption.'}
+                              </div>
+                              <div style={{ fontSize: '0.68rem', color: '#94a3b8', marginTop: '0.2rem' }}>
+                                Expired on: {new Date(coupon.expiresAt).toLocaleDateString()}
+                                {coupon.extendedCount > 0 ? ` • Was previously extended ${coupon.extendedCount} time(s)` : ''}
+                              </div>
+                            </div>
+
+                            <div style={{ fontSize: '0.68rem', color: '#94a3b8', fontStyle: 'italic' }}>
+                              💡 Want to use this offer? Request salon admin or reception counter to increase/extend the validity.
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 {/* Visit History Log */}
                 {loyaltyData?.recentVisits && loyaltyData.recentVisits.length > 0 && (

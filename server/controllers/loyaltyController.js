@@ -4,6 +4,31 @@ import { OfferCoupon } from '../models/OfferCoupon.js';
 import { SiteConfig } from '../models/SiteConfig.js';
 import { broadcastRealtimeEvent } from '../services/realtimeService.js';
 
+// Safely drop old TTL index so expired coupons are soft-preserved with reason rather than wiped out
+OfferCoupon.collection?.dropIndex('expiresAt_1').catch(() => {});
+
+// Helper: Soft-expire coupons that have passed their 35-day validity period without deleting them
+export const markExpiredCoupons = async () => {
+  try {
+    const result = await OfferCoupon.updateMany(
+      {
+        status: 'active',
+        isRedeemed: false,
+        expiresAt: { $lt: new Date() },
+      },
+      {
+        $set: {
+          status: 'expired',
+          expiredReason: 'Validity duration of 35 days expired without salon counter redemption.',
+        },
+      }
+    );
+    return result;
+  } catch (err) {
+    console.error('Mark Expired Coupons Error:', err.message);
+  }
+};
+
 // Helper: Generate unique coupon code
 const generateCouponCode = () => {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -161,13 +186,8 @@ export const getAllCustomers = async (req, res) => {
     // Clean up any accounts past their 24h restore window
     await purgeExpiredDeletedUsers();
 
-    // Auto-clean any expired coupons (>35 days) or redeemed coupons permanently from database
-    await OfferCoupon.deleteMany({
-      $or: [
-        { isRedeemed: true },
-        { expiresAt: { $lt: new Date() } },
-      ],
-    });
+    // Soft-expire any coupons that exceeded 35 days (preserve status and reason)
+    await markExpiredCoupons();
 
     const query = { role: 'user', isDeleted: { $ne: true } };
     if (search) {
@@ -182,24 +202,42 @@ export const getAllCustomers = async (req, res) => {
       .select('-password')
       .sort({ createdAt: -1 });
 
-    // Attach latest visit, stamp decay countdown, and active coupons to each customer
+    const fiveDaysLater = new Date(Date.now() + 5 * 24 * 60 * 60 * 1000);
+    const now = new Date();
+
+    // Attach latest visit, stamp decay countdown, and coupons to each customer
     const customerData = await Promise.all(
       users.map(async (u) => {
         const decayInfo = await applyStampInactivityCheck(u);
         const lastVisit = await VisitLog.findOne({ user: u._id }).sort({ visitedAt: -1 });
-        const couponsCount = await OfferCoupon.countDocuments({
-          user: u._id,
-          isRedeemed: false,
-          expiresAt: { $gt: new Date() },
-        });
+        
+        const [activeCoupons, expiredCouponsCount] = await Promise.all([
+          OfferCoupon.find({
+            user: u._id,
+            status: 'active',
+            expiresAt: { $gt: now },
+          }).lean(),
+          OfferCoupon.countDocuments({
+            user: u._id,
+            status: 'expired',
+          }),
+        ]);
+
+        const hasExpiringSoonCoupon = activeCoupons.some(
+          (c) => new Date(c.expiresAt) <= fiveDaysLater
+        );
+
         return {
           ...u.toObject(),
           currentStamps: u.currentStamps,
           lastStampDate: u.lastStampDate,
           daysUntilStampDecay: decayInfo.daysUntilDecay,
+          isStampDecayWarning: decayInfo.daysUntilDecay > 0 && decayInfo.daysUntilDecay <= 5,
           lastVisitDate: lastVisit?.visitedAt || null,
           lastServiceName: lastVisit?.serviceName || 'N/A',
-          activeCouponsCount: couponsCount,
+          activeCouponsCount: activeCoupons.length,
+          expiredCouponsCount,
+          hasExpiringSoonCoupon,
         };
       })
     );
@@ -234,13 +272,8 @@ export const getVisitHistory = async (req, res) => {
 // 4. User: Get Current User's Loyalty Profile, 45-Day Stamp Inactivity Check & Coupons
 export const getMyLoyalty = async (req, res) => {
   try {
-    // Asynchronous background purge of expired/redeemed coupons (non-blocking)
-    OfferCoupon.deleteMany({
-      $or: [
-        { isRedeemed: true },
-        { expiresAt: { $lt: new Date() } },
-      ],
-    }).catch(() => {});
+    // Soft-expire any coupons that exceeded 35 days (preserve status and reason)
+    await markExpiredCoupons();
 
     const user = await User.findById(req.user._id).select('name email phone currentStamps lifetimeVisits lastStampDate');
     if (!user) {
@@ -248,19 +281,53 @@ export const getMyLoyalty = async (req, res) => {
     }
     const decayInfo = await applyStampInactivityCheck(user);
 
-    const [coupons, recentVisits] = await Promise.all([
+    const now = Date.now();
+
+    const [activeRawCoupons, expiredCoupons, redeemedCoupons, recentVisits] = await Promise.all([
       OfferCoupon.find({
         user: req.user._id,
-        isRedeemed: { $ne: true },
+        status: 'active',
+        isRedeemed: false,
         expiresAt: { $gt: new Date() },
       })
         .sort({ createdAt: -1 })
+        .lean(),
+      OfferCoupon.find({
+        user: req.user._id,
+        status: 'expired',
+      })
+        .sort({ expiresAt: -1 })
+        .limit(10)
+        .lean(),
+      OfferCoupon.find({
+        user: req.user._id,
+        status: 'redeemed',
+      })
+        .sort({ redeemedAt: -1 })
+        .limit(10)
         .lean(),
       VisitLog.find({ user: req.user._id })
         .sort({ visitedAt: -1 })
         .limit(5)
         .lean(),
     ]);
+
+    // Enhance active coupons with expiry countdown and 5-day advance reminder warning
+    const coupons = activeRawCoupons.map((c) => {
+      const msLeft = new Date(c.expiresAt).getTime() - now;
+      const daysRemaining = Math.max(0, Math.ceil(msLeft / (1000 * 60 * 60 * 24)));
+      const isExpiringSoon = daysRemaining <= 5;
+      return {
+        ...c,
+        daysRemaining,
+        isExpiringSoon,
+        reminderMessage: isExpiringSoon
+          ? `⚠️ Expiry Reminder: This coupon will expire in ${daysRemaining} day${daysRemaining === 1 ? '' : 's'} on ${new Date(c.expiresAt).toLocaleDateString()}! Please visit the salon to claim your discount.`
+          : null,
+      };
+    });
+
+    const hasCouponExpiringSoon = coupons.some((c) => c.isExpiringSoon);
 
     res.status(200).json({
       user: {
@@ -276,8 +343,16 @@ export const getMyLoyalty = async (req, res) => {
       lifetimeVisits: user.lifetimeVisits,
       lastStampDate: user.lastStampDate,
       daysUntilStampDecay: decayInfo.daysUntilDecay,
+      isStampDecayWarning: decayInfo.daysUntilDecay > 0 && decayInfo.daysUntilDecay <= 5,
+      stampDecayWarningMessage:
+        decayInfo.daysUntilDecay > 0 && decayInfo.daysUntilDecay <= 5
+          ? `⚠️ Inactivity Alert: 1 stamp will expire in ${decayInfo.daysUntilDecay} day${decayInfo.daysUntilDecay === 1 ? '' : 's'} unless you visit the salon!`
+          : null,
       stampsNeeded: Math.max(0, 5 - user.currentStamps),
       coupons,
+      expiredCoupons,
+      redeemedCoupons,
+      hasCouponExpiringSoon,
       recentVisits,
     });
   } catch (error) {
@@ -297,30 +372,40 @@ export const redeemCoupon = async (req, res) => {
     const coupon = await OfferCoupon.findOne({ code: code.toUpperCase().trim() }).populate('user', 'name phone email');
 
     if (!coupon) {
-      return res.status(404).json({ message: 'Invalid coupon code or already used & cleared' });
+      return res.status(404).json({ message: 'Invalid coupon code. Coupon not found in database.' });
     }
 
-    if (coupon.isRedeemed) {
-      // Remove it from DB if it wasn't purged
-      await OfferCoupon.findByIdAndDelete(coupon._id);
+    if (coupon.isRedeemed || coupon.status === 'redeemed') {
       return res.status(400).json({
-        message: 'This coupon was already redeemed and has now been removed.',
+        message: `This coupon was already redeemed on ${coupon.redeemedAt ? new Date(coupon.redeemedAt).toLocaleDateString() : 'a previous date'}.`,
+        coupon,
       });
     }
 
-    if (new Date() > coupon.expiresAt) {
-      // Purge expired coupon from DB immediately
-      await OfferCoupon.findByIdAndDelete(coupon._id);
+    // Check if expired (exceeded 35 days)
+    if (new Date() > coupon.expiresAt || coupon.status === 'expired') {
+      coupon.status = 'expired';
+      if (!coupon.expiredReason) {
+        coupon.expiredReason = 'Validity duration of 35 days expired without salon counter redemption.';
+      }
+      await coupon.save();
+
       return res.status(400).json({
-        message: 'This coupon has expired (exceeded 35 days validity) and has been removed from database.',
+        message: `⚠️ Coupon ${coupon.code} has EXPIRED. Reason: ${coupon.expiredReason}. Admin can extend its expiry date in the Admin Dashboard to reactivate it.`,
+        isExpired: true,
+        coupon,
       });
     }
 
     const customerName = coupon.user?.name || 'Customer';
     const couponCode = coupon.code;
 
-    // Permanently remove redeemed coupon from DB as requested
-    await OfferCoupon.findByIdAndDelete(coupon._id);
+    // Mark as redeemed with timestamps and audit trail
+    coupon.isRedeemed = true;
+    coupon.status = 'redeemed';
+    coupon.redeemedAt = new Date();
+    coupon.redeemedBy = req.user._id;
+    await coupon.save();
 
     // Broadcast live event so customer's active coupons remove this coupon instantly without reload
     broadcastRealtimeEvent({
@@ -333,8 +418,8 @@ export const redeemCoupon = async (req, res) => {
     });
 
     res.status(200).json({
-      message: `✅ Coupon ${couponCode} redeemed successfully for ${customerName} and cleared from system!`,
-      coupon: { ...coupon.toObject(), isRedeemed: true },
+      message: `✅ Coupon ${couponCode} redeemed successfully for ${customerName}!`,
+      coupon,
     });
   } catch (error) {
     console.error('Redeem Coupon Error:', error);
@@ -555,6 +640,153 @@ export const updateCustomerByAdmin = async (req, res) => {
   } catch (error) {
     console.error('Update Customer Error:', error);
     res.status(500).json({ message: 'Failed to update customer: ' + error.message });
+  }
+};
+
+// 12. Admin: Get All Offer Coupons (Active, Expiring in 5 days, Expired, Redeemed) with filter & search
+export const getAllCouponsAdmin = async (req, res) => {
+  try {
+    await markExpiredCoupons();
+
+    const { status = 'all', search = '' } = req.query;
+
+    let query = {};
+    const now = new Date();
+
+    if (status === 'active') {
+      query = { status: 'active', expiresAt: { $gt: now } };
+    } else if (status === 'expiring_soon') {
+      const fiveDaysLater = new Date(Date.now() + 5 * 24 * 60 * 60 * 1000);
+      query = {
+        status: 'active',
+        expiresAt: { $gt: now, $lte: fiveDaysLater },
+      };
+    } else if (status === 'expired') {
+      query = { status: 'expired' };
+    } else if (status === 'redeemed') {
+      query = { status: 'redeemed' };
+    }
+
+    let coupons = await OfferCoupon.find(query)
+      .populate('user', 'name email phone currentStamps lifetimeVisits')
+      .populate('extendedBy', 'name email')
+      .populate('redeemedBy', 'name email')
+      .sort({ createdAt: -1 })
+      .lean();
+
+    // Filter by search term if provided (code, customer name, email, phone)
+    if (search && search.trim()) {
+      const s = search.trim().toLowerCase();
+      coupons = coupons.filter(
+        (c) =>
+          c.code.toLowerCase().includes(s) ||
+          c.user?.name?.toLowerCase().includes(s) ||
+          c.user?.email?.toLowerCase().includes(s) ||
+          c.user?.phone?.toLowerCase().includes(s)
+      );
+    }
+
+    // Enhance with remaining days and 5-day warning
+    const enhancedCoupons = coupons.map((c) => {
+      const msLeft = new Date(c.expiresAt).getTime() - Date.now();
+      const daysRemaining = Math.ceil(msLeft / (1000 * 60 * 60 * 24));
+      const isExpiringSoon = c.status === 'active' && daysRemaining >= 0 && daysRemaining <= 5;
+      return {
+        ...c,
+        daysRemaining: Math.max(0, daysRemaining),
+        isExpiringSoon,
+      };
+    });
+
+    // Compute summary stats
+    const [totalCount, activeCount, expiredCount, redeemedCount] = await Promise.all([
+      OfferCoupon.countDocuments(),
+      OfferCoupon.countDocuments({ status: 'active', expiresAt: { $gt: now } }),
+      OfferCoupon.countDocuments({ status: 'expired' }),
+      OfferCoupon.countDocuments({ status: 'redeemed' }),
+    ]);
+
+    const fiveDaysLater = new Date(Date.now() + 5 * 24 * 60 * 60 * 1000);
+    const expiringSoonCount = await OfferCoupon.countDocuments({
+      status: 'active',
+      expiresAt: { $gt: now, $lte: fiveDaysLater },
+    });
+
+    res.status(200).json({
+      coupons: enhancedCoupons,
+      stats: {
+        total: totalCount,
+        active: activeCount,
+        expiringSoon: expiringSoonCount,
+        expired: expiredCount,
+        redeemed: redeemedCount,
+      },
+    });
+  } catch (error) {
+    console.error('Get All Coupons Admin Error:', error);
+    res.status(500).json({ message: 'Failed to fetch coupons: ' + error.message });
+  }
+};
+
+// 13. Admin: Extend or Increase Coupon Expiry Date (Restores expired coupons or extends active ones)
+export const extendCouponExpiryAdmin = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { daysToAdd, customDate, reason } = req.body;
+
+    const coupon = await OfferCoupon.findById(id).populate('user', 'name email phone');
+    if (!coupon) {
+      return res.status(404).json({ message: 'Coupon not found' });
+    }
+
+    const prevExpiry = coupon.expiresAt;
+    const now = Date.now();
+
+    let newExpiry;
+    if (customDate) {
+      newExpiry = new Date(customDate);
+      if (isNaN(newExpiry.getTime())) {
+        return res.status(400).json({ message: 'Invalid custom date provided' });
+      }
+    } else {
+      const days = parseInt(daysToAdd, 10) || 7;
+      // If coupon is already expired, extend from now + days; if active, extend from current expiry + days
+      const baseTime = coupon.expiresAt && new Date(coupon.expiresAt).getTime() > now
+        ? new Date(coupon.expiresAt).getTime()
+        : now;
+      newExpiry = new Date(baseTime + days * 24 * 60 * 60 * 1000);
+    }
+
+    coupon.expiresAt = newExpiry;
+    coupon.status = 'active';
+    coupon.isRedeemed = false;
+    coupon.expiredReason = null;
+    coupon.extendedCount = (coupon.extendedCount || 0) + 1;
+    coupon.lastExtendedAt = new Date();
+    coupon.extendedBy = req.user._id;
+    coupon.reminded5DaysSent = false;
+
+    await coupon.save();
+
+    // Broadcast live event so customer's device instantly updates without reload!
+    broadcastRealtimeEvent({
+      type: 'COUPON_EXTENDED',
+      targetUserId: coupon.user?._id || coupon.user,
+      userId: coupon.user?._id || coupon.user,
+      coupon,
+      newExpiresAt: coupon.expiresAt,
+      timestamp: new Date(),
+    });
+
+    res.status(200).json({
+      message: `✅ Coupon ${coupon.code} validity extended successfully until ${new Date(newExpiry).toLocaleDateString()}! Status set to ACTIVE.`,
+      coupon,
+      prevExpiry,
+      newExpiry,
+    });
+  } catch (error) {
+    console.error('Extend Coupon Error:', error);
+    res.status(500).json({ message: 'Failed to extend coupon validity: ' + error.message });
   }
 };
 
