@@ -21,6 +21,10 @@ export const SmoothScrollProvider = ({ children }) => {
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
+    const isTouch =
+      typeof window !== 'undefined' &&
+      ('ontouchstart' in window || navigator.maxTouchPoints > 0 || window.innerWidth <= 860);
+
     const lenis = new Lenis({
       duration: 1.05,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
@@ -28,7 +32,8 @@ export const SmoothScrollProvider = ({ children }) => {
       gestureOrientation: 'vertical',
       smoothWheel: true,
       wheelMultiplier: 0.95,
-      touchMultiplier: 1.25,
+      touchMultiplier: isTouch ? 0 : 1.0,
+      syncTouch: false,
       infinite: false,
       prevent: (node) => {
         if (!node) return false;
@@ -102,35 +107,40 @@ export const SmoothScrollProvider = ({ children }) => {
     lockCountRef.current = Math.max(0, lockCountRef.current) + 1;
     lenisRef.current?.stop();
     document.body.classList.add('lenis-stopped');
-    // Lock background scroll cleanly without breaking native touch kinetic physics
     document.body.style.overflow = 'hidden';
     document.documentElement.style.overflow = 'hidden';
   };
 
   const startScroll = () => {
-    if (lockCountRef.current > 0) {
-      lockCountRef.current -= 1;
-    }
-    if (lockCountRef.current <= 0) {
+    lockCountRef.current = Math.max(0, lockCountRef.current - 1);
+    const hasActiveModal = Boolean(
+      document.querySelector(
+        '[role="dialog"], .modal-overlay, .mobile-drawer-overlay, .service-modal-backdrop'
+      )
+    );
+    if (!hasActiveModal || lockCountRef.current <= 0) {
       resetScrollStyles();
     }
   };
 
-  // Failsafe auto-recovery: Listen for route/escape/history changes to guarantee page never stays frozen
+  // Failsafe auto-recovery: guarantees website NEVER stays stuck/frozen on mobile or desktop
   useEffect(() => {
     const handleSafetyUnlock = () => {
-      // Check if any modal or drawer is actively in DOM
-      const hasActiveModal = document.querySelector(
-        '[role="dialog"], .modal-overlay, .mobile-drawer-overlay, .service-modal-backdrop'
+      const hasActiveModal = Boolean(
+        document.querySelector(
+          '[role="dialog"], .modal-overlay, .mobile-drawer-overlay, .service-modal-backdrop'
+        )
       );
-      if (!hasActiveModal) {
+      if (!hasActiveModal && (document.body.style.overflow === 'hidden' || document.documentElement.style.overflow === 'hidden')) {
         resetScrollStyles();
       }
     };
 
+    window.addEventListener('touchstart', handleSafetyUnlock, { passive: true });
     window.addEventListener('popstate', handleSafetyUnlock);
     window.addEventListener('hashchange', handleSafetyUnlock);
     return () => {
+      window.removeEventListener('touchstart', handleSafetyUnlock);
       window.removeEventListener('popstate', handleSafetyUnlock);
       window.removeEventListener('hashchange', handleSafetyUnlock);
     };

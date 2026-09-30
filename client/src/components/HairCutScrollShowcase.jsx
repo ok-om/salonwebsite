@@ -396,81 +396,6 @@ export const HairCutScrollShowcase = ({ onOpenLoyalty, onOpenAdmin }) => {
   useEffect(() => {
     ScrollTrigger.config({ ignoreMobileResize: true });
 
-    let touchStartY = 0;
-    let touchStartX = 0;
-    let isSwipeTriggered = false;
-
-    const handleTouchStart = (e) => {
-      if (!e.touches || e.touches.length === 0) return;
-      const isInsideElement = (pinnedStageRef.current && pinnedStageRef.current.contains(e.target)) || (sectionRef.current && sectionRef.current.contains(e.target));
-      if (!isInsideElement) return;
-      touchStartY = e.touches[0].clientY;
-      touchStartX = e.touches[0].clientX;
-      isSwipeTriggered = false;
-    };
-
-    const handleTouchMove = (e) => {
-      if (!e.touches || e.touches.length === 0) return;
-      const isInsideElement = (pinnedStageRef.current && pinnedStageRef.current.contains(e.target)) || (sectionRef.current && sectionRef.current.contains(e.target));
-      if (!isInsideElement) return;
-
-      const st = scrollTriggerRef.current;
-      const isInside = st && (st.isActive || (st.progress >= 0 && st.progress <= 1 && window.scrollY >= st.start - 10 && window.scrollY <= st.end + 10));
-      if (!isInside) return;
-
-      const currentY = e.touches[0].clientY;
-      const currentX = e.touches[0].clientX;
-      const deltaY = currentY - touchStartY;
-      const deltaX = currentX - touchStartX;
-
-      // Ignore predominantly horizontal gestures (e.g. style pill scrolling)
-      if (Math.abs(deltaX) > Math.abs(deltaY) * 1.1) return;
-
-      const currentIdx = activeIndexRef.current;
-
-      // Swiping UP (finger moves up -> scroll down intent -> Next Card)
-      if (deltaY < 0) {
-        if (currentIdx < HAIRCUTS.length - 1) {
-          // Inside showcase (cards 1-6): cancel native fling scroll so we step exactly 1 card
-          if (e.cancelable) {
-            e.preventDefault();
-          }
-          if (deltaY <= -25 && !isSwipeTriggered) {
-            isSwipeTriggered = true;
-            if (handleSelectCutRef.current) {
-              handleSelectCutRef.current(currentIdx + 1);
-            }
-          }
-        }
-        // If already at Card 7: allow native scroll down into CouponBanner & rest of page
-      }
-      // Swiping DOWN (finger moves down -> scroll up intent -> Prev Card)
-      else if (deltaY > 0) {
-        if (currentIdx > 0) {
-          // Inside showcase (cards 2-7): cancel native fling scroll so we step exactly 1 card
-          if (e.cancelable) {
-            e.preventDefault();
-          }
-          if (deltaY >= 25 && !isSwipeTriggered) {
-            isSwipeTriggered = true;
-            if (handleSelectCutRef.current) {
-              handleSelectCutRef.current(currentIdx - 1);
-            }
-          }
-        }
-        // If already at Card 1: allow native scroll up into Hero
-      }
-    };
-
-    const handleTouchEnd = () => {
-      isSwipeTriggered = false;
-    };
-
-    window.addEventListener('touchstart', handleTouchStart, { passive: true });
-    window.addEventListener('touchmove', handleTouchMove, { passive: false });
-    window.addEventListener('touchend', handleTouchEnd, { passive: true });
-    window.addEventListener('touchcancel', handleTouchEnd, { passive: true });
-
     const ctx = gsap.context(() => {
       // 1. SALON BACKGROUND PARALLAX (Gentle scale as user scrolls through showcase)
       gsap.fromTo(
@@ -579,13 +504,13 @@ export const HairCutScrollShowcase = ({ onOpenLoyalty, onOpenAdmin }) => {
         pinSpacing: true,
         scrub: isMobile ? true : 0.5,
         anticipatePin: 1,
-        snap: {
+        snap: isMobile ? false : {
           snapTo: (progress) => {
             return Math.round(progress * (HAIRCUTS.length - 1)) / (HAIRCUTS.length - 1);
           },
           inertia: false,
           duration: { min: 0.15, max: 0.35 },
-          delay: 0.04,
+          delay: 0.08,
           ease: 'power1.out',
           onComplete: () => {
             if (scrollTriggerRef.current) {
@@ -707,10 +632,6 @@ export const HairCutScrollShowcase = ({ onOpenLoyalty, onOpenAdmin }) => {
     }, sectionRef);
 
     return () => {
-      window.removeEventListener('touchstart', handleTouchStart);
-      window.removeEventListener('touchmove', handleTouchMove);
-      window.removeEventListener('touchend', handleTouchEnd);
-      window.removeEventListener('touchcancel', handleTouchEnd);
       if (scrollEndTimeoutRef.current) {
         clearTimeout(scrollEndTimeoutRef.current);
       }
