@@ -693,6 +693,35 @@ export const Navbar = ({ onOpenAuth, onOpenAdmin, onOpenLoyalty, onOpenProfile }
             display: none !important;
           }
         }
+        @media (max-width: 360px) {
+          .mobile-only-header {
+            gap: 0.3rem !important;
+          }
+          .mobile-stamp-badge {
+            padding: 0.2rem 0.45rem !important;
+            font-size: 0.68rem !important;
+            max-width: 105px !important;
+          }
+          .mobile-login-badge {
+            padding: 0.25rem 0.48rem !important;
+            font-size: 0.68rem !important;
+          }
+        }
+        @media (min-width: 2000px) {
+          .desktop-nav-menu {
+            gap: 2.5rem !important;
+          }
+          .desktop-nav-menu button {
+            font-size: 1.12rem !important;
+          }
+          .desktop-actions {
+            gap: 1rem !important;
+          }
+          .desktop-actions .btn {
+            padding: 0.55rem 1.25rem !important;
+            font-size: 0.95rem !important;
+          }
+        }
       `}</style>
     </>
   );

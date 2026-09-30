@@ -65,7 +65,7 @@ export const Footer = ({ onOpenAdminLogin }) => {
               </li>
               <li>
                 <a href="#services" style={{ color: 'inherit', textDecoration: 'none' }}>
-                  💈 Services Menu & Rates
+                  💈 Services & Signature Cuts
                 </a>
               </li>
               <li>

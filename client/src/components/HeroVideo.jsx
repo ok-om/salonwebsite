@@ -506,6 +506,37 @@ export const HeroVideo = ({ onOpenLoyalty, onOpenAdmin, onScrollToExperience, is
             gap: clamp(0.25rem, 0.8vh, 0.6rem) !important;
           }
         }
+        @media (max-width: 360px) {
+          .hero-highlight-stats-bar {
+            grid-template-columns: 1fr !important;
+            gap: 0.5rem !important;
+            padding: 0.65rem 0.75rem !important;
+          }
+          .hero-text-col h1 {
+            font-size: 1.45rem !important;
+          }
+          .hero-btn {
+            width: 100% !important;
+            justify-content: center !important;
+          }
+        }
+        @media (min-width: 2000px) {
+          .hero-highlight-stats-bar {
+            padding: 1.75rem 2.5rem !important;
+            gap: 2.5rem !important;
+          }
+          .hero-text-col h1 {
+            font-size: 5.2rem !important;
+          }
+          .hero-text-col p {
+            font-size: 1.55rem !important;
+            max-width: 780px !important;
+          }
+          .hero-btn {
+            padding: 1rem 2.2rem !important;
+            font-size: 1.15rem !important;
+          }
+        }
       `}</style>
     </section>
   );

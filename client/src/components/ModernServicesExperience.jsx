@@ -47,7 +47,6 @@ export const ModernServicesExperience = () => {
         'Experience the pinnacle of grooming with our classic haircuts, where tradition meets contemporary style.',
       fullDescription:
         'Personalized consultation tailored to your head shape and hair growth pattern. Includes precision shear sectioning, clipper graduation taper fade, refreshing scalp wash, botanical conditioning, and artisan styling paste finish.',
-      price: '₹499',
       duration: '35 Mins',
       image: '/hair-cut/imgi_214_1000_F_327372387_nDiUJ8UxnzYVwUsT3fHmUImZOL7jDZ9r.webp',
       shapeType: 'double-circle', // Eyeglasses/double circle shape
@@ -69,7 +68,6 @@ export const ModernServicesExperience = () => {
         'Experience the pinnacle of grooming with our classic haircuts, where tradition meets contemporary style.',
       fullDescription:
         'Master trimmer sculpt matching your jawline aesthetics. Cheek and neck line defined with feather razor precision, steam towel softening, and nourished with organic cedarwood beard oil.',
-      price: '₹299',
       duration: '25 Mins',
       image: '/hair-cut/imgi_414_1000_F_612963026_EgapnuI2p4b7ef9R7w8wRr5oHwEKU6Ts.webp',
       shapeType: 'bowtie', // Bowtie/butterfly shape
@@ -91,7 +89,6 @@ export const ModernServicesExperience = () => {
         'Experience the pinnacle of grooming with our classic haircuts, where tradition meets contemporary style.',
       fullDescription:
         'Traditional imperial wet shave experience. Begins with pre-shave essential oils, warm herbal lather applied with badger-hair brush, precision feather razor stroke, and double hot eucalyptus towel wrap with cold balm finish.',
-      price: '₹399',
       duration: '30 Mins',
       image: '/figures/client_wash.webp',
       shapeType: 'triple-arch', // Triple arch/cloud shape
@@ -693,7 +690,7 @@ export const ModernServicesExperience = () => {
                   </p>
                 </div>
 
-                {/* Bottom Row: More Details Outlined Pill Button + Price */}
+                {/* Bottom Row: More Details Outlined Pill Button + Duration */}
                 <div
                   style={{
                     display: 'flex',
@@ -1030,7 +1027,7 @@ export const ModernServicesExperience = () => {
                 </div>
               </div>
 
-              {/* Duration Info & Pricing */}
+              {/* Duration Info */}
               <div
                 style={{
                   display: 'flex',
@@ -1046,8 +1043,19 @@ export const ModernServicesExperience = () => {
                   <Clock size={15} color="var(--gold-primary)" />
                   <span>Duration: <strong>{activeServiceModal.duration}</strong></span>
                 </div>
-                <div style={{ color: 'var(--gold-primary)', fontSize: '1.1rem', fontWeight: 800 }}>
-                  {activeServiceModal.price}
+                <div
+                  style={{
+                    color: 'var(--gold-primary)',
+                    fontSize: '0.78rem',
+                    fontWeight: 700,
+                    background: 'rgba(212, 175, 55, 0.12)',
+                    padding: '0.25rem 0.65rem',
+                    borderRadius: '20px',
+                    border: '1px solid rgba(212, 175, 55, 0.3)',
+                    letterSpacing: '0.02em',
+                  }}
+                >
+                  Signature Craft
                 </div>
               </div>
             </div>
@@ -1300,7 +1308,7 @@ export const ModernServicesExperience = () => {
                   <Scissors size={13} /> The Classic Cut Salon Menu
                 </span>
                 <h3 style={{ fontSize: '1.3rem', color: '#ffffff', margin: '0.2rem 0 0', fontWeight: 800 }}>
-                  Complete Services & Rates
+                  Complete Signature Service Menu
                 </h3>
               </div>
               <button
@@ -1346,35 +1354,35 @@ export const ModernServicesExperience = () => {
                 {
                   category: '💈 Master Haircuts & Precision Fades',
                   items: [
-                    { name: 'Classic Gentleman Haircut', price: '₹499', duration: '35 Mins', desc: 'Face profile consultation, shear sectioning, taper fade & botanical finish.' },
-                    { name: 'Textured Crop Fade & Low Taper', price: '₹499', duration: '40 Mins', desc: 'Modern jagged scissor texturizing with zero skin taper fade.' },
-                    { name: 'Executive Quiff & Pompadour Cut', price: '₹549', duration: '40 Mins', desc: 'Voluminous directional quiff blow-dry sculpt with premium matte clay.' },
-                    { name: 'Skin Fade / Drop Fade Special', price: '₹549', duration: '40 Mins', desc: 'Zero shaver blend with surgical foil detailing and crisp edge-up.' },
-                    { name: 'Junior Grooming (Kids under 12)', price: '₹349', duration: '25 Mins', desc: 'Patient scissor & clipper styling designed for young gentlemen.' },
+                    { name: 'Classic Gentleman Haircut', duration: '35 Mins', desc: 'Face profile consultation, shear sectioning, taper fade & botanical finish.' },
+                    { name: 'Textured Crop Fade & Low Taper', duration: '40 Mins', desc: 'Modern jagged scissor texturizing with zero skin taper fade.' },
+                    { name: 'Executive Quiff & Pompadour Cut', duration: '40 Mins', desc: 'Voluminous directional quiff blow-dry sculpt with premium matte clay.' },
+                    { name: 'Skin Fade / Drop Fade Special', duration: '40 Mins', desc: 'Zero shaver blend with surgical foil detailing and crisp edge-up.' },
+                    { name: 'Junior Grooming (Kids under 12)', duration: '25 Mins', desc: 'Patient scissor & clipper styling designed for young gentlemen.' },
                   ],
                 },
                 {
                   category: '✂️ Beard Sculpting & Royal Shaves',
                   items: [
-                    { name: 'Royal Hot Towel Shave', price: '₹399', duration: '30 Mins', desc: 'Pre-shave essential oils, warm herbal badger lather, straight razor & double hot eucalyptus towels.' },
-                    { name: 'Beard Trim & Razor Line Sculpt', price: '₹299', duration: '25 Mins', desc: 'Symmetry alignment, cheek and neck straight-razor cleaning & cedarwood balm massage.' },
-                    { name: 'Moustache & Goatee Detailing', price: '₹199', duration: '15 Mins', desc: 'Precision contour shaping with organic styling wax.' },
-                    { name: 'Express Beard Shape & Conditioning', price: '₹249', duration: '20 Mins', desc: 'Clipper beard graduation with argan oil steam treatment.' },
+                    { name: 'Royal Hot Towel Shave', duration: '30 Mins', desc: 'Pre-shave essential oils, warm herbal badger lather, straight razor & double hot eucalyptus towels.' },
+                    { name: 'Beard Trim & Razor Line Sculpt', duration: '25 Mins', desc: 'Symmetry alignment, cheek and neck straight-razor cleaning & cedarwood balm massage.' },
+                    { name: 'Moustache & Goatee Detailing', duration: '15 Mins', desc: 'Precision contour shaping with organic styling wax.' },
+                    { name: 'Express Beard Shape & Conditioning', duration: '20 Mins', desc: 'Clipper beard graduation with argan oil steam treatment.' },
                   ],
                 },
                 {
                   category: '💆 Scalp Therapies & Hair Spa',
                   items: [
-                    { name: 'Scalp Detox & Deep Conditioning', price: '₹399', duration: '25 Mins', desc: 'Charcoal follicle purification, invigorating scalp massage & nutrient mask.' },
-                    { name: 'Ayurvedic Hot Oil Scalp Massage', price: '₹349', duration: '25 Mins', desc: 'Herbal root stimulation, acupressure temple relief & warm towel wrap.' },
-                    { name: 'Keratin Nourish Hair Spa', price: '₹599', duration: '40 Mins', desc: 'Intensive restorative protein infusion for dry or frizzy hair.' },
+                    { name: 'Scalp Detox & Deep Conditioning', duration: '25 Mins', desc: 'Charcoal follicle purification, invigorating scalp massage & nutrient mask.' },
+                    { name: 'Ayurvedic Hot Oil Scalp Massage', duration: '25 Mins', desc: 'Herbal root stimulation, acupressure temple relief & warm towel wrap.' },
+                    { name: 'Keratin Nourish Hair Spa', duration: '40 Mins', desc: 'Intensive restorative protein infusion for dry or frizzy hair.' },
                   ],
                 },
                 {
                   category: '👑 Complete VIP Makeover Packages',
                   items: [
-                    { name: 'The Classic Gentleman Trio (Haircut + Beard + Shave)', price: '₹799', duration: '60 Mins', desc: 'Complete signature transformation package with steam towels and styling finish.' },
-                    { name: 'Royal Groom Transformation (Haircut + Shave + Scalp Detox)', price: '₹1,099', duration: '75 Mins', desc: 'The ultimate royal indulgence. Full haircut, hot towel straight razor shave, and luxury detox spa.' },
+                    { name: 'The Classic Gentleman Trio (Haircut + Beard + Shave)', duration: '60 Mins', desc: 'Complete signature transformation package with steam towels and styling finish.' },
+                    { name: 'Royal Groom Transformation (Haircut + Shave + Scalp Detox)', duration: '75 Mins', desc: 'The ultimate royal indulgence. Full haircut, hot towel straight razor shave, and luxury detox spa.' },
                   ],
                 },
               ].map((section, idx) => (
@@ -1430,15 +1438,12 @@ export const ModernServicesExperience = () => {
                           </p>
                         </div>
                         <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                          <div style={{ color: 'var(--gold-primary)', fontWeight: 800, fontSize: '0.98rem', marginBottom: '0.35rem' }}>
-                            {item.price}
-                          </div>
                           <a
-                            href={`https://wa.me/${config.whatsapp?.replace(/[^0-9]/g, '') || '919322188848'}?text=Hello!%20I%20would%20like%20to%20book%20the%20"${encodeURIComponent(item.name)}"%20(${item.price})%20service.`}
+                            href={`https://wa.me/${config.whatsapp?.replace(/[^0-9]/g, '') || '919322188848'}?text=Hello!%20I%20would%20like%20to%20book%20the%20"${encodeURIComponent(item.name)}"%20service.`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="btn btn-primary btn-sm"
-                            style={{ padding: '0.28rem 0.65rem', fontSize: '0.72rem' }}
+                            style={{ padding: '0.35rem 0.85rem', fontSize: '0.78rem' }}
                           >
                             Book
                           </a>
@@ -1644,6 +1649,58 @@ export const ModernServicesExperience = () => {
           font-size: 0.72rem;
           color: #94a3b8;
           margin: 0;
+        }
+
+        @media (max-width: 360px) {
+          .scissor-float-left,
+          .scissor-float-right {
+            display: none !important;
+          }
+          .retro-display-title {
+            font-size: 1.55rem !important;
+          }
+          .btn-pop-orange {
+            padding: 0.65rem 1.15rem !important;
+            font-size: 0.84rem !important;
+            width: 100% !important;
+            justify-content: center !important;
+          }
+          .pop-shape-grid {
+            gap: 0.5rem !important;
+          }
+          .pop-shape-card {
+            padding: 0.65rem 0.35rem !important;
+            border-radius: 16px !important;
+          }
+          .pop-shape-mask-container {
+            height: 140px !important;
+          }
+          .vibrant-services-grid {
+            gap: 1.15rem !important;
+          }
+          .vibrant-service-card {
+            padding: 1.15rem 0.85rem !important;
+            border-radius: 20px !important;
+          }
+        }
+
+        @media (min-width: 2000px) {
+          .vibrant-services-grid {
+            gap: 2.75rem !important;
+          }
+          .vibrant-service-card {
+            padding: 2.5rem 2rem 2.8rem !important;
+            border-radius: 40px !important;
+          }
+          .pop-shape-grid {
+            gap: 2.25rem !important;
+          }
+          .pop-shape-mask-container {
+            height: 290px !important;
+          }
+          .extra-art-img {
+            height: 330px !important;
+          }
         }
       `}</style>
     </section>

@@ -17,7 +17,6 @@ const HAIRCUTS = [
     description: 'Surgical sectioning with bespoke taper fade, scissor-textured crown, and clean beard blend.',
     image: '/hair-cut/imgi_214_1000_F_327372387_nDiUJ8UxnzYVwUsT3fHmUImZOL7jDZ9r.webp',
     badge: 'Trending Cut',
-    price: '₹499',
     duration: '35 mins',
     animClass: 'card-anim-style-1',
     animName: '3D Depth Zoom & Tilt',
@@ -31,7 +30,6 @@ const HAIRCUTS = [
     description: 'Crisp side part with natural graduation, high-gloss artisan styling paste, and temple line taper.',
     image: '/hair-cut/imgi_218_1000_F_469681744_FZWt6LKXLoCU4XVv8Cjx6ZFmwNlNLm7x.webp',
     badge: 'Executive',
-    price: '₹549',
     duration: '40 mins',
     animClass: 'card-anim-style-2',
     animName: 'Blueprint Slide from Left',
@@ -45,7 +43,6 @@ const HAIRCUTS = [
     description: 'Choppy top texture designed for low maintenance, paired with velvety skin-tapered sideburns.',
     image: '/hair-cut/imgi_240_1000_F_288480491_sSOxyfSGfwPlMrHCvpNEQZHTbEiEgkIO.webp',
     badge: 'Low Maintenance',
-    price: '₹499',
     duration: '30 mins',
     animClass: 'card-anim-style-3',
     animName: 'Elastic Gravity Drop',
@@ -59,7 +56,6 @@ const HAIRCUTS = [
     description: 'Traditional shear work balanced to natural hair swirl, conditioned with cedarwood tonic.',
     image: '/hair-cut/imgi_252_1000_F_434370728_kHa2nwVqDX1oxH2hJfwYh3J323knuVWV.webp',
     badge: 'Timeless',
-    price: '₹449',
     duration: '35 mins',
     animClass: 'card-anim-style-4',
     animName: '3D Heritage Catalog Flip',
@@ -73,7 +69,6 @@ const HAIRCUTS = [
     description: 'Blowout volume with root-lifting texture, finished with high-precision straight razor edges.',
     image: '/hair-cut/imgi_272_1000_F_1136144072_OPmo46myEzyxZlp1IwUwwGQS2zkpy1Dk.webp',
     badge: 'Statement Look',
-    price: '₹599',
     duration: '45 mins',
     animClass: 'card-anim-style-5',
     animName: 'Sharp Razor Slice from Right',
@@ -87,7 +82,6 @@ const HAIRCUTS = [
     description: 'Sculpted for natural wavy hair flow, weightless feathering, and razor-cleaned neck taper.',
     image: '/hair-cut/imgi_313_1000_F_292538620_17sS0WLcHCDk3ChhkoTyCh5HDm2zBV53.webp',
     badge: 'Popular',
-    price: '₹499',
     duration: '35 mins',
     animClass: 'card-anim-style-6',
     animName: 'Liquid Wave Arc Rise',
@@ -101,7 +95,6 @@ const HAIRCUTS = [
     description: 'Complete head-to-beard transformation: precision fade, hot towel straight-razor shave, and finish.',
     image: '/hair-cut/imgi_414_1000_F_612963026_EgapnuI2p4b7ef9R7w8wRr5oHwEKU6Ts.webp',
     badge: 'Master Combo',
-    price: '₹899',
     duration: '60 mins',
     animClass: 'card-anim-style-7',
     animName: 'Imperial Royal Burst & Aura',
@@ -2037,6 +2030,64 @@ export const HairCutScrollShowcase = ({ onOpenLoyalty, onOpenAdmin }) => {
           }
           div.pinned-stage-wrapper .stage-mini-progress {
             width: 36px !important;
+          }
+        }
+
+        @media (max-width: 360px) {
+          div.pinned-stage-wrapper .cards-main-container {
+            padding: 0 0.25rem !important;
+            max-width: 100% !important;
+          }
+          div.pinned-stage-wrapper .stage-nav-control-bar {
+            max-width: 100% !important;
+            padding: 0.22rem 0.45rem !important;
+          }
+          div.pinned-stage-wrapper .stage-nav-btn {
+            padding: 0.22rem 0.45rem !important;
+            font-size: 0.65rem !important;
+            gap: 0.2rem !important;
+          }
+          div.pinned-stage-wrapper .style-pills-container {
+            padding: 0.15rem 0.25rem !important;
+          }
+          div.pinned-stage-wrapper .style-pill-btn {
+            padding: 0.16rem 0.38rem !important;
+            font-size: 0.62rem !important;
+          }
+        }
+
+        @media (min-width: 2000px) {
+          .cards-main-container {
+            max-width: 1050px !important;
+          }
+          .haircut-card-grid {
+            grid-template-columns: 360px 1fr !important;
+            gap: 2.5rem !important;
+          }
+          .haircut-img {
+            height: 320px !important;
+          }
+          .active-cut-card {
+            padding: 2rem 2.25rem !important;
+            border-radius: 26px !important;
+          }
+          .haircut-card-title {
+            font-size: 2.1rem !important;
+          }
+          .haircut-desc-text {
+            font-size: 1.12rem !important;
+          }
+          .style-pill-btn {
+            padding: 0.5rem 1.15rem !important;
+            font-size: 0.92rem !important;
+          }
+          .stage-nav-control-bar {
+            max-width: 580px !important;
+            padding: 0.6rem 1.1rem !important;
+          }
+          .stage-nav-btn {
+            font-size: 0.92rem !important;
+            padding: 0.5rem 1.25rem !important;
           }
         }
       `}</style>
